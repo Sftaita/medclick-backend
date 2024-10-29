@@ -1,0 +1,117 @@
+.boite{
+    background-color: rgba(0, 0, 0, 0.50);
+    position: absolute;
+    height: 100vh;
+    width: 100vw;
+    top: 0px;
+    left:0px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
+.boite h1{
+    margin-bottom: 40px;
+    color: #3fcc8a;
+}
+
+.boite h2{
+    margin: 0;
+    padding: 0;
+    letter-spacing: inherit;
+    font-size: 24px;
+    font-weight: 600;
+}
+
+.boite h3{
+    margin: 0;
+    padding: 0;
+    letter-spacing: inherit;
+    font-size: 20px;
+    font-weight: 600;
+    text-decoration: underline;
+}
+
+.boite h4{
+    margin: 0;
+    padding: 0;
+    letter-spacing: inherit;
+    font-size: 16px;
+    font-weight: 600;
+    text-decoration: underline;
+}
+
+.boite span{
+    color: #3fcc8a;
+    text-decoration: underline;
+}
+
+.smallbox{
+    border-radius: 25px;
+    background-color: whitesmoke;
+    height: 90vh;
+    width: 90vw;
+    padding: 40px 40px 40px 40px;
+}
+
+.scroll{
+    height: 70%;
+    padding: 10px 20px 10px 0px;
+    overflow-y: scroll;
+    margin-bottom: 30px;
+}
+
+.smallbox p {
+    text-align: justify;
+    font-size: 16px;
+    
+}
+
+.form-check{
+    margin-top:10px;
+    margin-bottom:20px;
+}
+
+.form-check-label span{
+    color: rgb(50, 163, 110);
+    cursor: pointer;
+    font-weight: 600;
+    text-decoration: underline;
+}
+
+@media only screen and (max-width: 700px){
+
+    .smallbox{
+        border-radius: 10px;
+        padding: 10px 10px 10px 10px;
+    }
+
+    .scroll p {
+        font-size: 14px;
+        
+    }
+
+    .boite h1{
+        font-size: 18px;
+    }
+
+    .boite h2{
+        font-size: 18px;
+        font-weight: 600;
+    }
+    
+    .boite h3{
+        font-size: 14px;
+        font-weight: 600;
+        
+    }
+    
+    .boite h4{
+        font-size: 14px;
+        font-weight: 600;
+        
+    }
+    
+
+}

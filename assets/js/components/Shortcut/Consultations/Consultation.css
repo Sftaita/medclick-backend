@@ -1,0 +1,24 @@
+.personal-modal{
+    position: fixed;
+    top: 0;
+    left:0;
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    
+    
+}
+
+.personal-modal .inside-personal-modal{
+    
+    width: 80vw;
+    height: 30vh;
+    display: flex;
+    flex-direction: row;
+    align-items: space-around;
+    justify-content: space-around;
+    padding: 4%
+}

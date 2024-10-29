@@ -1,0 +1,20 @@
+{
+  "name": "MED CLICK",
+  "short-name": "MED CLICK",
+  "start_url": "/home",
+  "display": "standalone",
+  "background_color": "#343a40",
+  "theme_color": "#343a40",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+        "src": "../icons/icon-16x16.png",
+        "type": "image/png",
+        "sizes": "16x16"
+    },
+    {
+      "src": "../icons/icon-32x32.png",
+      "type": "image/png",
+      "sizes": "32x32"
+  }
+  ]}

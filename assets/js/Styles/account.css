@@ -1,0 +1,9 @@
+.responsive-container-50 {
+  width: 50%;
+}
+
+@media only screen and (max-width: 700px) {
+  .responsive-container-50 {
+    width: 98%;
+  }
+}

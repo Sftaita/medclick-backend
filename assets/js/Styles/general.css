@@ -1,0 +1,159 @@
+.content{
+    padding: 0;
+}
+
+.form-content{
+    padding: 40px 10vw 0 10vw;
+}
+
+.responsive-table{
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 1em;
+    border-radius: 5px 5px 0 0;
+    overflow: hidden;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+    margin-bottom: 20px;
+    margin-top: 40px;
+}
+
+
+.responsive-table thead tr {
+    background-color: #343A40;
+    color: #fff;
+    text-align: left;
+    font-weight: bold;
+    table-layout: fixed;
+    width: 100%;
+}
+
+.responsive-table th,
+.responsive-table td {
+    padding: 30px 20px;
+}
+
+.responsive-table tbody tr {
+    background: #f3f3f3;
+}
+
+.responsive-table tbody tr:hover {
+    background-color: #d8d8d8;
+  }
+
+.responsive-table tbody tr:last-of-type {
+    border-bottom: 2px solid #343A40;
+}
+
+.center{
+    text-align: center;
+}
+
+.justify{
+    text-align: justify;
+}
+
+
+.custom-container-center{
+
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 30px 0 0 0;
+
+}
+
+.custom-title{
+    font-size: 4.5rem;
+    font-weight: 300;
+    line-height: 1.2;
+    padding: 10px 0 50px 0;
+}
+
+
+.custom-text-center{
+    text-align: center;
+}
+
+
+
+
+@media only screen and (max-width: 700px){
+    .form-content{
+        padding: 20px 4vw 0 4vw;
+    }
+
+    .container {
+        width: 90%;
+        margin: 0 auto;
+        padding: 10px;
+        overflow: none;
+    }
+
+    .responsive-table{
+       margin-top: 20px;
+    }
+
+    .responsive-table table, thead, tbody, tr, th, td {
+        display: block;
+    }
+
+    .responsive-table thead{
+        display: none;
+    }
+
+    .responsive-table td {
+        padding-left: 150px;
+        position: relative;
+        margin-top: -1px;
+        padding-top: 10px;
+        padding-bottom: 10px;
+    }
+    
+    .responsive-table tbody tr:nth-child(odd) {
+        background: #f3f3f3;
+    }
+    
+    .responsive-table td::before {
+        content: attr(data-label);
+        position: absolute;
+        top:0;
+        left: 0;
+        width: 130px;
+        bottom: 0;
+        background-color:  #343A40;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        padding-left: 10px;
+        font-weight: bold;
+    }
+    
+    .responsive-table tr{
+        margin-bottom: 1rem;   
+    }
+    
+    h1{
+    font-size: 1em;  
+    }
+
+    .custom-title{
+        font-size: 2rem;
+        font-weight: 600;
+        line-height: 1.2;
+        padding: 5px 0 10px 0;
+    }
+
+    .custom-container-center{
+       padding: 30px 0 0px 0;
+       justify-content: space-evenly;
+    }
+
+    .custom-text-center{
+        text-align: start;
+    }
+}
+    
+    

@@ -1,0 +1,18 @@
+.badge-content {
+  margin: 4px 20px 4px 8px;
+  display: flex;
+  flex-direction: row;
+}
+
+@media only screen and (max-width: 700px) {
+  .badge-content {
+    margin-bottom: 14px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+  }
+
+  .badge {
+    margin-right: 5px;
+  }
+}
