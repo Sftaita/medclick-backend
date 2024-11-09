@@ -31,15 +31,37 @@ class ConnectionHistoryRepository extends ServiceEntityRepository
         $startDate = $date->format('Y-m-d');
 
         return $this->createQueryBuilder('c')
-            ->where('c.date >= :begin')
-            ->andWhere('c.date <= :end')
-            ->setParameter('begin', $startDate)
-            ->setParameter('end', new \DateTime())
-            ->select ("c.id, c.date, IDENTITY(c.user)")
-            ->getQuery()
-            ->getResult()
-        ;    
+        ->innerJoin('c.user', 'u') 
+        ->where('c.date >= :begin')
+        ->andWhere('c.date <= :end')
+        ->setParameter('begin', $startDate)
+        ->setParameter('end', new \DateTime())
+        ->select("c.id, c.date, u.id AS user_id, u.firstname, u.lastname, u.speciality") 
+        ->getQuery()
+        ->getResult(); 
     }
+
+    public function findLastTenNonAdminConnections()
+    {
+        $results = $this->createQueryBuilder('c')
+            ->innerJoin('c.user', 'u')
+            ->where('u.roles NOT LIKE :adminRole')
+            ->setParameter('adminRole', '%ROLE_ADMIN%')
+            ->orderBy('c.date', 'DESC')
+            ->setMaxResults(10)
+            ->select("c.id, c.date, u.id AS user_id, u.firstname, u.lastname, u.speciality")
+            ->getQuery()
+            ->getResult();
+
+        return array_map(function ($entry) {
+            // Conversion de la date dans le fuseau horaire de Bruxelles
+            $brusselsTimezone = new \DateTimeZone('Europe/Brussels');
+            $entry['date']->setTimezone($brusselsTimezone);
+            $entry['date'] = $entry['date']->format('Y-m-d H:i:s');
+            return $entry;
+        }, $results);
+    }
+
 
     /**
  * Récupère l'historique de connexion d'un utilisateur, trié par date.
@@ -53,6 +75,20 @@ public function findByUserOrderedByDate($user)
         ->getQuery()
         ->getResult();
 }
+
+public function findUsersActiveBetween(\DateTimeInterface $startDate, \DateTimeInterface $endDate)
+{
+    return $this->createQueryBuilder('ch')
+        ->select('DISTINCT u.id')
+        ->join('ch.user', 'u')
+        ->where('ch.date >= :startDate')
+        ->andWhere('ch.date <= :endDate')
+        ->setParameter('startDate', $startDate)
+        ->setParameter('endDate', $endDate)
+        ->getQuery()
+        ->getResult();
+}
+
 
 
 }

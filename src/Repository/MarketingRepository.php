@@ -65,22 +65,21 @@ class MarketingRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    // /**
-    //  * @return Marketing[] Returns an array of Marketing objects
-    //  */
-    /*
-    public function findByExampleField($value)
+
+
+    /**
+    * @return Marketing[] Returns an array of Marketing objects
+    */
+    public function findAllCampaign()
     {
         return $this->createQueryBuilder('m')
-            ->andWhere('m.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('m.id', 'ASC')
-            ->setMaxResults(10)
+            ->orderBy('m.id', 'DESC')
+            ->select("m.id, m.campaignName")
             ->getQuery()
             ->getResult()
         ;
     }
-    */
+
 
     /*
     public function findOneBySomeField($value): ?Marketing

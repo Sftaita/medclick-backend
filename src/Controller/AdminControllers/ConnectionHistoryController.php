@@ -2,84 +2,83 @@
 
 namespace App\Controller\AdminControllers;
 
-use App\Repository\ConnectionHistoryRepository;
-use Symfony\Component\Serializer\Serializer;
-use Symfony\Component\HttpFoundation\Response;
+use DateTime;
+use DatePeriod;
+use DateInterval;
+use App\Repository\UserRepository;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Serializer\Encoder\JsonEncoder;
-use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-
+use App\Repository\ConnectionHistoryRepository;
 
 /**
- * @Route("/api/connection/", name="Sthhb")
+ * @Route("/api/admin/", name="Sthhb")
  */
 class ConnectionHistoryController extends AbstractController
 {
     /**
-     * @Route("history/{interval}", name="connection_history", methods={"GET"})
-     * @IsGranted("ROLE_ADMIN")
-     * Renvoie le nombre de connection par interval de temps.
+     * @Route("history/quick", name="connection_history_quick", methods={"GET"})
+     * Fournit le nombre de connexions des 7 derniers jours, le nombre d'utilisateurs uniques,
+     * les 10 derniers utilisateurs uniques connectés, et les 10 derniers utilisateurs inscrits.
      */
-    public function connectionNumber($interval, ConnectionHistoryRepository $history)
+    public function quickConnectionStats(ConnectionHistoryRepository $history, UserRepository $userRepository)
     {
-        $intervalArray = [
-            "d1" => "- 1 day",
-            "d2" => "- 2 days", 
-            "d3" => "- 3 days", 
-            "d4" => "- 4 days",
-            "d5" => "- 5 days",
-            "d6" => "- 6 days",
-            "w1" => "- 1 week", 
-            "w2" => "- 2 weeks", 
-            "w3" => "- 3 weeks", 
-            "m1" => "- 1 month", 
-            "m2" => "- 2 months", 
-            "m3" => "- 3 months", 
-            "m6" => "- 6 months"
-        ];
+        // Récupère les connexions des 7 derniers jours pour les statistiques journalières
+        $last7DaysData = $history->findByInterval('-7 days');
 
-        $list = $history->findByInterval($intervalArray[$interval]);
-
-        $data =  array();
-        
-
-        foreach ($list as $x) {
-            $date = $x['date'];
-            $formatedDate = $date->format('Y-m-d');            
-            $data[] = ["id"=>  $x['id'], "user"=>  $x['1'], "date" => $formatedDate]; 
+        if (!is_array($last7DaysData)) {
+            return new JsonResponse(['message' => 'Données de connexion invalides'], JsonResponse::HTTP_NOT_FOUND);
         }
 
-        // On spécifie que l'on utilise un encoder en JSON
-        $encoders = [new JsonEncoder()];
+        // Calcul des statistiques journalières
+        $dailyStats = [];
+        foreach ($last7DaysData as $entry) {
+            $dateKey = $entry['date']->format('Y-m-d');
+            if (!isset($dailyStats[$dateKey])) {
+                $dailyStats[$dateKey] = [
+                    "connection_count" => 0,
+                    "unique_users" => []
+                ];
+            }
+            $dailyStats[$dateKey]["connection_count"]++;
+            $dailyStats[$dateKey]["unique_users"][$entry['user_id']] = true;
+        }
 
-        //On instancie le "normaliseur" pour convertir la collection en tableau
-        $normalizers = [new ObjectNormalizer()];
+        $formattedDailyStats = [];
+        $endDate = new DateTime();
+        $startDate = (clone $endDate)->sub(new DateInterval('P6D'));
+        $period = new DatePeriod($startDate, new DateInterval('P1D'), $endDate->add(new DateInterval('P1D')));
+        foreach ($period as $date) {
+            $dateKey = $date->format('Y-m-d');
+            $formattedDailyStats[] = [
+                "date" => $dateKey,
+                "connection_count" => $dailyStats[$dateKey]["connection_count"] ?? 0,
+                "unique_user_count" => isset($dailyStats[$dateKey]) ? count($dailyStats[$dateKey]["unique_users"]) : 0,
+            ];
+        }
 
+        // Récupère tous les utilisateurs inscrits
+        $allUsers = $userRepository->findAll();
 
+        // Récupère les utilisateurs actifs depuis le début d'octobre jusqu'à aujourd'hui
+        $octoberStart = new DateTime('first day of October last year');
+        $activeUsers = $history->findUsersActiveBetween($octoberStart, $endDate);
 
-        // On fait la conversion en json
-        // On instencie le convertisseur
-        $serializer = new Serializer($normalizers, $encoders);
+        // Récupère les 10 derniers utilisateurs inscrits avec le statut de validation de leur token
+        $lastTenUsers = $userRepository->findLastTenUsersWithValidationStatus();
 
-        // On converyit en json
-        $jsonContent = $serializer->serialize($data, 'json');
-        //, [
-        //    'circular_reference_handler' => function($test){
-        //        return $test->getId();
-        //   }
-        //]);
+        // Récupère les 10 dernières connexions d'utilisateurs non administrateurs
+        $latestConnections = $history->findLastTenNonAdminConnections();
 
+        // Compilation des données
+        $data = [
+            "daily_stats" => $formattedDailyStats,
+            "all_users_count" => count($allUsers),
+            "active_users_since_october" => count($activeUsers),
+            "latest_users_registered" => $lastTenUsers,
+            "latest_users_connected" => $latestConnections,
+        ];
 
-
-        // On instancie la réponse
-        $respone = new Response($jsonContent);
-
-        // On ajoute l'entête HTTP
-        $respone->headers->set('Content-Type', 'application/json');
-
-        // On envoie la réponse
-        return $respone;
+        return new JsonResponse($data);
     }
 }

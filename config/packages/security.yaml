@@ -70,7 +70,7 @@ security:
     - { path: ^/api/userStat, roles: IS_AUTHENTICATED_FULLY }
     - { path: ^/api/statistics, roles: IS_AUTHENTICATED_FULLY }
     - { path: ^/api/connectionHistory, roles: IS_AUTHENTICATED_FULLY }
-    - { path: "^/api/admin", roles: ROLE_ADMIN }
+    - { path: "^/api/admin", roles: ROLE_ADMIN, methods: [GET, PUT, DELETE, POST] }
     - {
         path: ^/api/users,
         roles: IS_AUTHENTICATED_FULLY,

@@ -114,6 +114,16 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $this->_em->flush();
     }
 
+    public function findLastTenUsersWithValidationStatus()
+{
+    return $this->createQueryBuilder('u')
+        ->select('u.id, u.firstname, u.lastname, u.email, u.validatedAt')
+        ->orderBy('u.createdAt', 'DESC')
+        ->setMaxResults(10)
+        ->getQuery()
+        ->getResult();
+}
+
 
 
 

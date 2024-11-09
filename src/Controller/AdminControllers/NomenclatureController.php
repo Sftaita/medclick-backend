@@ -93,6 +93,102 @@ class NomenclatureController extends AbstractController{
         return new JsonResponse(['message' => 'Nomenclature updated successfully'], 200);
     }
 
+    /**
+     * @Route("/api/admin/nomenclature/update-type", name="UpdateNomenclatureType", methods={"PUT"})
+     */
+    public function updateNomenclatureType(Request $request, NomenclatureRepository $nomenclatureRepository, EntityManagerInterface $entityManager): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+
+        // Vérifier que les données contiennent bien 'ids' et 'type'
+        if (!isset($data['ids']) || !is_array($data['ids']) || !isset($data['type'])) {
+            return new JsonResponse(['error' => 'Invalid data format'], 400);
+        }
+
+        // Vérifier que 'type' est soit 1 soit 2
+        if (!in_array($data['type'], [1, 2])) {
+            return new JsonResponse(['error' => 'Invalid type, must be 1 or 2'], 400);
+        }
+
+        // Parcourir les ids et vérifier qu'ils sont bien des entiers
+        $ids = $data['ids'];
+        foreach ($ids as $id) {
+            if (!is_int($id)) {
+                return new JsonResponse(['error' => 'Invalid ID type, IDs must be integers'], 400);
+            }
+        }
+
+        // Pour chaque ID, récupérer la nomenclature et mettre à jour son type
+        foreach ($ids as $id) {
+            $nomenclature = $nomenclatureRepository->find($id);
+
+            // Vérifier si la nomenclature existe
+            if (!$nomenclature) {
+                return new JsonResponse(['error' => "Nomenclature with ID $id not found"], 404);
+            }
+
+            // Mettre à jour le type
+            $nomenclature->setType($data['type']);
+            $entityManager->persist($nomenclature);
+        }
+
+        // Enregistrer toutes les modifications
+        $entityManager->flush();
+
+        return new JsonResponse(['message' => 'Types updated successfully'], 200);
+    }
+
+    /**
+     * @Route("/api/admin/nomenclature/update-subtype", name="UpdateNomenclatureSubType", methods={"PUT"})
+     */
+    public function updateNomenclatureSubType(Request $request, NomenclatureRepository $nomenclatureRepository, EntityManagerInterface $entityManager): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+
+        // Liste des sous-types autorisés
+        $allowedSubTypes = ["", "shoulder", "humerus", "elbow", "forearm", "wristhand", "back", "pelvic", "hip", "proximalFemur", "midFemur", "distalFemur", "knee", "limb", "ankle", "foot"];
+
+        // Vérifier que les données contiennent bien 'ids' et 'subType'
+        if (!isset($data['ids']) || !is_array($data['ids']) || !isset($data['subType'])) {
+            return new JsonResponse(['error' => 'Invalid data format'], 400);
+        }
+
+        // Vérifier que 'subType' est dans la liste autorisée
+        if (!in_array($data['subType'], $allowedSubTypes)) {
+            return new JsonResponse(['error' => 'Invalid subType value'], 400);
+        }
+
+        // Parcourir les ids et vérifier qu'ils sont bien des entiers
+        $ids = $data['ids'];
+        foreach ($ids as $id) {
+            if (!is_int($id)) {
+                return new JsonResponse(['error' => 'Invalid ID type, IDs must be integers'], 400);
+            }
+        }
+
+        // Pour chaque ID, récupérer la nomenclature et mettre à jour son subType
+        foreach ($ids as $id) {
+            $nomenclature = $nomenclatureRepository->find($id);
+
+            // Vérifier si la nomenclature existe
+            if (!$nomenclature) {
+                return new JsonResponse(['error' => "Nomenclature with ID $id not found"], 404);
+            }
+
+            // Mettre à jour le sous-type
+            $nomenclature->setSubType($data['subType']);
+            $entityManager->persist($nomenclature);
+        }
+        
+       
+        // Enregistrer toutes les modifications
+        $entityManager->flush();
+
+        return new JsonResponse(['message' => 'SubTypes updated successfully'], 200);
+    }
+
+
+
     
 
 }
