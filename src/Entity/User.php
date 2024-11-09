@@ -148,6 +148,16 @@ class User implements UserInterface
      */
     private $resetToken;
 
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $acceptedTerms;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $termsAcceptedDate;
+
     public function __construct()
     {
         $this->years = new ArrayCollection();
@@ -414,6 +424,36 @@ class User implements UserInterface
     public function setResetToken(?string $resetToken): self
     {
         $this->resetToken = $resetToken;
+
+        return $this;
+    }
+
+    public function getAcceptedTerms(): ?bool
+    {
+        return $this->acceptedTerms;
+    }
+
+    public function setAcceptedTerms(?bool $acceptedTerms): self
+    {
+        $this->acceptedTerms = $acceptedTerms;
+
+        // Définir la date d'acceptation si elle n'est pas déjà définie
+        if ($acceptedTerms && $this->termsAcceptedDate === null) {
+            $this->termsAcceptedDate = new \DateTimeImmutable();
+        }
+
+        return $this;
+    }
+
+
+    public function getTermsAcceptedDate(): ?\DateTimeInterface
+    {
+        return $this->termsAcceptedDate;
+    }
+
+    public function setTermsAcceptedDate(?\DateTimeInterface $termsAcceptedDate): self
+    {
+        $this->termsAcceptedDate = $termsAcceptedDate;
 
         return $this;
     }
