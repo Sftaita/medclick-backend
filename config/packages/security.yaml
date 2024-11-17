@@ -56,6 +56,7 @@ security:
   access_control:
     - { path: ^/api/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }
     - { path: ^/api/autre, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+    - { path: ^/api/terms-conditions, roles: IS_AUTHENTICATED_ANONYMOUSLY,  methods: [GET]  }
     - { path: ^/api/marketing/active, roles: IS_AUTHENTICATED_ANONYMOUSLY }
 
     - { path: ^/api/years, roles: IS_AUTHENTICATED_FULLY }
@@ -69,6 +70,7 @@ security:
     - { path: ^/api/surgeries, roles: IS_AUTHENTICATED_FULLY }
     - { path: ^/api/userStat, roles: IS_AUTHENTICATED_FULLY }
     - { path: ^/api/statistics, roles: IS_AUTHENTICATED_FULLY }
+    - { path: ^/api/acceptTerms, roles: IS_AUTHENTICATED_FULLY }
     - { path: ^/api/connectionHistory, roles: IS_AUTHENTICATED_FULLY }
     - { path: "^/api/admin", roles: ROLE_ADMIN, methods: [GET, PUT, DELETE, POST] }
     - {

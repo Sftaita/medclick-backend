@@ -1,0 +1,4 @@
+{
+  "editor.defaultFormatter": "higoka.php-cs-fixer",
+  "editor.formatOnSave": true
+}

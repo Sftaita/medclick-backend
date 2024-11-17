@@ -79,6 +79,16 @@ class Marketing
      */
     private $viewedAt;
 
+    /**
+     * @ORM\Column(type="integer", nullable=true, options={"default": 5})
+     */
+    private $duration;
+
+    /**
+     * @ORM\Column(type="string", length=500, nullable=true)
+     */
+    private $redirectUrl;
+
     public function __construct()
     {
         $this->viewedAt = new ArrayCollection();
@@ -247,6 +257,30 @@ class Marketing
                 $viewedAt->setMarketing(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getDuration(): ?int
+    {
+        return $this->duration;
+    }
+
+    public function setDuration(?int $duration): self
+    {
+        $this->duration = $duration;
+
+        return $this;
+    }
+
+    public function getRedirectUrl(): ?string
+    {
+        return $this->redirectUrl;
+    }
+
+    public function setRedirectUrl(?string $redirectUrl): self
+    {
+        $this->redirectUrl = $redirectUrl;
 
         return $this;
     }

@@ -12,14 +12,13 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class GeneralMarketingController extends AbstractController
 {
-
     private $doctrine;
 
     public function __construct(ManagerRegistry $doctrine)
     {
         $this->doctrine = $doctrine;
     }
-    
+
     /**
      * @Route("/api/marketing/active", name="get_active_campaign", methods={"GET"})
      */
@@ -40,7 +39,7 @@ class GeneralMarketingController extends AbstractController
 
         // Incrémenter les vues de la campagne sélectionnée
         $randomCampaign->setViews($randomCampaign->getViews() + 1);
-        
+
         // Enregistrer une nouvelle vue dans la table MarketingView
         $view = new MarketingView();
         $view->setMarketing($randomCampaign);
@@ -52,6 +51,9 @@ class GeneralMarketingController extends AbstractController
         $entityManager->persist($view);
         $entityManager->flush();
 
+        // Déterminer la durée avec une valeur par défaut de 5
+        $duration = $randomCampaign->getDuration() ?? 5;
+
         // Renvoyer les informations de la campagne en JSON
         $campaignData = [
             'id' => $randomCampaign->getId(),
@@ -61,13 +63,15 @@ class GeneralMarketingController extends AbstractController
             'end_date' => $randomCampaign->getEndDate() ? $randomCampaign->getEndDate()->format('Y-m-d') : null,
             'views' => $randomCampaign->getViews(), // Après l'incrémentation
             'clicks' => $randomCampaign->getClicks(),
+            'duration' => $duration, // Inclure la durée
             'formats' => [
                 'smartphone' => $randomCampaign->getSmartphoneFormat(),
                 'tablet_portrait' => $randomCampaign->getTabletPortraitFormat(),
                 'tablet_landscape' => $randomCampaign->getTabletLandscapeFormat(),
                 'screen_14_inch' => $randomCampaign->getScreen14InchFormat(),
                 'large_screen' => $randomCampaign->getLargeScreenFormat(),
-            ]
+            ],
+            'redirect_url' => $randomCampaign->getRedirectUrl(), // Inclure l'URL de redirection
         ];
 
         return new JsonResponse($campaignData, JsonResponse::HTTP_OK);
