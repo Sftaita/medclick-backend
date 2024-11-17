@@ -10,8 +10,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
-use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @Route("/api/admin", name="marketing_")
@@ -25,58 +23,76 @@ class MarketingController extends AbstractController
         $this->entityManager = $entityManager;
     }
 
+   /**
+     * @Route("/marketing", name="index", methods={"GET"})
+     */
+    public function index(MarketingRepository $marketingRepository): Response
+    {
+        $marketings = $marketingRepository->findAll();
+
+        // Vérification et structuration des données pour chaque campagne
+        $campaigns = [];
+        foreach ($marketings as $marketing) {
+            $campaigns[] = [
+                'id' => $marketing->getId(),
+                'campaign_name' => $marketing->getCampaignName(),
+                'status' => $marketing->getStatus(),
+                'start_date' => $marketing->getStartDate() ? $marketing->getStartDate()->format('Y-m-d') : null,
+                'end_date' => $marketing->getEndDate() ? $marketing->getEndDate()->format('Y-m-d') : null,
+                'views' => $marketing->getViews(),
+                'clicks' => $marketing->getClicks(),
+                'duration' => $marketing->getDuration(), // Ajout de la durée
+                'redirect_url' => $marketing->getRedirectUrl(), // Ajout de l'URL de redirection
+                'formats' => [
+                    'smartphone' => $marketing->getSmartphoneFormat(),
+                    'tablet_portrait' => $marketing->getTabletPortraitFormat(),
+                    'tablet_landscape' => $marketing->getTabletLandscapeFormat(),
+                    'screen_14_inch' => $marketing->getScreen14InchFormat(),
+                    'large_screen' => $marketing->getLargeScreenFormat(),
+                ]
+            ];
+        }
+
+        return new JsonResponse($campaigns);
+    }
+
+
     /**
+     * @Route("/marketing/{id}", name="get_campaign", methods={"GET"})
+     */
+    public function getCampaignById(Marketing $marketing): Response
+    {
+        // Structure les données de la campagne pour la réponse JSON
+        $campaignData = [
+            'id' => $marketing->getId(),
+            'campaign_name' => $marketing->getCampaignName(),
+            'status' => $marketing->getStatus(),
+            'start_date' => $marketing->getStartDate() ? $marketing->getStartDate()->format('Y-m-d') : null,
+            'end_date' => $marketing->getEndDate() ? $marketing->getEndDate()->format('Y-m-d') : null,
+            'views' => $marketing->getViews(),
+            'clicks' => $marketing->getClicks(),
+            'duration' => $marketing->getDuration(), // Ajout de la durée
+            'redirect_url' => $marketing->getRedirectUrl(), // Ajout de l'URL de redirection
+            'smartphone_format' => $marketing->getSmartphoneFormat(),
+            'tablet_portrait_format' => $marketing->getTabletPortraitFormat(),
+            'tablet_landscape_format' => $marketing->getTabletLandscapeFormat(),
+            'screen_14_inch_format' => $marketing->getScreen14InchFormat(),
+            'large_screen_format' => $marketing->getLargeScreenFormat(),
+        ];
+
+        return new JsonResponse($campaignData);
+    }
+
+
+
+
+   /**
      * @Route("/marketing", name="create", methods={"POST"})
      */
-    public function create(Request $request, ValidatorInterface $validator): Response
+    public function create(Request $request): Response
     {
         $data = json_decode($request->getContent(), true);
 
-        // Définir les contraintes de validation
-        $constraints = new Assert\Collection([
-            'campaign_name' => new Assert\NotBlank(['message' => 'Campaign name is required']),
-            'status' => new Assert\Choice([
-                'choices' => ['active', 'inactive'],
-                'message' => 'Status must be either "active" or "inactive".'
-            ]),
-            'start_date' => new Assert\Date(['message' => 'Start date must be a valid date.']),
-            'end_date' => [
-                new Assert\Date(['message' => 'End date must be a valid date.']),
-                new Assert\Expression([
-                    'expression' => 'value >= this["start_date"]',
-                    'message' => 'End date must be after or equal to the start date.',
-                ])
-            ],
-            'duration' => [
-                new Assert\Optional([
-                    new Assert\Type(['type' => 'integer', 'message' => 'Duration must be an integer.']),
-                    new Assert\Positive(['message' => 'Duration must be greater than zero.']),
-                ]),
-            ],
-            'redirect_url' => new Assert\Optional([
-                new Assert\Url(['message' => 'Redirect URL must be a valid URL.']),
-            ]),
-            'smartphone_format' => new Assert\Optional(),
-            'tablet_portrait_format' => new Assert\Optional(),
-            'tablet_landscape_format' => new Assert\Optional(),
-            'screen_14_inch_format' => new Assert\Optional(),
-            'large_screen_format' => new Assert\Optional(),
-        ]);
-
-        // Valider les données
-        $violations = $validator->validate($data, $constraints);
-
-        // Si des erreurs sont trouvées, renvoyer une réponse avec les messages d'erreur
-        if (count($violations) > 0) {
-            $errors = [];
-            foreach ($violations as $violation) {
-                $errors[] = $violation->getMessage();
-            }
-
-            return new JsonResponse(['errors' => $errors], Response::HTTP_BAD_REQUEST);
-        }
-
-        // Créer l'entité Marketing
         $marketing = new Marketing();
         $marketing->setCampaignName($data['campaign_name']);
         $marketing->setStatus($data['status']);
@@ -85,8 +101,8 @@ class MarketingController extends AbstractController
         if ($endDate) {
             $marketing->setEndDate(new \DateTime($endDate));
         }
-        $marketing->setDuration($data['duration'] ?? 5);
-        $marketing->setRedirectUrl($data['redirect_url'] ?? null);
+        $marketing->setDuration($data['duration'] ?? 5); // Définit une valeur par défaut si non fourni
+        $marketing->setRedirectUrl($data['redirect_url'] ?? null); // Null si non fourni
         $marketing->setSmartphoneFormat($data['smartphone_format'] ?? null);
         $marketing->setTabletPortraitFormat($data['tablet_portrait_format'] ?? null);
         $marketing->setTabletLandscapeFormat($data['tablet_landscape_format'] ?? null);
@@ -99,56 +115,14 @@ class MarketingController extends AbstractController
         return $this->json(['status' => 'Marketing campaign created'], Response::HTTP_CREATED);
     }
 
+
     /**
      * @Route("/marketing/{id}", name="edit", methods={"PUT"})
      */
-    public function edit(Request $request, Marketing $marketing, ValidatorInterface $validator): Response
+    public function edit(Request $request, Marketing $marketing): Response
     {
         $data = json_decode($request->getContent(), true);
 
-        // Valider les données avec les mêmes contraintes que pour la création
-        $constraints = new Assert\Collection([
-            'campaign_name' => new Assert\NotBlank(['message' => 'Campaign name is required']),
-            'status' => new Assert\Choice([
-                'choices' => ['active', 'inactive'],
-                'message' => 'Status must be either "active" or "inactive".'
-            ]),
-            'start_date' => new Assert\Date(['message' => 'Start date must be a valid date.']),
-            'end_date' => [
-                new Assert\Date(['message' => 'End date must be a valid date.']),
-                new Assert\Expression([
-                    'expression' => 'value >= this["start_date"]',
-                    'message' => 'End date must be after or equal to the start date.',
-                ])
-            ],
-            'duration' => [
-                new Assert\Optional([
-                    new Assert\Type(['type' => 'integer', 'message' => 'Duration must be an integer.']),
-                    new Assert\Positive(['message' => 'Duration must be greater than zero.']),
-                ]),
-            ],
-            'redirect_url' => new Assert\Optional([
-                new Assert\Url(['message' => 'Redirect URL must be a valid URL.']),
-            ]),
-            'smartphone_format' => new Assert\Optional(),
-            'tablet_portrait_format' => new Assert\Optional(),
-            'tablet_landscape_format' => new Assert\Optional(),
-            'screen_14_inch_format' => new Assert\Optional(),
-            'large_screen_format' => new Assert\Optional(),
-        ]);
-
-        $violations = $validator->validate($data, $constraints);
-
-        if (count($violations) > 0) {
-            $errors = [];
-            foreach ($violations as $violation) {
-                $errors[] = $violation->getMessage();
-            }
-
-            return new JsonResponse(['errors' => $errors], Response::HTTP_BAD_REQUEST);
-        }
-
-        // Mettre à jour l'entité Marketing
         $marketing->setCampaignName($data['campaign_name']);
         $marketing->setStatus($data['status']);
         $marketing->setStartDate(new \DateTime($data['start_date']));
@@ -156,8 +130,8 @@ class MarketingController extends AbstractController
         if ($endDate) {
             $marketing->setEndDate(new \DateTime($endDate));
         }
-        $marketing->setDuration($data['duration'] ?? 5);
-        $marketing->setRedirectUrl($data['redirect_url'] ?? null);
+        $marketing->setDuration($data['duration'] ?? 5); // Valeur par défaut si non fourni
+        $marketing->setRedirectUrl($data['redirect_url'] ?? null); // Null si non fourni
         $marketing->setSmartphoneFormat($data['smartphone_format'] ?? null);
         $marketing->setTabletPortraitFormat($data['tablet_portrait_format'] ?? null);
         $marketing->setTabletLandscapeFormat($data['tablet_landscape_format'] ?? null);
@@ -167,5 +141,44 @@ class MarketingController extends AbstractController
         $this->entityManager->flush();
 
         return $this->json(['status' => 'Marketing campaign updated']);
+    }
+
+
+    /**
+     * @Route("/marketing/{id}", name="delete_marketing_campaign", methods={"DELETE"})
+     */
+    public function delete(Marketing $marketing, EntityManagerInterface $entityManager): JsonResponse
+    {
+        $entityManager->remove($marketing);
+        $entityManager->flush();
+
+        return new JsonResponse(['status' => 'Marketing campaign deleted']);
+    }
+
+    /**
+     * @Route("/{id}", name="show", methods={"GET"})
+     */
+    public function show(Marketing $marketing): Response
+    {
+        return $this->json($marketing);
+    }
+
+    /**
+     * @Route("/marketing/{id}/status", name="update_status", methods={"PUT"})
+     */
+    public function updateStatus(Request $request, Marketing $marketing): Response
+    {
+        $data = json_decode($request->getContent(), true);
+
+        // On s'assure que le champ 'status' est présent dans la requête
+        if (!isset($data['status'])) {
+            return new JsonResponse(['error' => 'Status field is required'], Response::HTTP_BAD_REQUEST);
+        }
+
+        // Met à jour le statut de la campagne
+        $marketing->setStatus($data['status']);
+        $this->entityManager->flush();
+
+        return new JsonResponse(['status' => 'Marketing campaign status updated']);
     }
 }
