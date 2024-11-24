@@ -12,7 +12,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 /**
- * @Route("/api/admin", name="marketing_")
+ * @Route("/api/admin", name="marketing")
  */
 class MarketingController extends AbstractController
 {
@@ -153,14 +153,6 @@ class MarketingController extends AbstractController
         $entityManager->flush();
 
         return new JsonResponse(['status' => 'Marketing campaign deleted']);
-    }
-
-    /**
-     * @Route("/{id}", name="show", methods={"GET"})
-     */
-    public function show(Marketing $marketing): Response
-    {
-        return $this->json($marketing);
     }
 
     /**

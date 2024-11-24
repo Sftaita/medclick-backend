@@ -102,6 +102,11 @@ class Surgeries
      */
     private $nomenclature;
 
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $createdAt;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -211,6 +216,18 @@ class Surgeries
     public function setNomenclature(?Nomenclature $nomenclature): self
     {
         $this->nomenclature = $nomenclature;
+
+        return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTimeInterface
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(?\DateTimeInterface $createdAt): self
+    {
+        $this->createdAt = $createdAt;
 
         return $this;
     }

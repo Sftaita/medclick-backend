@@ -53,35 +53,34 @@ class NewSurgeriesAPIController extends AbstractController
         YearsRepository $yearsRepository, 
         NomenclatureRepository $nomenclatureRepository,
         Request $request
-    ): JsonResponse{
+    ): JsonResponse {
 
         // Find the resident based on the user ID.
         $resident = $userRepository->findOneBy(['id' => $this->security->getUser()]);
         
-        if(!$resident){
+        if (!$resident) {
             $this->handleMissingData("Aucun utilisateur retrouvé");
         }
 
         // Get the POST data and decode it into an associative array.
         $data = json_decode($request->getContent(), true);
 
-            // Find the current year by ID
-            $year = $yearsRepository->findOneBy(['id' => $data['year']]);
+        // Find the current year by ID
+        $year = $yearsRepository->findOneBy(['id' => $data['year']]);
         
-            if(!$year){
-                $this->handleMissingData("Année non retrouvé");
-            }
+        if (!$year) {
+            $this->handleMissingData("Année non retrouvé");
+        }
 
-            // Find the surgery reference by its ID.
-            $surgeryReference = $nomenclatureRepository->findOneBy(['id' => $data['surgeryId']]);
+        // Find the surgery reference by its ID.
+        $surgeryReference = $nomenclatureRepository->findOneBy(['id' => $data['surgeryId']]);
 
-            if(!$surgeryReference){
-                $this->handleMissingData("Cette intervention n'est pas retrouvé en base de donnée");
-            }
+        if (!$surgeryReference) {
+            $this->handleMissingData("Cette intervention n'est pas retrouvée en base de données");
+        }
 
-            // Cette ligne reconstitue un code unique à chaque intervention en concaténant le code d'hospitalisation et le numéro N
-            // obtenus à partir de l'objet surgeryReference. Ces valeurs proviennent de la table nomenclature.
-            $code = $surgeryReference->getCodeHospitalisation().''.$surgeryReference->getN();
+        // Create a unique code for the surgery.
+        $code = $surgeryReference->getCodeHospitalisation() . '' . $surgeryReference->getN();
 
         // Create a new Surgeries entity.
         $surgery = new Surgeries;
@@ -93,7 +92,8 @@ class NewSurgeriesAPIController extends AbstractController
             ->setSpeciality($surgeryReference->getSpeciality())
             ->setCode($code)
             ->setName($surgeryReference->getName())
-            ->setPosition($data['position']);
+            ->setPosition($data['position'])
+            ->setCreatedAt(new \DateTime()); // Set the current date and time.
 
         // Depending on the position, set the FirstHand and SecondHand attributes.
         switch ($data['position']) {
@@ -120,7 +120,8 @@ class NewSurgeriesAPIController extends AbstractController
         $entityManager->flush();
 
         return new JsonResponse([
-                'message' => "ok"
-        ], JsonResponse::HTTP_OK, ['Access-Control-Allow-Origin' =>  $_ENV['CORS_ALLOW_ORIGIN']]);
+            'message' => "ok"
+        ], JsonResponse::HTTP_OK, ['Access-Control-Allow-Origin' => $_ENV['CORS_ALLOW_ORIGIN']]);
     }
+
 }

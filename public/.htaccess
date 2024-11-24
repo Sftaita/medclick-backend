@@ -1,61 +1,57 @@
-# Use the front controller as index file. It serves as a fallback solution when
-# every other rewrite/redirect fails (e.g. in an aliased environment without
-# mod_rewrite).
+# Utilisation du contrôleur frontal comme fichier index.
 DirectoryIndex index.php
 
-# By default, Apache does not evaluate symbolic links if you did not enable this
-# feature in your server configuration.
-# Uncomment the following line if you install assets as symlinks or if you experience
-# problems related to symlinks when compiling LESS/Sass/CoffeScript assets.
+# Active les liens symboliques si nécessaire.
+# Uncommenter si vous rencontrez des problèmes avec les symlinks.
 # Options +FollowSymlinks
 
-# Disabling MultiViews prevents unwanted negotiation, e.g. "/index" should not resolve
-# to the front controller "/index.php" but be rewritten to "/index.php/index".
+# Désactiver MultiViews pour éviter des négociations imprévues.
 <IfModule mod_negotiation.c>
     Options -MultiViews
 </IfModule>
 
-# Enable mod_headers to handle CORS
+# Gestion des en-têtes CORS
 <IfModule mod_headers.c>
-    # Add CORS headers
+    # En-têtes pour la production
     Header always set Access-Control-Allow-Origin "https://admin.easymed.fun"
     Header always set Access-Control-Allow-Methods "GET, POST, OPTIONS, PUT, DELETE, PATCH"
     Header always set Access-Control-Allow-Headers "Authorization, Content-Type"
+
+    # En-têtes pour le développement local
+    SetEnvIf Host "localhost" ENVIRONMENT=development
+    <If "%{ENV:ENVIRONMENT} == 'development'">
+        Header always set Access-Control-Allow-Origin "http://localhost:3000"
+    </If>
 </IfModule>
 
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
-    # Determine the RewriteBase automatically and set it as environment variable.
-    # If you are using Apache aliases to do mass virtual hosting or installed the
-    # project in a subdirectory, the base path will be prepended to allow proper
-    # resolution of the index.php file and to redirect to the correct URI.
+    # Détecte automatiquement la base du chemin et le configure comme variable d'environnement.
     RewriteCond %{REQUEST_URI}::$0 ^(/.+)/(.*)::\2$
     RewriteRule .* - [E=BASE:%1]
-    
-    # Sets the HTTP_AUTHORIZATION header removed by Apache
+
+    # Définit l'en-tête HTTP_AUTHORIZATION s'il est supprimé par Apache.
     RewriteCond %{HTTP:Authorization} .+
     RewriteRule ^ - [E=HTTP_AUTHORIZATION:%0]
 
-    # Redirect to URI without front controller to prevent duplicate content
+    # Redirige les URI vers leur version sans le contrôleur frontal.
     RewriteCond %{ENV:REDIRECT_STATUS} =""
     RewriteRule ^index\.php(?:/(.*)|$) %{ENV:BASE}/$1 [R=301,L]
 
-    # If the requested filename exists, simply serve it.
-    # We only want to let Apache serve files and not directories.
+    # Si le fichier demandé existe, le sert directement.
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ %{ENV:BASE}/index.php [L]
 
-    # Force HTTPS
+    # Redirection HTTPS pour la production, pas pour localhost
+    RewriteCond %{HTTP_HOST} !^localhost
     RewriteCond %{SERVER_PORT} 80
     RewriteRule ^(.*)$ https://www.medclick.be/$1 [R=301,L]
 </IfModule>
 
 <IfModule !mod_rewrite.c>
     <IfModule mod_alias.c>
-        # When mod_rewrite is not available, we instruct a temporary redirect of
-        # the start page to the front controller explicitly so that the website
-        # and the generated links can still be used.
+        # Si mod_rewrite n'est pas disponible, redirige temporairement la page d'accueil.
         RedirectMatch 307 ^/$ /index.php/
     </IfModule>
 </IfModule>
