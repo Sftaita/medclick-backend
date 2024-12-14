@@ -169,6 +169,23 @@ class YearsRepository extends ServiceEntityRepository
         return $request;
     }
 
+    /**
+     * Renvoie toutes les années d'un utilisateur.
+     *
+     * @param int $userId L'ID de l'utilisateur
+     * @return array Tableau contenant les années associées à l'utilisateur
+     */
+    public function getYearsByUserId(int $userId): array
+    {
+        return $this->createQueryBuilder('y')
+            ->andWhere('y.user = :userId')
+            ->setParameter('userId', $userId)
+            ->select('y.id, y.yearOfFormation, y.dateOfStart, y.hospital, y.master')
+            ->orderBy('y.yearOfFormation', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
+
 
 
 

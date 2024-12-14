@@ -8,6 +8,7 @@ use App\Repository\YearsRepository;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Security\Core\Security;
 
 class UsersController extends AbstractController
 {
@@ -53,4 +54,43 @@ class UsersController extends AbstractController
 
         return new JsonResponse($yearsData, JsonResponse::HTTP_OK, [], true);
     }
+
+    /**
+     * @Route("/api/admin/fetchUserById/{id}", name="userProfil", methods={"GET"})
+     */
+    public function fecthUserProfil(int $id, UserRepository $userRepository, YearsRepository $yearsRepository): JsonResponse
+    {
+        $searchedUser = $userRepository->findOneBy(['id' => $id]);
+
+        // Vérifie si l'utilisateur existe
+        if (!$searchedUser) {
+            return new JsonResponse([
+                'success' => false,
+                'message' => 'Utilisateur introuvable.',
+            ], JsonResponse::HTTP_NOT_FOUND);
+        }
+
+        
+
+        // Prépare les données de l'utilisateur pour la réponse
+        $userData = [
+            'id' => $searchedUser->getId(),
+            'firstname' => $searchedUser->getFirstname(),
+            'lastname' => $searchedUser->getLastname(),
+            'speciality' => $searchedUser->getSpeciality(),
+            'email' => $searchedUser->getEmail(),
+            'role' => $searchedUser->getRoles(),
+            'createdAt' => $searchedUser->getCounter(),
+            'validatedAt' => $searchedUser-> getValidatedAt(),
+            'years' => $yearsRepository->getYearsByUserId($searchedUser->getId())
+            // Ajoutez d'autres champs si nécessaire
+        ];
+
+        // Retourne les données utilisateur en JSON
+        return new JsonResponse([
+            'success' => true,
+            'data' => $userData,
+        ], JsonResponse::HTTP_OK);
+    }
+
 }

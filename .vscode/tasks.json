@@ -1,0 +1,19 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Start Local Server", // Le nom de votre tâche
+            "type": "shell",             // Type de commande (shell)
+            "command": "php -S 127.0.0.1:8000 -t public", // Commande à exécuter
+            "problemMatcher": []         // Pas de gestion d'erreurs ici
+        },
+        {
+            "label": "Start public Server", // Le nom de votre tâche
+            "type": "shell",             // Type de commande (shell)
+            "command": "php -S 192.168.1.22:8000 -t public", // Commande à exécuter
+            "problemMatcher": []         // Pas de gestion d'erreurs ici
+        }
+    ]
+}
