@@ -322,28 +322,42 @@ class ExcelGeneratorController extends AbstractController
                 ->setCellValue('B' . $row, "  " . $surgery['code'])
                 ->setCellValue('C' . $row, "  " . $surgery['name']);
 
-            if ($surgery['position'] == 1) {
-
-                $acceuil->setCellValue('L' . $row, "1");
-                $firstHandSoloSum++;
-            }
-
-            if ($surgery['position'] == 2) {
-
-                $acceuil->setCellValue('I' . $row, "1")
-                    ->setCellValue('K' . $row, $LABELS[$surgery['firstHand']]);
-                $secondHandSum++;
-
-                $first[$surgery['firstHand']]++;
-            }
-
-            if ($surgery['position'] == 3) {
-
-                $acceuil->setCellValue('M' . $row, "1")
-                    ->setCellValue('N' . $row, $LABELS[$surgery['secondHand']]);
-                $firstHandHelpSum++;
-                $second[$surgery['secondHand']]++;
-            }
+                if ($surgery['position'] == 1) {
+                    $acceuil->setCellValue('L' . $row, "1");
+                    $acceuil->getStyle('L' . $row)
+                        ->getAlignment()
+                        ->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                    $firstHandSoloSum++;
+                }
+                
+                if ($surgery['position'] == 2) {
+                    $acceuil->setCellValue('I' . $row, "1")
+                            ->setCellValue('K' . $row, $LABELS[$surgery['firstHand']]);
+                    $acceuil->getStyle('I' . $row)
+                        ->getAlignment()
+                        ->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                    $acceuil->getStyle('K' . $row)
+                        ->getAlignment()
+                        ->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                
+                    $secondHandSum++;
+                    $first[$surgery['firstHand']]++;
+                }
+                
+                if ($surgery['position'] == 3) {
+                    $acceuil->setCellValue('M' . $row, "1")
+                            ->setCellValue('N' . $row, $LABELS[$surgery['secondHand']]);
+                    $acceuil->getStyle('M' . $row)
+                        ->getAlignment()
+                        ->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                    $acceuil->getStyle('N' . $row)
+                        ->getAlignment()
+                        ->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                
+                    $firstHandHelpSum++;
+                    $second[$surgery['secondHand']]++;
+                }
+                
 
             $row++;
         }
