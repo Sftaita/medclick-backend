@@ -56,7 +56,7 @@ class ExcelGeneratorController extends AbstractController
 
 
     /**
-     * @Route("/api/excel/{year}", name="excel", methods={ "GET" })
+     * @Route("/api/excel/{year}", name="excelOldVersion", methods={ "GET" })
      * @param int $year Définie l'année d'interet pour l'extraction des données.
      */
     public function ExcelGenerator($year)
@@ -214,7 +214,7 @@ class ExcelGeneratorController extends AbstractController
         /*----------------------------------------------------- PAGE DE GARDE ---------------------------------------------------------------------*/
         $reader = IOFactory::createReader('Xlsx');
 
-        $spreadsheet = $reader->load('ExcelTemplate.xlsx');
+        $spreadsheet = $reader->load('ExcelTemplateOldVersion.xlsx');
 
         $sheet1 = $spreadsheet->getSheet(0);
 

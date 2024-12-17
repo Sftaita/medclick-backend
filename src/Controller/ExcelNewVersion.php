@@ -47,6 +47,13 @@ class ExcelNewVersion extends AbstractController
      */
     public function ExcelGenerator2(int $year): Response
     {
+        // Premier check, l'utilisateur est il un admin qui cherche à avoir acces aux information
+        // 1. Si $this->security->getUser() est admin
+
+        // Alors on cherche à qui appartient année
+        $searchedYear = $this->yearsRepository->findOneBy(['id'=> $year]);
+        $user = $searchedYear->getUser();
+        // Sinon
         $user = $this->userRepository->findOneBy(['id' => $this->security->getUser()]);
 
         if (!$user) {
@@ -411,7 +418,7 @@ class ExcelNewVersion extends AbstractController
         $orthoTrauma = array();
         $orthoElective = array();
         $general = array();
-        
+       
         // Trier les interventions dans les tableaux appropriés
         foreach ($surgeriesWithNomenclature as $surgery) {
             $yearOfFormation = $surgery['yearOfFormation'];
