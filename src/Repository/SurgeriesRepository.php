@@ -197,22 +197,22 @@ class SurgeriesRepository extends ServiceEntityRepository
         return $querry;
     }
 
-    // /**
-    //  * @return Surgeries[] Returns an array of Surgeries objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    /**
+     * Renvoie les chirurgie qui n om par de nomenclature attribué
+     *
+     * @param integer $limit
+     * @param integer $offset
+     * @return array
+     */
+    public function findSurgeriesWithoutNomenclature(int $limit, int $offset): array
     {
         return $this->createQueryBuilder('s')
-            ->andWhere('s.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('s.id', 'ASC')
-            ->setMaxResults(10)
+            ->where('s.nomenclature IS NULL')
+            ->setMaxResults($limit)
+            ->setFirstResult($offset)
             ->getQuery()
-            ->getResult()
-        ;
+            ->getResult();
     }
-    */
 
     /*
     public function findOneBySomeField($value): ?Surgeries
