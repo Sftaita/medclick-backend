@@ -1,15 +1,25 @@
 
-    <div style="width:90%px; padding:4%;">
-        <h1 style="color:#4bbf73;text-align:center;">Med-Click</h1>
-
-        <p>Bonjour {{ firstname}}.</p><br>
-
-        <p>Bienvenue dans la communauté!</p><br>
-
-        <p>Voici le lien à suivre afin d'activer ton compte: https://www.api-link.medclick.be/activation/{{token}} .</p><br>
-
-        <h2>Med-Click</h2>
+    <div style="width: 100%; max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; background-color: #f9f9f9; border: 1px solid #ddd; border-radius: 8px; padding: 20px;">
+    <div style="text-align: center; margin-bottom: 20px;">
+        <h1 style="color: #303F9F; margin: 0;">Med-Click</h1>
+        <p style="color: #888; font-size: 14px; margin: 5px 0;">La plateforme médicale qui vous simplifie la vie</p>
     </div>
-  
 
+    <div style="background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);">
+        <p style="font-size: 16px; color: #333; line-height: 1.5;">Bonjour <strong>{{ firstname }}</strong>,</p>
+        <p style="font-size: 16px; color: #333; line-height: 1.5;">Bienvenue dans la communauté <strong>Med-Click</strong> ! Nous sommes ravis de vous compter parmi nous.</p>
+        <p style="font-size: 16px; color: #333; line-height: 1.5;">Pour activer votre compte, veuillez cliquer sur le lien ci-dessous :</p>
 
+        <div style="text-align: center; margin: 20px 0;">
+            <a href="https://www.api-medclick.easymed.fun/activation/{{ token }}" style="display: inline-block; padding: 10px 20px; background-color: #303F9F; color: #fff; text-decoration: none; border-radius: 5px; font-size: 16px;">Activer mon compte</a>
+        </div>
+
+        <p style="font-size: 14px; color: #666; text-align: center; margin: 20px 0;">Si vous ne parvenez pas à cliquer sur le bouton, copiez et collez le lien suivant dans votre navigateur :</p>
+        <p style="font-size: 14px; color: #303F9F; word-break: break-word; text-align: center;">https://www.api-medclick.easymed.fun/activation/{{ token }}</p>
+    </div>
+
+    <footer style="margin-top: 30px; text-align: center; font-size: 12px; color: #888;">
+        <p>Med-Click &copy; {{ "now"|date("Y") }} - Tous droits réservés</p>
+        <p><a href="#" style="color: #303F9F; text-decoration: none;">Politique de confidentialité</a> | <a href="#" style="color: #303F9F; text-decoration: none;">Conditions d'utilisation</a></p>
+    </footer>
+</div>

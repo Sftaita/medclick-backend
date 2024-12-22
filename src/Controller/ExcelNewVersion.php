@@ -232,15 +232,21 @@ class ExcelNewVersion extends AbstractController
                 switch ($currentSurgery->getPosition()) {
                     case 1:
                         $currentSheet->setCellValue('L' . $currentRow, "1");
+                        // Appliquer le style pour centrer
+                        $currentSheet->getStyle('L' . $currentRow)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
                         break;
+                
                     case 2:
                         $firstHandId = $currentSurgery->getFirstHand();
                         $firstHandLabel = isset($supervisorLabels[$firstHandId]) ? $supervisorLabels[$firstHandId] : '';
-            
+                
                         $currentSheet->setCellValue('I' . $currentRow, "1")
                                      ->setCellValue('K' . $currentRow, $firstHandLabel);
-            
-                        // Incrémenter le compteur isFirsthand pour le superviseur
+                
+                        // Appliquer le style pour centrer
+                        $currentSheet->getStyle('I' . $currentRow)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                        $currentSheet->getStyle('K' . $currentRow)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                
                         foreach ($supervisors as &$supervisor) {
                             if ($supervisor['id'] == $firstHandId) {
                                 $supervisor['isFirsthand']++;
@@ -249,15 +255,18 @@ class ExcelNewVersion extends AbstractController
                         }
                         unset($supervisor); // Libérer la référence
                         break;
-            
+                
                     case 3:
                         $secondHandId = $currentSurgery->getSecondHand();
                         $secondHandLabel = isset($supervisorLabels[$secondHandId]) ? $supervisorLabels[$secondHandId] : '';
-            
+                
                         $currentSheet->setCellValue('M' . $currentRow, "1")
                                      ->setCellValue('N' . $currentRow, $secondHandLabel);
-            
-                        // Incrémenter le compteur isSecondhand pour le superviseur
+                
+                        // Appliquer le style pour centrer
+                        $currentSheet->getStyle('M' . $currentRow)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                        $currentSheet->getStyle('N' . $currentRow)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                
                         foreach ($supervisors as &$supervisor) {
                             if ($supervisor['id'] == $secondHandId) {
                                 $supervisor['isSecondhand']++;
@@ -267,6 +276,7 @@ class ExcelNewVersion extends AbstractController
                         unset($supervisor); // Libérer la référence
                         break;
                 }
+                
             
                 // Incrémenter currentRow pour pointer vers la nouvelle ligne
                 $currentRow++;
@@ -295,6 +305,9 @@ class ExcelNewVersion extends AbstractController
                 $currentSheet->setCellValue('L' . $currentRow, $percentageFirsthand . "%");
                 $currentSheet->setCellValue('M' . $currentRow, $currentSupervisor['isSecondhand']);
                 $currentSheet->setCellValue('N' . $currentRow, $percentageSecondhand . "%");
+
+                $currentSheet->getStyle('K' . $currentRow)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+
             }
 
             // Décompte final
@@ -418,7 +431,7 @@ class ExcelNewVersion extends AbstractController
         $orthoTrauma = array();
         $orthoElective = array();
         $general = array();
-       
+      
         // Trier les interventions dans les tableaux appropriés
         foreach ($surgeriesWithNomenclature as $surgery) {
             $yearOfFormation = $surgery['yearOfFormation'];
@@ -428,10 +441,10 @@ class ExcelNewVersion extends AbstractController
             $name = $surgery['name'];
             $position = $surgery['position'];
             $speciality = $surgery['speciality'];
-           
+         
         
             switch (true) {
-                case $surgery['speciality'] == 'ortho' && $surgery['type'] == 'trauma':
+                case $surgery['speciality'] == 'ortho' && $surgery['type'] == '2':
                     if (!isset($orthoTrauma[$subtype])) {
                         $orthoTrauma[$subtype] = array();
                     }
@@ -457,7 +470,7 @@ class ExcelNewVersion extends AbstractController
                     }
                     break;
                 
-                case $surgery['speciality'] == 'ortho' && $surgery['type'] == 'elective':
+                case $surgery['speciality'] == 'ortho' && $surgery['type'] == '1':
                     if (!isset($orthoElective[$subtype])) {
                         $orthoElective[$subtype] = array();
                     }

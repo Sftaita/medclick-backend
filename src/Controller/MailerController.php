@@ -2,13 +2,11 @@
 
 namespace App\Controller;
 
-
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use Twig\Environment;
-
 
 class MailerController extends AbstractController
 {
@@ -16,7 +14,6 @@ class MailerController extends AbstractController
      * @var MailerInterface
      */
     private $mailer;
-
 
     /**
      * @var Environment
@@ -32,20 +29,13 @@ class MailerController extends AbstractController
     /**
      * Envoie d'email
      *
-     * @return void
-     * 
      * @Route("/mail", name="email")
      */
     public function sendEmail(string $to, string $subject, string $template, array $parameters)
     {
-
         $email = (new Email())
-            ->from('info@medclick.be')
+            ->from('Medclick <service@medclick.be>') // Nom personnalisé ajouté
             ->to($to)
-            //->cc('cc@example.com')
-            //->bcc('bcc@example.com')
-            //->replyTo('fabien@example.com')
-            //->priority(Email::PRIORITY_HIGH)
             ->subject($subject)
             ->html(
                 $this->twig->render($template, $parameters)

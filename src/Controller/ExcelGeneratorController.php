@@ -456,7 +456,7 @@ class ExcelGeneratorController extends AbstractController
 
         if (!empty($surgeriesSummary)) {
 
-            $row = 16;
+            $row = 15;
 
             $colFirst = ["", "E", "F", "G", "H", "I", "J", "K"];
             $colSecond = ["", "M", "N", "O", "P", "Q", "R", "S"];
