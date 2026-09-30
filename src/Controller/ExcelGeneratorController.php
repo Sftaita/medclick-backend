@@ -59,9 +59,9 @@ class ExcelGeneratorController extends AbstractController
 
 
     /**
-     * @Route("/api/excel/{year}", name="excelOldVersion", methods={ "GET" })
      * @param int $year Définie l'année d'interet pour l'extraction des données.
      */
+    #[Route('/api/excel/{year}', name: 'excelOldVersion', methods: ['GET'])]
     public function ExcelGenerator($year)
     {
 

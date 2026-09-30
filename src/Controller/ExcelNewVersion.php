@@ -42,10 +42,10 @@ class ExcelNewVersion extends AbstractController
     }
 
     /**
-     * @Route("/api/excel2/{year}", name="excel", methods={ "GET" })
      * @param int $year Définie l'année d'interet pour l'extraction des données.
      * @return Response
      */
+    #[Route('/api/excel2/{year}', name: 'excel', methods: ['GET'])]
     public function ExcelGenerator2(int $year): Response
     {
         $user = $this->userRepository->findOneBy(['id' => $this->security->getUser()]);

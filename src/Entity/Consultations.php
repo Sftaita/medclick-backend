@@ -9,7 +9,6 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * @ORM\Entity(repositoryClass=ConsultationsRepository::class)
  * @ApiResource(
  *      normalizationContext={
  *          "groups"={"consultation_read"}
@@ -25,84 +24,48 @@ use Symfony\Component\Validator\Constraints as Assert;
  *          "delete"
  *      },
  *      attributes={
- *          "order": {"date": "DESC"}   
+ *          "order": {"date": "DESC"}
  *      }
  * )
  */
+#[ORM\Entity(repositoryClass: ConsultationsRepository::class)]
 class Consultations
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     * 
-     * @Groups({"consultation_read"})
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
+    #[Groups(['consultation_read'])]
     private $id;
 
-    /**
-     * @ORM\Column(type="date")
-     * 
-     * @Groups({"consultation_read"})
-     * 
-     * @Assert\NotBlank(message="Indiquer la date")
-     */
+    #[ORM\Column(type: 'date')]
+    #[Groups(['consultation_read'])]
+    #[Assert\NotBlank(message: 'Indiquer la date')]
     private $date;
 
-    /**
-     * @ORM\Column(type="string", length=10)
-     * 
-     * @Groups({"consultation_read"})
-     * 
-     * @Assert\NotBlank(message="Indiquer le nombre de consultation")
-     * @Assert\Length(
-     *      max = 3,
-     *      maxMessage = "Ce nombre de consultation est improbable",
-     * )
-     *  @Assert\Type(
-     *     type="numeric",
-     *     message="Veuillez entrer un nombre."
-     * )
-     */
+    #[ORM\Column(type: 'string', length: 10)]
+    #[Groups(['consultation_read'])]
+    #[Assert\NotBlank(message: 'Indiquer le nombre de consultation')]
+    #[Assert\Length(max: 3, maxMessage: 'Ce nombre de consultation est improbable')]
+    #[Assert\Type(type: 'numeric', message: 'Veuillez entrer un nombre.')]
     private $number;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=Years::class, inversedBy="consultations")
-     * 
-     * @Groups({"consultation_read"})
-     */
+    #[ORM\ManyToOne(targetEntity: Years::class, inversedBy: 'consultations')]
+    #[Groups(['consultation_read'])]
     private $year;
 
-    /**
-     * @ORM\Column(type="string", length=100, nullable=true)
-     * 
-     */
+    #[ORM\Column(type: 'string', length: 100, nullable: true)]
     private $moment;
 
-    /**
-     * @ORM\Column(type="string", length=100, nullable=true)
-     * 
-     * @Groups({"consultation_read"})
-     * 
-     * @Assert\NotBlank(message="Veuillez indiquer le moment de la journée.")
-     * @Assert\Length(
-     *      max = 20,
-     *      maxMessage = "Trop long",
-     * )
-     */
+    #[ORM\Column(type: 'string', length: 100, nullable: true)]
+    #[Groups(['consultation_read'])]
+    #[Assert\NotBlank(message: 'Veuillez indiquer le moment de la journée.')]
+    #[Assert\Length(max: 20, maxMessage: 'Trop long')]
     private $dayPart;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     * 
-     * @Groups({"consultation_read"})
-     * 
-     * @Assert\NotBlank(message="Veuillez indiquer la spécialité pour laquelle vous avez consulté.")
-     * @Assert\Length(
-     *      max = 30,
-     *      maxMessage = "Trop long",
-     * )
-     */
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    #[Groups(['consultation_read'])]
+    #[Assert\NotBlank(message: 'Veuillez indiquer la spécialité pour laquelle vous avez consulté.')]
+    #[Assert\Length(max: 30, maxMessage: 'Trop long')]
     private $speciality;
 
     public function getId(): ?int

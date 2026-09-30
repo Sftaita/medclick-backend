@@ -28,7 +28,7 @@ class GardesRepository extends ServiceEntityRepository
     {
         return $this->createQueryBuilder('u')
             ->andWhere('u.year = :param1')
-            ->setParameters(array('param1' => $IdYear))
+            ->setParameter('param1', $IdYear)
             ->select('u.id, u.dateOfStart, u.dateOfEnd, u.number')
             ->getQuery()
             ->getResult();

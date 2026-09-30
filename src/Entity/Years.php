@@ -14,7 +14,6 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
 
 
 /**
- * @ORM\Entity(repositoryClass=YearsRepository::class)
  * @ApiResource(
  *      normalizationContext={
  *          "groups"={"surgeries_read"}
@@ -27,90 +26,62 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
  *          "delete"
  *      },
  *      attributes={
- *          "order": {"yearOfFormation": "DESC"}   
+ *          "order": {"yearOfFormation": "DESC"}
  *      }
  * )
- *
  */
+#[ORM\Entity(repositoryClass: YearsRepository::class)]
 class Years
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     * @Groups({"surgeries_read", "consultation_read", "surgeons_read", "formations_read", "gardes_read"})
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
+    #[Groups(['surgeries_read', 'consultation_read', 'surgeons_read', 'formations_read', 'gardes_read'])]
     private $id;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="years")
-     * @ORM\JoinColumn(nullable=false)
-     * @Groups({"surgeries_read"})
-     */
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'years')]
+    #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['surgeries_read'])]
     private $user;
 
-    /**
-     * @ORM\Column(type="string")
-     * @Groups({"surgeries_read", "consultation_read", "formations_read", "gardes_read"})
-     * 
-     * @Assert\NotBlank(message="En quelle année êtes vous?")
-     */
+    #[ORM\Column(type: 'string')]
+    #[Groups(['surgeries_read', 'consultation_read', 'formations_read', 'gardes_read'])]
+    #[Assert\NotBlank(message: 'En quelle année êtes vous?')]
     private $yearOfFormation;
 
-    /**
-     * @ORM\Column(type="date")
-     * @Groups({"surgeries_read"})
-     * 
-     * @Assert\NotBlank(message="A quelle date avez vous commencez ce stage?")
-     * 
-     */
+    #[ORM\Column(type: 'date')]
+    #[Groups(['surgeries_read'])]
+    #[Assert\NotBlank(message: 'A quelle date avez vous commencez ce stage?')]
     private $dateOfStart;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     * @Groups({"surgeries_read"})
-     * 
-     * @Assert\NotBlank(message="Veuillez renseigner l'hopital")
-     * @Assert\Length(
-     *      max = 150,
-     *      maxMessage = "Le nom de l'hopital est trop long",
-     * )
-     */
+    #[ORM\Column(type: 'string', length: 255)]
+    #[Groups(['surgeries_read'])]
+    #[Assert\NotBlank(message: 'Veuillez renseigner l\'hopital')]
+    #[Assert\Length(max: 150, maxMessage: 'Le nom de l\'hopital est trop long')]
     private $hospital;
 
     /**
-     * @ORM\Column(type="string", length=255)
-     * @Groups({"surgeries_read"})
-     * 
-     * * @Assert\NotBlank(message="Qui est votre maitre de stage?")
+     * *
      */
+    #[ORM\Column(type: 'string', length: 255)]
+    #[Groups(['surgeries_read'])]
+    #[Assert\NotBlank(message: 'Qui est votre maitre de stage?')]
     private $master;
 
-    /**
-     * @ORM\OneToMany(targetEntity=Surgeries::class, mappedBy="year")
-     */
+    #[ORM\OneToMany(targetEntity: Surgeries::class, mappedBy: 'year')]
     private $surgeries;
 
-    /**
-     * @Groups({"surgeries_read"})
-     * 
-     * @ORM\OneToMany(targetEntity=Surgeons::class, mappedBy="year")
-     */
+    #[Groups(['surgeries_read'])]
+    #[ORM\OneToMany(targetEntity: Surgeons::class, mappedBy: 'year')]
     private $Surgeons;
 
-    /**
-     * @ORM\OneToMany(targetEntity=Consultations::class, mappedBy="year")
-     */
+    #[ORM\OneToMany(targetEntity: Consultations::class, mappedBy: 'year')]
     private $consultations;
 
-    /**
-     * @ORM\OneToMany(targetEntity=Formations::class, mappedBy="year")
-     */
+    #[ORM\OneToMany(targetEntity: Formations::class, mappedBy: 'year')]
     private $formations;
 
-    /**
-     * @ORM\OneToMany(targetEntity=Gardes::class, mappedBy="year")
-     */
+    #[ORM\OneToMany(targetEntity: Gardes::class, mappedBy: 'year')]
     private $gardes;
 
     public function __construct()

@@ -13,9 +13,9 @@ use Symfony\Component\Security\Core\Security;
 class UsersController extends AbstractController
 {
     /**
-     * @Route("/api/admin/users", name="users_list", methods={"GET"})
      * Retourne la liste des utilisateurs inscrits.
      */
+    #[Route('/api/admin/users', name: 'users_list', methods: ['GET'])]
     public function usersList(UserRepository $userRepository, ConnectionHistoryRepository $connectionHistoryRepository): JsonResponse
     {
         $usersData = [];
@@ -45,9 +45,9 @@ class UsersController extends AbstractController
     }
 
     /**
-     * @Route("/api/userStat/{id}", name="user_stat", methods={"GET"})
      * Retourne les statistiques d'un utilisateur spécifique.
      */
+    #[Route('/api/userStat/{id}', name: 'user_stat', methods: ['GET'])]
     public function userStat(int $id, YearsRepository $yearsRepository): JsonResponse
     {
         // Uniquement ses propres statistiques, sauf pour un administrateur.
@@ -60,9 +60,7 @@ class UsersController extends AbstractController
         return new JsonResponse($yearsData);
     }
 
-    /**
-     * @Route("/api/admin/fetchUserById/{id}", name="userProfil", methods={"GET"})
-     */
+    #[Route('/api/admin/fetchUserById/{id}', name: 'userProfil', methods: ['GET'])]
     public function fecthUserProfil(int $id, UserRepository $userRepository, YearsRepository $yearsRepository): JsonResponse
     {
         $searchedUser = $userRepository->findOneBy(['id' => $id]);

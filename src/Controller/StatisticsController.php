@@ -14,14 +14,11 @@ use App\Repository\YearsRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Security;
 
 
-/**
- * @Route("/api/statistics/", name="StatisticsController")
- */
+#[Route('/api/statistics/', name: 'StatisticsController')]
 class StatisticsController
 {
     private $userRepository;
@@ -43,12 +40,13 @@ class StatisticsController
         $this->statisticsRepository = $statisticsRepository;
         $this->formationRepository = $formationRepository;
     }
-    /**
-     * @Route("update/{userId<\d+>}", name="update", methods={ "POST" })
-     * @IsGranted("ROLE_ADMIN")
-     */
-    public function update($userId, EntityManagerInterface  $manager)
+    #[Route('update/{userId<\d+>}', name: 'update', methods: ['POST'])]
+    public function update($userId, EntityManagerInterface  $manager, AuthorizationCheckerInterface $authorizationChecker)
     {
+        // Réservé aux administrateurs.
+        if (!$authorizationChecker->isGranted('ROLE_ADMIN')) {
+            return new JsonResponse(['message' => 'Accès refusé'], JsonResponse::HTTP_FORBIDDEN);
+        }
 
         $final = ['firstHand' => 0, 'secondHand' => 0, 'consultations' => 0, 'gardes' => 0, 'formations' => 0];
 
@@ -126,9 +124,7 @@ class StatisticsController
         return new Response('ok');
     }
 
-    /**
-     * @Route("fetch/{userId<\d+>}", name="fetch", methods={"GET"})
-     */
+    #[Route('fetch/{userId<\d+>}', name: 'fetch', methods: ['GET'])]
     public function fetch($userId, Security $security, AuthorizationCheckerInterface $authorizationChecker)
     {
         // Statistiques de l'utilisateur $userId.

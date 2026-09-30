@@ -16,9 +16,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
  */
 class GetNomenclatureBySpecialityController extends AbstractController
 {
-    /**
-     * @Route("/api/nomenclature/{speciality}", name="nomenclature", methods={"GET"})
-     */
+    #[Route('/api/nomenclature/{speciality}', name: 'nomenclature', methods: ['GET'])]
     public function fetchNomenclature($speciality, NomenclatureRepository $nomenclature)
     {
         // On cherche la nomenclature selon la specialité

@@ -45,9 +45,7 @@ class NewSurgeriesAPIController extends AbstractController
     }
     
 
-    /**
-     * @Route("/api/surgeries/addNewSurgery", name="Add a new surgery - version 2", methods={"POST"})
-     */
+    #[Route('/api/surgeries/addNewSurgery', name: 'Add a new surgery - version 2', methods: ['POST'])]
     public function addNewSurgery(
         UserRepository $userRepository,
         YearsRepository $yearsRepository, 

@@ -13,9 +13,8 @@ class GetSurgeonsController extends AbstractController
 {
     /**
      * Liste des chirurgiens (id, prénom, nom, maître de stage) d'une année de l'utilisateur connecté.
-     *
-     * @Route("/api/list/{id}", name="list", methods={"GET"})
      */
+    #[Route('/api/list/{id}', name: 'list', methods: ['GET'])]
     public function CheckDate($id, SurgeonsRepository $surgeonsRepository, YearsRepository $yearsRepository)
     {
         $year = $yearsRepository->find($id);

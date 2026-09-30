@@ -11,9 +11,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-/**
- * @Route("/api/admin", name="marketing")
- */
+#[Route('/api/admin', name: 'marketing')]
 class MarketingController extends AbstractController
 {
     private $entityManager;
@@ -23,9 +21,7 @@ class MarketingController extends AbstractController
         $this->entityManager = $entityManager;
     }
 
-   /**
-     * @Route("/marketing", name="index", methods={"GET"})
-     */
+   #[Route('/marketing', name: 'index', methods: ['GET'])]
     public function index(MarketingRepository $marketingRepository): Response
     {
         $marketings = $marketingRepository->findAll();
@@ -57,9 +53,7 @@ class MarketingController extends AbstractController
     }
 
 
-    /**
-     * @Route("/marketing/{id}", name="get_campaign", methods={"GET"})
-     */
+    #[Route('/marketing/{id}', name: 'get_campaign', methods: ['GET'])]
     public function getCampaignById(Marketing $marketing): Response
     {
         // Structure les données de la campagne pour la réponse JSON
@@ -86,9 +80,7 @@ class MarketingController extends AbstractController
 
 
 
-   /**
-     * @Route("/marketing", name="create", methods={"POST"})
-     */
+   #[Route('/marketing', name: 'create', methods: ['POST'])]
     public function create(Request $request): Response
     {
         $data = json_decode($request->getContent(), true);
@@ -116,9 +108,7 @@ class MarketingController extends AbstractController
     }
 
 
-    /**
-     * @Route("/marketing/{id}", name="edit", methods={"PUT"})
-     */
+    #[Route('/marketing/{id}', name: 'edit', methods: ['PUT'])]
     public function edit(Request $request, Marketing $marketing): Response
     {
         $data = json_decode($request->getContent(), true);
@@ -144,9 +134,7 @@ class MarketingController extends AbstractController
     }
 
 
-    /**
-     * @Route("/marketing/{id}", name="delete_marketing_campaign", methods={"DELETE"})
-     */
+    #[Route('/marketing/{id}', name: 'delete_marketing_campaign', methods: ['DELETE'])]
     public function delete(Marketing $marketing, EntityManagerInterface $entityManager): JsonResponse
     {
         $entityManager->remove($marketing);
@@ -155,9 +143,7 @@ class MarketingController extends AbstractController
         return new JsonResponse(['status' => 'Marketing campaign deleted']);
     }
 
-    /**
-     * @Route("/marketing/{id}/status", name="update_status", methods={"PUT"})
-     */
+    #[Route('/marketing/{id}/status', name: 'update_status', methods: ['PUT'])]
     public function updateStatus(Request $request, Marketing $marketing): Response
     {
         $data = json_decode($request->getContent(), true);

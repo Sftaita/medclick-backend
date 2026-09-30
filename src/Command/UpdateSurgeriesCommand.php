@@ -2,6 +2,7 @@
 
 namespace App\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
 use App\Entity\Nomenclature;
 use App\Entity\Surgeries;
 use App\Repository\SurgeriesRepository;
@@ -16,9 +17,9 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 // 2. Ouvrez une console et naviguez vers la racine de votre projet Symfony.
 // 3. Exécutez la commande: php bin/console app:update-surgeries
 // 4. Après l'exécution, vous verrez le nombre de chirurgies sans correspondance de nomenclature.
+#[AsCommand(name: 'app:update-surgeries')]
 class UpdateSurgeriesCommand extends Command
 {
-    protected static $defaultName = 'app:update-surgeries';
 
     // L'EntityManager est injecté dans la commande pour pouvoir interagir avec la base de données
     private $entityManager;

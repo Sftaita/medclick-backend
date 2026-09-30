@@ -2,6 +2,7 @@
 
 namespace App\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
 use App\Entity\Favorites;
 use App\Entity\Nomenclature;
 use Doctrine\ORM\EntityManagerInterface;
@@ -16,9 +17,9 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 // 2. Ouvrez une console et naviguez vers la racine de votre projet Symfony.
 // 3. Exécutez la commande: php bin/console app:update-favorites
 // 4. Après l'exécution, vous verrez le nombre de favoris sans correspondance de nomenclature.
+#[AsCommand(name: 'app:update-favorites')]
 class UpdateFavoritesCommand extends Command
 {
-    protected static $defaultName = 'app:update-favorites';
 
     // L'EntityManager est injecté dans la commande pour pouvoir interagir avec la base de données
     private $entityManager;

@@ -7,86 +7,54 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity(repositoryClass=MarketingRepository::class)
- */
+#[ORM\Entity(repositoryClass: MarketingRepository::class)]
 class Marketing
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
     private $id;
 
-    /**
-     * @ORM\Column(type="string", length=400)
-     */
+    #[ORM\Column(type: 'string', length: 400)]
     private $campaign_name;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: 'string', length: 255)]
     private $status;
 
-    /**
-     * @ORM\Column(type="date")
-     */
+    #[ORM\Column(type: 'date')]
     private $start_date;
 
-    /**
-     * @ORM\Column(type="date", nullable=true)
-     */
+    #[ORM\Column(type: 'date', nullable: true)]
     private $end_date;
 
-    /**
-     * @ORM\Column(type="integer", options={"default" : 0})
-     */
+    #[ORM\Column(type: 'integer', options: ['default' => 0])]
     private $views = 0;
 
-    /**
-     * @ORM\Column(type="integer", options={"default" : 0})
-     */
+    #[ORM\Column(type: 'integer', options: ['default' => 0])]
     private $clicks = 0;
 
-    /**
-     * @ORM\Column(type="string", length=500, nullable=true)
-     */
+    #[ORM\Column(type: 'string', length: 500, nullable: true)]
     private $smartphone_format;
 
-    /**
-     * @ORM\Column(type="string", length=500, nullable=true)
-     */
+    #[ORM\Column(type: 'string', length: 500, nullable: true)]
     private $tablet_portrait_format;
 
-    /**
-     * @ORM\Column(type="string", length=500, nullable=true)
-     */
+    #[ORM\Column(type: 'string', length: 500, nullable: true)]
     private $tablet_landscape_format;
 
-    /**
-     * @ORM\Column(type="string", length=500, nullable=true)
-     */
+    #[ORM\Column(type: 'string', length: 500, nullable: true)]
     private $screen_14_inch_format;
 
-    /**
-     * @ORM\Column(type="string", length=500, nullable=true)
-     */
+    #[ORM\Column(type: 'string', length: 500, nullable: true)]
     private $large_screen_format;
 
-    /**
-     * @ORM\OneToMany(targetEntity=MarketingView::class, mappedBy="marketing")
-     */
+    #[ORM\OneToMany(targetEntity: MarketingView::class, mappedBy: 'marketing')]
     private $viewedAt;
 
-    /**
-     * @ORM\Column(type="integer", nullable=true, options={"default": 5})
-     */
+    #[ORM\Column(type: 'integer', nullable: true, options: ['default' => 5])]
     private $duration;
 
-    /**
-     * @ORM\Column(type="string", length=500, nullable=true)
-     */
+    #[ORM\Column(type: 'string', length: 500, nullable: true)]
     private $redirectUrl;
 
     public function __construct()

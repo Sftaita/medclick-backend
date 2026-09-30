@@ -144,6 +144,16 @@ class DataLeakTest extends ApiTestBase
         $this->assertArrayNotHasKey('user', $data);
     }
 
+    public function testStatisticsUpdateIsAdminOnly(): void
+    {
+        $this->clientFor($this->alice)->request('POST', '/api/statistics/update/' . $this->alice->getId());
+        $this->assertResponseStatusCodeSame(403);
+
+        $admin = $this->createUser('admin@test.be', ['ROLE_ADMIN']);
+        $this->clientFor($admin)->request('POST', '/api/statistics/update/' . $this->alice->getId());
+        $this->assertResponseIsSuccessful();
+    }
+
     // ---------------------------------------------------------------- Accès anonyme
 
     /**

@@ -5,26 +5,18 @@ namespace App\Entity;
 use App\Repository\TermsConditionsRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity(repositoryClass=TermsConditionsRepository::class)
- */
+#[ORM\Entity(repositoryClass: TermsConditionsRepository::class)]
 class TermsConditions
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
     private $id;
 
-    /**
-     * @ORM\Column(type="text")
-     */
+    #[ORM\Column(type: 'text')]
     private $content;
 
-    /**
-     * @ORM\Column(type="date")
-     */
+    #[ORM\Column(type: 'date')]
     private $publishedAt;
 
     public function getId(): ?int

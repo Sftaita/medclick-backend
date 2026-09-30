@@ -19,9 +19,7 @@ class GeneralMarketingController extends AbstractController
         $this->doctrine = $doctrine;
     }
 
-    /**
-     * @Route("/api/marketing/active", name="get_active_campaign", methods={"GET"})
-     */
+    #[Route('/api/marketing/active', name: 'get_active_campaign', methods: ['GET'])]
     public function getActiveCampaign(MarketingRepository $marketingRepository): JsonResponse
     {
         $currentDate = new DateTime(); // Date actuelle

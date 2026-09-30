@@ -24,58 +24,41 @@ use Symfony\Component\Serializer\Annotation\Groups;
  *          "delete"={"security"="is_granted('ROLE_ADMIN')"}
  *      },
  * ),
- * @ORM\Entity(repositoryClass=StatisticsRepository::class)
  */
+#[ORM\Entity(repositoryClass: StatisticsRepository::class)]
 class Statistics
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     * 
-     * @Groups({"statistics_read"})
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
+    #[Groups(['statistics_read'])]
     private $id;
 
-    /**
-     * @ORM\OneToOne(targetEntity=User::class, inversedBy="firstHandSurgery")
-     * @ORM\JoinColumn(nullable=false)
-     */
+    #[ORM\OneToOne(targetEntity: User::class, inversedBy: 'firstHandSurgery')]
+    #[ORM\JoinColumn(nullable: false)]
     private $user;
 
-    /**
-     * @ORM\Column(type="integer", nullable=true)
-     * @Groups({"statistics_read"})
-     */
+    #[ORM\Column(type: 'integer', nullable: true)]
+    #[Groups(['statistics_read'])]
     private $firstHandSurgeries;
 
-    /**
-     * @ORM\Column(type="integer", nullable=true)
-     * @Groups({"statistics_read"})
-     */
+    #[ORM\Column(type: 'integer', nullable: true)]
+    #[Groups(['statistics_read'])]
     private $secondHandSurgeries;
 
-    /**
-     * @ORM\Column(type="integer", nullable=true)
-     */
+    #[ORM\Column(type: 'integer', nullable: true)]
     private $fistHandHelpedSurgeries;
 
-    /**
-     * @ORM\Column(type="integer", nullable=true)
-     * @Groups({"statistics_read"})
-     */
+    #[ORM\Column(type: 'integer', nullable: true)]
+    #[Groups(['statistics_read'])]
     private $consultations;
 
-    /**
-     * @ORM\Column(type="integer", nullable=true)
-     * @Groups({"statistics_read"})
-     */
+    #[ORM\Column(type: 'integer', nullable: true)]
+    #[Groups(['statistics_read'])]
     private $gardes;
 
-    /**
-     * @ORM\Column(type="integer", nullable=true)
-     * @Groups({"statistics_read"})
-     */
+    #[ORM\Column(type: 'integer', nullable: true)]
+    #[Groups(['statistics_read'])]
     private $formations;
 
     public function getId(): ?int

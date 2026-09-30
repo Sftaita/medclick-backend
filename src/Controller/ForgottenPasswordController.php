@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 
+use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\UserRepository;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,10 +24,9 @@ class ForgottenPasswordController extends AbstractController
     /**
      * Envoie un lien de réinitialisation. La réponse est identique que le compte existe ou non
      * (pas d'énumération des emails).
-     *
-     * @Route("api/forgottenPassword", name="forgotten_password" , methods={"POST"})
      */
-    public function forgottenPassword(Request $request, UserRepository $userRepository, TokenGeneratorInterface $tokenGenerator, MailerController $mailer)
+    #[Route('api/forgottenPassword', name: 'forgotten_password', methods: ['POST'])]
+    public function forgottenPassword(Request $request, UserRepository $userRepository, TokenGeneratorInterface $tokenGenerator, MailerController $mailer, EntityManagerInterface $em)
     {
         $parameters = json_decode($request->getContent(), true);
         $username = $parameters['username'] ?? null;
@@ -36,14 +36,14 @@ class ForgottenPasswordController extends AbstractController
         }
 
         //On cherche l'utilisateur dans la base de donnée
-        $user = $userRepository->findOneByEmail($username);
+        $user = $userRepository->findOneBy(['email' => $username]);
 
         if ($user) {
             $token = $tokenGenerator->generateToken();
 
             $user->setResetToken($token)
                 ->setResetTokenRequestedAt(new \DateTime());
-            $this->getDoctrine()->getManager()->flush();
+            $em->flush();
 
             //On envoie un email avec le lien de réinitialisation.
             $mailer->sendEmail($user->getEmail(), "Ré-initialisation du mot de passse", "email/emailReseterEmail.html.twig", [
@@ -57,10 +57,8 @@ class ForgottenPasswordController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("api/resetPassword", name="reset_password" , methods={"POST"})
-     */
-    public function resetPassword(Request $request, UserRepository $userRepository, UserPasswordHasherInterface $encoder)
+    #[Route('api/resetPassword', name: 'reset_password', methods: ['POST'])]
+    public function resetPassword(Request $request, UserRepository $userRepository, UserPasswordHasherInterface $encoder, EntityManagerInterface $em)
     {
         $parameters = json_decode($request->getContent(), true);
         $token = $parameters['token'] ?? null;
@@ -76,7 +74,7 @@ class ForgottenPasswordController extends AbstractController
             return new JsonResponse(['message' => "Le mot de passe doit contenir entre 6 et 50 caractères"], JsonResponse::HTTP_BAD_REQUEST);
         }
 
-        $user = $userRepository->findOneByEmail($username);
+        $user = $userRepository->findOneBy(['email' => $username]);
 
         $registeredToken = $user ? $user->getResetToken() : null;
         $requestedAt = $user ? $user->getResetTokenRequestedAt() : null;
@@ -93,7 +91,7 @@ class ForgottenPasswordController extends AbstractController
         $user->setPassword($encoder->hashPassword($user, $password))
             ->setResetToken(null)
             ->setResetTokenRequestedAt(null);
-        $this->getDoctrine()->getManager()->flush();
+        $em->flush();
 
         return new JsonResponse(['message' => "Mot de passe modifié"]);
     }

@@ -2,6 +2,7 @@
 
 namespace App\Controller\Years;
 
+use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Years;
 use App\Repository\YearsRepository;
 use Symfony\Component\HttpFoundation\Request;
@@ -12,10 +13,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class YearsController extends AbstractController
 {
-    /**
-     * @Route("/api/years/create", name="createYears", methods={"POST"})
-     */
-    public function createYears(Security $security, YearsRepository $yearsRepository, Request $request): JsonResponse
+    #[Route('/api/years/create', name: 'createYears', methods: ['POST'])]
+    public function createYears(Security $security, YearsRepository $yearsRepository, Request $request, EntityManagerInterface $entityManager): JsonResponse
     {
         // Récupérer les données de la requête
         $data = json_decode($request->getContent(), true);
@@ -63,7 +62,6 @@ class YearsController extends AbstractController
         $newYear->setDateOfStart($dateOfStart); // Ajouter la date de début
         $newYear->setUser($user);
 
-        $entityManager = $this->getDoctrine()->getManager();
         $entityManager->persist($newYear);
         $entityManager->flush();
 

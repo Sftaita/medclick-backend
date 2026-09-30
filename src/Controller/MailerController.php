@@ -28,9 +28,8 @@ class MailerController extends AbstractController
 
     /**
      * Envoie d'email
-     *
-     * @Route("/mail", name="email")
      */
+    #[Route('/mail', name: 'email')]
     public function sendEmail(string $to, string $subject, string $template, array $parameters)
     {
         $email = (new Email())

@@ -45,7 +45,7 @@ class YearsRepository extends ServiceEntityRepository
         $check =  $this->createQueryBuilder('u')
             ->andWhere('u.user = :param1')
             ->andWhere('u.id = :param2')
-            ->setParameters(array('param1' => $IdUser, 'param2' => $year))
+            ->setParameter('param1', $IdUser)->setParameter('param2', $year)
             ->select('u')
             ->getQuery()
             ->getOneOrNullResult();
@@ -66,7 +66,7 @@ class YearsRepository extends ServiceEntityRepository
     {
         $hospital = $this->createQueryBuilder('u')
             ->andWhere('u.id = :param1')
-            ->setParameters(array('param1' => $year))
+            ->setParameter('param1', $year)
             ->select('u.hospital')
             ->getQuery()
             ->getOneOrNullResult();
@@ -83,7 +83,7 @@ class YearsRepository extends ServiceEntityRepository
     {
         $hospital = $this->createQueryBuilder('u')
             ->andWhere('u.id = :param1')
-            ->setParameters(array('param1' => $year))
+            ->setParameter('param1', $year)
             ->select('u.master')
             ->getQuery()
             ->getOneOrNullResult();
@@ -100,7 +100,7 @@ class YearsRepository extends ServiceEntityRepository
     {
         $query = $this->createQueryBuilder('u')
             ->andWhere('u.id = :param1')
-            ->setParameters(array('param1' => $year))
+            ->setParameter('param1', $year)
             ->select('u.yearOfFormation')
             ->getQuery()
             ->getOneOrNullResult();
@@ -116,7 +116,7 @@ class YearsRepository extends ServiceEntityRepository
     {
         $query = $this->createQueryBuilder('u')
             ->andWhere('u.id = :param1')
-            ->setParameters(array('param1' => $year))
+            ->setParameter('param1', $year)
             ->select('u.dateOfStart')
             ->getQuery()
             ->getOneOrNullResult();
@@ -132,7 +132,7 @@ class YearsRepository extends ServiceEntityRepository
     {
         $query = $this->createQueryBuilder('u')
             ->andWhere('u.user = :param1')
-            ->setParameters(array('param1' => $id))
+            ->setParameter('param1', $id)
             ->select('u.id')
             ->getQuery()
             ->getResult();
@@ -161,7 +161,7 @@ class YearsRepository extends ServiceEntityRepository
     {
         $request = $this->createQueryBuilder('u')
             ->andWhere('u.id = :param1')
-            ->setParameters(array('param1' => $year))
+            ->setParameter('param1', $year)
             ->select('u.hospital, u.yearOfFormation, u.master, u.dateOfStart')
             ->getQuery()
             ->getOneOrNullResult();

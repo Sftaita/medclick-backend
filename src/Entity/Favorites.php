@@ -13,8 +13,6 @@ use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
 
 /**
- * @ORM\Entity(repositoryClass=FavoritesRepository::class)
- * 
  * @ApiResource(
  *      normalizationContext={
  *          "groups"={"favorites_read"}
@@ -28,58 +26,40 @@ use Doctrine\Common\Collections\ArrayCollection;
  *      },
  *      attributes={
  *          "order": {"speciality": "ASC", "shortcut" : "ASC"},
- *          "pagination_enabled"=false 
+ *          "pagination_enabled"=false
  *      }
  * )
  */
+#[ORM\Entity(repositoryClass: FavoritesRepository::class)]
 class Favorites
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     * 
-     * @Groups({"favorites_read"})
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
+    #[Groups(['favorites_read'])]
     private $id;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     * 
-     * @Groups({"favorites_read"})
-     */
+    #[ORM\Column(type: 'string', length: 255)]
+    #[Groups(['favorites_read'])]
     private $shortcut;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     * 
-     * @Groups({"favorites_read"})
-     */
+    #[ORM\Column(type: 'string', length: 255)]
+    #[Groups(['favorites_read'])]
     private $SurgeryName;
 
-    /**
-     * @ORM\Column(type="string", length=100)
-     * 
-     * @Groups({"favorites_read"})
-     */
+    #[ORM\Column(type: 'string', length: 100)]
+    #[Groups(['favorites_read'])]
     private $codeHospitalisation;
 
-    /**
-     * @ORM\Column(type="string", length=100, nullable=true)
-     * 
-     * @Groups({"favorites_read"})
-     */
+    #[ORM\Column(type: 'string', length: 100, nullable: true)]
+    #[Groups(['favorites_read'])]
     private $speciality;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="favorites")
-     * @ORM\JoinColumn(nullable=false)
-     */
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'favorites')]
+    #[ORM\JoinColumn(nullable: false)]
     private $user;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=Nomenclature::class, inversedBy="favorites")
-     */
+    #[ORM\ManyToOne(targetEntity: Nomenclature::class, inversedBy: 'favorites')]
     private $surgery;
 
     public function getId(): ?int

@@ -11,16 +11,14 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use App\Repository\ConnectionHistoryRepository;
 
-/**
- * @Route("/api/admin/", name="Sthhb")
- */
+#[Route('/api/admin/', name: 'Sthhb')]
 class ConnectionHistoryController extends AbstractController
 {
     /**
-     * @Route("history/quick", name="connection_history_quick", methods={"GET"})
      * Fournit le nombre de connexions des 7 derniers jours, le nombre d'utilisateurs uniques,
      * les 10 derniers utilisateurs uniques connectés, et les 10 derniers utilisateurs inscrits.
      */
+    #[Route('history/quick', name: 'connection_history_quick', methods: ['GET'])]
     public function quickConnectionStats(ConnectionHistoryRepository $history, UserRepository $userRepository)
     {
         // Récupère les connexions des 7 derniers jours pour les statistiques journalières

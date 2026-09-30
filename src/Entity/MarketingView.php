@@ -5,27 +5,19 @@ namespace App\Entity;
 use App\Repository\MarketingViewRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity(repositoryClass=MarketingViewRepository::class)
- */
+#[ORM\Entity(repositoryClass: MarketingViewRepository::class)]
 class MarketingView
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
     private $id;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=marketing::class, inversedBy="viewedAt")
-     * @ORM\JoinColumn(nullable=false)
-     */
+    #[ORM\ManyToOne(targetEntity: marketing::class, inversedBy: 'viewedAt')]
+    #[ORM\JoinColumn(nullable: false)]
     private $marketing;
 
-    /**
-     * @ORM\Column(type="datetime")
-     */
+    #[ORM\Column(type: 'datetime')]
     private $viewedAt;
 
     public function getId(): ?int

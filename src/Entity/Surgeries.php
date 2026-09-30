@@ -9,7 +9,6 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * @ORM\Entity(repositoryClass=SurgeriesRepository::class)
  * @ApiResource(
  *      normalizationContext={
  *          "groups"={"surgeries_read"}
@@ -25,96 +24,61 @@ use Symfony\Component\Validator\Constraints as Assert;
  *          "delete"
  *      },
  *      attributes={
- *          "order": {"date": "DESC", "id" : "DESC"}   
+ *          "order": {"date": "DESC", "id" : "DESC"}
  *      }
  * )
  */
+#[ORM\Entity(repositoryClass: SurgeriesRepository::class)]
 class Surgeries
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     * @Groups({"surgeries_read"})
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
+    #[Groups(['surgeries_read'])]
     private $id;
 
-    /**
-     * @ORM\Column(type="date")
-     * @Groups({"surgeries_read"})
-     * 
-     * @Assert\NotBlank(message="Indiquer la date")
-     * 
-     */
+    #[ORM\Column(type: 'date')]
+    #[Groups(['surgeries_read'])]
+    #[Assert\NotBlank(message: 'Indiquer la date')]
     private $date;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     * @Groups({"surgeries_read"})
-     * 
-     * @Assert\NotBlank(message="Veuillez indiquer la spécialité.")
-     * @Assert\Length(
-     *      max = 150,
-     *      maxMessage = "Le nom de la specialité est trop long",
-     * )
-     */
+    #[ORM\Column(type: 'string', length: 255)]
+    #[Groups(['surgeries_read'])]
+    #[Assert\NotBlank(message: 'Veuillez indiquer la spécialité.')]
+    #[Assert\Length(max: 150, maxMessage: 'Le nom de la specialité est trop long')]
     private $speciality;
 
-    /**
-     * @ORM\Column(type="string", length=1000)
-     * @Groups({"surgeries_read"})
-     * 
-     * @Assert\NotBlank(message="Veuillez indiquer le titre de l'intervention.")
-     * @Assert\Length(
-     *      max = 500,
-     *      maxMessage = "Le nom de l'intervention est trop long",
-     * )
-     */
+    #[ORM\Column(type: 'string', length: 1000)]
+    #[Groups(['surgeries_read'])]
+    #[Assert\NotBlank(message: 'Veuillez indiquer le titre de l\'intervention.')]
+    #[Assert\Length(max: 500, maxMessage: 'Le nom de l\'intervention est trop long')]
     private $name;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     * @Groups({"surgeries_read"})
-     * 
-     * @Assert\NotBlank(message="Veuillez indiquer votre rôle durant l'intervention.")
-     */
+    #[ORM\Column(type: 'string', length: 255)]
+    #[Groups(['surgeries_read'])]
+    #[Assert\NotBlank(message: 'Veuillez indiquer votre rôle durant l\'intervention.')]
     private $position;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=Years::class, inversedBy="surgeries")
-     * @Groups({"surgeries_read"})
-     * 
-     * @Assert\NotBlank(message="L'intervention doit être liée à une année de formation")
-     */
+    #[ORM\ManyToOne(targetEntity: Years::class, inversedBy: 'surgeries')]
+    #[Groups(['surgeries_read'])]
+    #[Assert\NotBlank(message: 'L\'intervention doit être liée à une année de formation')]
     private $year;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     * @Groups({"surgeries_read"})
-     * 
-     */
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    #[Groups(['surgeries_read'])]
     private $firstHand;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     * @Groups({"surgeries_read"})
-     */
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    #[Groups(['surgeries_read'])]
     private $secondHand;
 
-    /**
-     * @ORM\Column(type="string", length=50, nullable=true)
-     * 
-     */
+    #[ORM\Column(type: 'string', length: 50, nullable: true)]
     private $code;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=Nomenclature::class, inversedBy="surgeries")
-     */
+    #[ORM\ManyToOne(targetEntity: Nomenclature::class, inversedBy: 'surgeries')]
     private $nomenclature;
 
-    /**
-     * @ORM\Column(type="datetime", nullable=true)
-     */
+    #[ORM\Column(type: 'datetime', nullable: true)]
     private $createdAt;
 
     public function getId(): ?int

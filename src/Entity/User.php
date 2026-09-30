@@ -14,7 +14,6 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
- * @ORM\Entity(repositoryClass=UserRepository::class)
  * @ApiResource(
  *      normalizationContext={
  *          "groups"={"user_read"}
@@ -23,148 +22,94 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  *          "groups"={"user_write"}
  *      },
  *      attributes={
- *          "order": {"lastname": "ASC"}   
+ *          "order": {"lastname": "ASC"}
  *      }
  * )
- * @UniqueEntity("email",message="Cet utilisateur existe déjà")
  */
+#[ORM\Entity(repositoryClass: UserRepository::class)]
+#[UniqueEntity('email', message: 'Cet utilisateur existe déjà')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     * 
-     * @Groups({"user_read"})
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
+    #[Groups(['user_read'])]
     private $id;
 
-    /**
-     * @ORM\Column(type="string", length=180, unique=true)
-     * @Groups({"user_read", "user_write"})
-     * 
-     * @Assert\NotBlank(message="L'email doit être renseigné")
-     * @Assert\Email(
-     *     message = "L'email indiqué n'est pas valide"
-     * )
-     */
+    #[ORM\Column(type: 'string', length: 180, unique: true)]
+    #[Groups(['user_read', 'user_write'])]
+    #[Assert\NotBlank(message: 'L\'email doit être renseigné')]
+    #[Assert\Email(message: 'L\'email indiqué n\'est pas valide')]
     private $email;
 
-    /**
-     * @ORM\Column(type="json")
-     */
+    #[ORM\Column(type: 'json')]
     private $roles = [];
 
     /**
      * @var string The hashed password
-     * @ORM\Column(type="string")
-     * @Groups({"user_write"})
-     *
-     * @Assert\NotBlank(message="Un mot de passe est nécessaire")
-     * @Assert\Length(
-     *      min = 6,
-     *      max = 50,
-     *      minMessage = "Le mot de passe choisi est trop court",
-     *      maxMessage = "Le mot de passe est trop long"
-     * )
      */
+    #[ORM\Column(type: 'string')]
+    #[Groups(['user_write'])]
+    #[Assert\NotBlank(message: 'Un mot de passe est nécessaire')]
+    #[Assert\Length(min: 6, max: 50, minMessage: 'Le mot de passe choisi est trop court', maxMessage: 'Le mot de passe est trop long')]
     private $password;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     * @Groups({"user_read", "user_write"})
-     *
-     * @Assert\NotBlank(message="Quel est votre prénom")
-     * @Assert\Length(
-     *      max = 50,
-     *      maxMessage = "Le prénom est trop long"
-     * )
-     */
+    #[ORM\Column(type: 'string', length: 255)]
+    #[Groups(['user_read', 'user_write'])]
+    #[Assert\NotBlank(message: 'Quel est votre prénom')]
+    #[Assert\Length(max: 50, maxMessage: 'Le prénom est trop long')]
     private $firstname;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     * @Groups({"user_read", "user_write"})
-     *
-     * @Assert\NotBlank(message="Quel est votre nom")
-     * @Assert\Length(
-     *      max = 50,
-     *      maxMessage = "Le nom est trop long"
-     * )
-     */
+    #[ORM\Column(type: 'string', length: 255)]
+    #[Groups(['user_read', 'user_write'])]
+    #[Assert\NotBlank(message: 'Quel est votre nom')]
+    #[Assert\Length(max: 50, maxMessage: 'Le nom est trop long')]
     private $lastname;
 
-    /**
-     * @ORM\OneToMany(targetEntity=Years::class, mappedBy="user")
-     */
+    #[ORM\OneToMany(targetEntity: Years::class, mappedBy: 'user')]
     private $years;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
     public $token;
 
-    /**
-     * @ORM\Column(type="datetime", nullable=true)
-     */
+    #[ORM\Column(type: 'datetime', nullable: true)]
     private $createdAt;
 
-    /**
-     * @ORM\Column(type="datetime", nullable=true)
-     * 
-     * @Groups({"user_read"})
-     */
+    #[ORM\Column(type: 'datetime', nullable: true)]
+    #[Groups(['user_read'])]
     private $validatedAt;
 
-    /**
-     * @ORM\Column(type="string", length=10, nullable=true)
-     * @Groups({"user_read"})
-     */
+    #[ORM\Column(type: 'string', length: 10, nullable: true)]
+    #[Groups(['user_read'])]
     private $counter;
 
-    /**
-     * @ORM\OneToMany(targetEntity=Favorites::class, mappedBy="user")
-     */
+    #[ORM\OneToMany(targetEntity: Favorites::class, mappedBy: 'user')]
     private $favorites;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     * @Groups({"user_read", "user_write"})
-     *
-     * @Assert\Length(
-     *      max = 100,
-     *      maxMessage = "Le nom de specialité est trop long"
-     * )
-     */
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    #[Groups(['user_read', 'user_write'])]
+    #[Assert\Length(max: 100, maxMessage: 'Le nom de specialité est trop long')]
     private $speciality;
 
     /**
      * Statistiques de l'utilisateur (nom historique ; voir aussi getStatistics()).
-     *
-     * @ORM\OneToOne(targetEntity=Statistics::class, mappedBy="user", cascade={"persist", "remove"})
      */
+    #[ORM\OneToOne(targetEntity: Statistics::class, mappedBy: 'user', cascade: ['persist', 'remove'])]
     private $firstHandSurgery;
 
-    /**
-     * @ORM\Column(type="string", length=50, nullable=true)
-     */
+    #[ORM\Column(type: 'string', length: 50, nullable: true)]
     private $resetToken;
 
     /**
      * Date de la demande de réinitialisation (le token expire après un délai).
-     *
-     * @ORM\Column(type="datetime", nullable=true)
      */
+    #[ORM\Column(type: 'datetime', nullable: true)]
     private $resetTokenRequestedAt;
 
-    /**
-     * @ORM\Column(type="boolean", nullable=true)
-     */
+    #[ORM\Column(type: 'boolean', nullable: true)]
     private $acceptedTerms;
 
-    /**
-     * @ORM\Column(type="datetime", nullable=true)
-     */
+    #[ORM\Column(type: 'datetime', nullable: true)]
     private $termsAcceptedDate;
 
     public function __construct()

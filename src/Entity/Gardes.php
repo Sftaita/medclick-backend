@@ -10,8 +10,6 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * @ORM\Entity(repositoryClass=GardesRepository::class)
- * 
  * @ApiResource(
  *      normalizationContext={
  *          "groups"={"gardes_read"}
@@ -27,62 +25,39 @@ use Symfony\Component\Validator\Constraints as Assert;
  *          "delete"
  *      },
  *      attributes={
- *          "order": {"dateOfStart": "DESC"}   
+ *          "order": {"dateOfStart": "DESC"}
  *      }
  * )
  */
+#[ORM\Entity(repositoryClass: GardesRepository::class)]
 class Gardes
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     * 
-     * @Groups({"gardes_read"})
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
+    #[Groups(['gardes_read'])]
     private $id;
 
-    /**
-     * @ORM\Column(type="datetime")
-     * 
-     * @Groups({"gardes_read"})
-     * 
-     * @Assert\NotBlank(message="Veuillez indiquer la date de début.")
-     */
+    #[ORM\Column(type: 'datetime')]
+    #[Groups(['gardes_read'])]
+    #[Assert\NotBlank(message: 'Veuillez indiquer la date de début.')]
     private $dateOfStart;
 
-    /**
-     * @ORM\Column(type="datetime")
-     * 
-     * @Groups({"gardes_read"})
-     * 
-     * @Assert\NotBlank(message="Veuillez indiquer la date de fin.")
-     */
+    #[ORM\Column(type: 'datetime')]
+    #[Groups(['gardes_read'])]
+    #[Assert\NotBlank(message: 'Veuillez indiquer la date de fin.')]
     private $dateOfEnd;
 
-    /**
-     * @ORM\Column(type="string", length=10)
-     * 
-     * @Groups({"gardes_read"})
-     * 
-     * @Assert\NotBlank(message="Indiquer le nombre de consultation")
-     * @Assert\Length(
-     *      max = 3,
-     *      maxMessage = "Ce nombre de consultation est improbable",
-     * )
-     *  @Assert\Type(
-     *     type="numeric",
-     *     message="Veuillez entrer un nombre."
-     * )
-     */
+    #[ORM\Column(type: 'string', length: 10)]
+    #[Groups(['gardes_read'])]
+    #[Assert\NotBlank(message: 'Indiquer le nombre de consultation')]
+    #[Assert\Length(max: 3, maxMessage: 'Ce nombre de consultation est improbable')]
+    #[Assert\Type(type: 'numeric', message: 'Veuillez entrer un nombre.')]
     private $number;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=Years::class, inversedBy="gardes")
-     * @ORM\JoinColumn(nullable=false)
-     * 
-     * @Groups({"gardes_read"})
-     */
+    #[ORM\ManyToOne(targetEntity: Years::class, inversedBy: 'gardes')]
+    #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['gardes_read'])]
     private $year;
 
     public function getId(): ?int

@@ -10,8 +10,6 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * @ORM\Entity(repositoryClass=FormationsRepository::class)
- * 
  * @ApiResource(
  *      normalizationContext={
  *          "groups"={"formations_read"}
@@ -27,106 +25,61 @@ use Symfony\Component\Validator\Constraints as Assert;
  *          "delete"
  *      },
  *      attributes={
- *          "order": {"dateOfStart": "DESC"}   
+ *          "order": {"dateOfStart": "DESC"}
  *      }
  * )
  */
+#[ORM\Entity(repositoryClass: FormationsRepository::class)]
 class Formations
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     * 
-     * @Groups({"formations_read"})
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
+    #[Groups(['formations_read'])]
     private $id;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     * 
-     * @Groups({"formations_read"})
-     * 
-     * @Assert\NotBlank(message="Veuillez indiquer le type d'évènement.")
-     * @Assert\Length(
-     *      max = 255,
-     *      maxMessage = "Le nom est trop long",
-     * )
-     */
+    #[ORM\Column(type: 'string', length: 255)]
+    #[Groups(['formations_read'])]
+    #[Assert\NotBlank(message: 'Veuillez indiquer le type d\'évènement.')]
+    #[Assert\Length(max: 255, maxMessage: 'Le nom est trop long')]
     private $event;
 
-    /**
-     * @ORM\Column(type="datetime")
-     * 
-     * @Groups({"formations_read"})
-     * 
-     * @Assert\NotBlank(message="Veuillez indiquer la date de début.")
-     */
+    #[ORM\Column(type: 'datetime')]
+    #[Groups(['formations_read'])]
+    #[Assert\NotBlank(message: 'Veuillez indiquer la date de début.')]
     private $dateOfStart;
 
-    /**
-     * @ORM\Column(type="datetime")
-     * 
-     * @Groups({"formations_read"})
-     * 
-     * @Assert\NotBlank(message="Veuillez indiquer la date de fin.")
-     */
+    #[ORM\Column(type: 'datetime')]
+    #[Groups(['formations_read'])]
+    #[Assert\NotBlank(message: 'Veuillez indiquer la date de fin.')]
     private $dateOfEnd;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     * 
-     * @Groups({"formations_read"})
-     * 
-     * @Assert\NotBlank(message="Veuillez indiquer le titre de l'évènement.")
-     */
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    #[Groups(['formations_read'])]
+    #[Assert\NotBlank(message: 'Veuillez indiquer le titre de l\'évènement.')]
     private $name;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     * 
-     * @Groups({"formations_read"})
-     * 
-     * @Assert\NotBlank(message="Décrire brièvement l'évènement.")
-     * @Assert\Length(
-     *      max = 255,
-     *      maxMessage = "La description est trop longue (max 255 charactères)",
-     * )
-     */
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    #[Groups(['formations_read'])]
+    #[Assert\NotBlank(message: 'Décrire brièvement l\'évènement.')]
+    #[Assert\Length(max: 255, maxMessage: 'La description est trop longue (max 255 charactères)')]
     private $description;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     * 
-     * @Groups({"formations_read"})
-     * 
-     * @Assert\NotBlank(message="Ou l'évènement à t-il eu lieu?")
-     * @Assert\Length(
-     *      max = 255,
-     *      maxMessage = "L'adresse est trop longue",
-     * )
-     */
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    #[Groups(['formations_read'])]
+    #[Assert\NotBlank(message: 'Ou l\'évènement à t-il eu lieu?')]
+    #[Assert\Length(max: 255, maxMessage: 'L\'adresse est trop longue')]
     private $location;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     * 
-     * @Groups({"formations_read"})
-     * 
-     * @Assert\NotBlank(message="A quel titre y assistiez vous?")
-     * @Assert\Length(
-     *      max = 255,
-     *      maxMessage = "Votre rôle est trop long",
-     * )
-     */
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    #[Groups(['formations_read'])]
+    #[Assert\NotBlank(message: 'A quel titre y assistiez vous?')]
+    #[Assert\Length(max: 255, maxMessage: 'Votre rôle est trop long')]
     private $role;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=Years::class, inversedBy="formations")
-     * @ORM\JoinColumn(nullable=false)
-     * 
-     * @Groups({"formations_read"})
-     */
+    #[ORM\ManyToOne(targetEntity: Years::class, inversedBy: 'formations')]
+    #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['formations_read'])]
     private $year;
 
     public function getId(): ?int

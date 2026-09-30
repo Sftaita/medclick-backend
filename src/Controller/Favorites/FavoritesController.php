@@ -24,9 +24,7 @@ class FavoritesController extends AbstractController
         $this->doctrine = $doctrine;
     }
     
-    /**
-     * @Route("/api/favorites/getMyList", name="GetFavoritesList", methods={"GET"})
-     */
+    #[Route('/api/favorites/getMyList', name: 'GetFavoritesList', methods: ['GET'])]
     public function addSurgery(Security $security, FavoritesRepository $favoritesRepository)
     {
         $user = $security->getUser();
@@ -49,9 +47,7 @@ class FavoritesController extends AbstractController
         return($this->json($data, 200 , ['Access-Control-Allow-Origin' => $_ENV['CORS_ALLOW_ORIGIN']]));
     }
 
-    /**
-     * @Route("/api/favorites/addNew", name="AddANewFavorites-NewVersion", methods={"POST"})
-     */
+    #[Route('/api/favorites/addNew', name: 'AddANewFavorites-NewVersion', methods: ['POST'])]
     public function addNewFavorite(Request $request,Security $security, NomenclatureRepository $nomenclatureRepository)
     {
         $user = $security->getUser();
@@ -96,9 +92,7 @@ class FavoritesController extends AbstractController
 
     }
 
-    /**
-     * @Route("/api/favorites/updateNew", name="UpdateFavorites-NewVersion", methods={"PUT"})
-     */
+    #[Route('/api/favorites/updateNew', name: 'UpdateFavorites-NewVersion', methods: ['PUT'])]
     public function updateFavorite(Request $request,Security $security,FavoritesRepository $favoritesRepository, NomenclatureRepository $nomenclatureRepository)
     {
         $user = $security->getUser();
@@ -154,7 +148,7 @@ class FavoritesController extends AbstractController
         }
 
        // Save the updated favorite
-        $entityManager = $this->getDoctrine()->getManager();
+        $entityManager = $this->doctrine->getManager();
         $entityManager->persist($favorite);
         $entityManager->flush();
 

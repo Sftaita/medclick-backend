@@ -28,7 +28,7 @@ class FormationsRepository extends ServiceEntityRepository
     {
         return $this->createQueryBuilder('u')
             ->andWhere('u.year = :param1')
-            ->setParameters(array('param1' => $IdYear))
+            ->setParameter('param1', $IdYear)
             ->select('u.id, u.event, u.dateOfStart, u.dateOfEnd, u.name, u.description, u.location, u.role')
             ->getQuery()
             ->getResult();;

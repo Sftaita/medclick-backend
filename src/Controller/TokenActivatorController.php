@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
@@ -9,10 +10,8 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class TokenActivatorController extends AbstractController
 {
-    /**
-     * @Route("/activation/{token}", name="activation", methods={"GET"})
-     */
-    public function VerifyToken($token, UserRepository $userRepo)
+    #[Route('/activation/{token}', name: 'activation', methods: ['GET'])]
+    public function VerifyToken($token, UserRepository $userRepo, EntityManagerInterface $em)
     {
         if(strlen($token) !== 32){
             throw $this->createNotFoundException("Lien d'activation invalide");
@@ -31,7 +30,6 @@ class TokenActivatorController extends AbstractController
             $user->setToken(null);
             $user->setValidatedAt(new \DateTime());
     
-            $em = $this->getDoctrine()->getManager();
             $em->persist($user);
             $em->flush();
            

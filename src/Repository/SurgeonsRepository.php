@@ -62,7 +62,7 @@ class SurgeonsRepository extends ServiceEntityRepository
         $boss =  $this->createQueryBuilder('u')
         ->andWhere('u.year = :param1')
         ->andWhere('u.boss = 1')
-        ->setParameters(array('param1'=> $year))
+        ->setParameter('param1', $year)
         ->select('u')
         ->getQuery()
         ->getResult();

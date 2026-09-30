@@ -20,9 +20,7 @@ class TermsConditionsController
         $this->security = $security;
     }
 
-    /**
-     * @Route("/api/terms-conditions", name="get_terms_conditions", methods={"GET"})
-     */
+    #[Route('/api/terms-conditions', name: 'get_terms_conditions', methods: ['GET'])]
     public function getTermsConditions(): JsonResponse
     {
         {
@@ -42,9 +40,7 @@ class TermsConditionsController
         }
     }
 
-    /**
-     * @Route("/api/acceptTerms", name="accept_terms_conditions", methods={"PUT"})
-     */
+    #[Route('/api/acceptTerms', name: 'accept_terms_conditions', methods: ['PUT'])]
     public function acceptTermsConditions(): JsonResponse
     {
         $userConnected = $this->security->getUser();

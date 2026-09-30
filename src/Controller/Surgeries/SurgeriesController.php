@@ -32,17 +32,14 @@ class SurgeriesController extends AbstractController
     }
 
     /**
-     * @Route("/api/surgeries/add", name="Add a new surgery", methods={"POST"})
-     *
      * Add a new surgery to the database.
-     *
      * @param Request $request The HTTP request object.
      * @param Security $security The security service.
      * @param UserRepository $userRepository The user repository.
      * @param NomenclatureRepository $nomenclatureRepository The nomenclature repository.
-     *
      * @return void
      */
+    #[Route('/api/surgeries/add', name: 'Add a new surgery', methods: ['POST'])]
     public function addSurgery(Request $request, Security $security, UserRepository $userRepository, NomenclatureRepository $nomenclatureRepository, YearsRepository $yearsRepository)
     {
         // Get the current user from the security service.
@@ -129,9 +126,7 @@ class SurgeriesController extends AbstractController
         ], JsonResponse::HTTP_OK, ['Access-Control-Allow-Origin' =>  $_ENV['CORS_ALLOW_ORIGIN']]);
     }
 
-    /**
-     * @Route("/api/surgeries/update/{id}", name="UpdateSurgery", methods={"PUT"})
-     */
+    #[Route('/api/surgeries/update/{id}', name: 'UpdateSurgery', methods: ['PUT'])]
     public function updateSurgery($id, Request $request, Security $security, UserRepository $userRepository, NomenclatureRepository $nomenclatureRepository, YearsRepository $yearsRepository, SurgeriesRepository $surgeriesRepository)
     {
         // Get the current user from the security service.

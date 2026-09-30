@@ -28,7 +28,7 @@ class ConsultationsRepository extends ServiceEntityRepository
     {
         return $this->createQueryBuilder('u')
             ->andWhere('u.year = :param1')
-            ->setParameters(array('param1' => $IdYear))
+            ->setParameter('param1', $IdYear)
             ->select('u.date, u.number, u.dayPart, u.speciality')
             ->getQuery()
             ->getResult();;
@@ -43,7 +43,7 @@ class ConsultationsRepository extends ServiceEntityRepository
     {
         return $this->createQueryBuilder('u')
             ->andWhere('u.year = :param1')
-            ->setParameters(array('param1' => $IdYear))
+            ->setParameter('param1', $IdYear)
             ->select('DISTINCT u.date')
             ->getQuery()
             ->getResult();;
@@ -58,7 +58,7 @@ class ConsultationsRepository extends ServiceEntityRepository
     {
         return $this->createQueryBuilder('u')
             ->andWhere('u.user = :param1')
-            ->setParameters(array('param1' => $IdUser))
+            ->setParameter('param1', $IdUser)
             ->select('count(u.id)')
             ->getQuery()
             ->getResult();
@@ -93,7 +93,7 @@ class ConsultationsRepository extends ServiceEntityRepository
             ->andWhere('u.year = :param1')
             ->andWhere('u.date = :param2')
             ->andWhere('u.dayPart = :param3')
-            ->setParameters(array('param1' => $year, 'param2' => $date, 'param3' => $dayPart))
+            ->setParameter('param1', $year)->setParameter('param2', $date)->setParameter('param3', $dayPart)
             ->select('count(u)')
             ->getQuery()
             ->getResult();

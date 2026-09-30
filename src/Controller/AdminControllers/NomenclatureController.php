@@ -12,9 +12,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class NomenclatureController extends AbstractController{
 
-    /**
-     * @Route("/api/admin/nomenclature/{speciality}", name="GetListOfNomenclature", methods={"GET"})
-     */
+    #[Route('/api/admin/nomenclature/{speciality}', name: 'GetListOfNomenclature', methods: ['GET'])]
     public function getNomenclature($speciality, NomenclatureRepository $nomenclatureRepository): JsonResponse
     {
         if (!isset($speciality) || !is_string($speciality) || strlen($speciality) > 15) {
@@ -40,9 +38,7 @@ class NomenclatureController extends AbstractController{
         return $this->json($data, 200, ['Access-Control-Allow-Origin' => $_ENV['CORS_ALLOW_ORIGIN']]);
     }
 
-    /**
-     * @Route("/api/admin/nomenclature", name="PostNomenclature", methods={"POST"})
-     */
+    #[Route('/api/admin/nomenclature', name: 'PostNomenclature', methods: ['POST'])]
     public function postNomenclature(Request $request, NomenclatureRepository $nomenclatureRepository, EntityManagerInterface $entityManager): JsonResponse
     {
         
@@ -65,9 +61,7 @@ class NomenclatureController extends AbstractController{
     }
 
 
-    /**
-     * @Route("/api/admin/nomenclature", name="UpdateNomenclature", methods={"PUT"})
-     */
+    #[Route('/api/admin/nomenclature', name: 'UpdateNomenclature', methods: ['PUT'])]
     public function updateNomenclature(Request $request, NomenclatureRepository $nomenclatureRepository, EntityManagerInterface $entityManager): JsonResponse
     {
         
@@ -93,9 +87,7 @@ class NomenclatureController extends AbstractController{
         return new JsonResponse(['message' => 'Nomenclature updated successfully'], 200);
     }
 
-    /**
-     * @Route("/api/admin/nomenclature/update-type", name="UpdateNomenclatureType", methods={"PUT"})
-     */
+    #[Route('/api/admin/nomenclature/update-type', name: 'UpdateNomenclatureType', methods: ['PUT'])]
     public function updateNomenclatureType(Request $request, NomenclatureRepository $nomenclatureRepository, EntityManagerInterface $entityManager): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
@@ -138,9 +130,7 @@ class NomenclatureController extends AbstractController{
         return new JsonResponse(['message' => 'Types updated successfully'], 200);
     }
 
-    /**
-     * @Route("/api/admin/nomenclature/update-subtype", name="UpdateNomenclatureSubType", methods={"PUT"})
-     */
+    #[Route('/api/admin/nomenclature/update-subtype', name: 'UpdateNomenclatureSubType', methods: ['PUT'])]
     public function updateNomenclatureSubType(Request $request, NomenclatureRepository $nomenclatureRepository, EntityManagerInterface $entityManager): JsonResponse
     {
         $data = json_decode($request->getContent(), true);

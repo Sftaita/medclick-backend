@@ -60,7 +60,7 @@ class SurgeriesRepository extends ServiceEntityRepository
         $check =  $this->createQueryBuilder('u')
             ->andWhere('u.year = :param1')
             ->andWhere('u.firstHand = :param2')
-            ->setParameters(array('param1' => $IdYear, 'param2' => $IdSurgeon))
+            ->setParameter('param1', $IdYear)->setParameter('param2', $IdSurgeon)
             ->select('u.id')
             ->getQuery()
             ->getResult();
@@ -80,7 +80,7 @@ class SurgeriesRepository extends ServiceEntityRepository
             ->where('u.year = :param2')
             ->andWhere('u.position = 2 OR u.position = 3')
             ->andWhere('u.firstHand = :param1 OR u.secondHand = :param1')
-            ->setParameters(array('param1' => $surgeon, 'param2' => $yearId ))
+            ->setParameter('param1', $surgeon)->setParameter('param2', $yearId)
             ->getQuery()
             ->getResult();
         return;
@@ -97,7 +97,7 @@ class SurgeriesRepository extends ServiceEntityRepository
         $arr =  $this->createQueryBuilder('u')
             ->andWhere('u.name = :param1')
             ->andWhere('u.year = :param2')
-            ->setParameters(array('param1' => $SurgeryName, 'param2' => $year))
+            ->setParameter('param1', $SurgeryName)->setParameter('param2', $year)
             ->select('u.position')
             ->getQuery()
             ->getResult();
@@ -118,7 +118,7 @@ class SurgeriesRepository extends ServiceEntityRepository
         $check =  $this->createQueryBuilder('u')
             ->andWhere('u.year = :param1')
             ->andWhere('u.secondHand = :param2')
-            ->setParameters(array('param1' => $IdYear, 'param2' => $IdSurgeon))
+            ->setParameter('param1', $IdYear)->setParameter('param2', $IdSurgeon)
             ->select('COUNT (u.firstHand)')
             ->getQuery()
             ->getResult();
@@ -138,7 +138,7 @@ class SurgeriesRepository extends ServiceEntityRepository
         $check =  $this->createQueryBuilder('u')
             ->andWhere('u.year = :param1')
             ->andWhere('u.secondHand = :param2')
-            ->setParameters(array('param1' => $IdYear, 'param2' => $IdSurgeon))
+            ->setParameter('param1', $IdYear)->setParameter('param2', $IdSurgeon)
             ->select('u.id')
             ->getQuery()
             ->getResult();
