@@ -138,14 +138,11 @@ class User implements UserInterface
     private $speciality;
 
     /**
+     * Statistiques de l'utilisateur (nom historique ; voir aussi getStatistics()).
+     *
      * @ORM\OneToOne(targetEntity=Statistics::class, mappedBy="user", cascade={"persist", "remove"})
      */
     private $firstHandSurgery;
-
-    /**
-     * @ORM\OneToOne(targetEntity=Statistics::class, mappedBy="user")
-     */
-    private $statistics;
 
     /**
      * @ORM\Column(type="string", length=50, nullable=true)
@@ -415,14 +412,17 @@ class User implements UserInterface
         return $this;
     }
 
+    /**
+     * Alias de getFirstHandSurgery() : une seule relation inverse vers Statistics.
+     */
     public function getStatistics(): ?Statistics
     {
-        return $this->statistics;
+        return $this->firstHandSurgery;
     }
 
     public function setStatistics(?Statistics $statistics): self
     {
-        $this->statistics = $statistics;
+        $this->firstHandSurgery = $statistics;
 
         return $this;
     }
