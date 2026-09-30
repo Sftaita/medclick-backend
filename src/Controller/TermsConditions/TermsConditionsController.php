@@ -5,8 +5,8 @@ namespace App\Controller\TermsConditions;
 use App\Entity\User;
 use App\Entity\TermsConditions;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\Security\Core\Security;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 class TermsConditionsController

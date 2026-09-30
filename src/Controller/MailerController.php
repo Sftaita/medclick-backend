@@ -5,7 +5,6 @@ namespace App\Controller;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Routing\Annotation\Route;
 use Twig\Environment;
 
 class MailerController extends AbstractController
@@ -29,7 +28,6 @@ class MailerController extends AbstractController
     /**
      * Envoie d'email
      */
-    #[Route('/mail', name: 'email')]
     public function sendEmail(string $to, string $subject, string $template, array $parameters)
     {
         $email = (new Email())

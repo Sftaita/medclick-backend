@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [master, "securite/**", "outillage/**"]
+    branches: [master, "securite/**", "outillage/**", "migration/**"]
   pull_request:
 
 jobs:
@@ -12,11 +12,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # Même version mineure que la production (Hostinger, PHP 8.2).
+      # Même version que la production (Hostinger, PHP 8.4 requis par Symfony 8).
       - uses: shivammathur/setup-php@v2
         with:
-          php-version: "8.2"
-          extensions: mbstring, intl, pdo_sqlite, zip, gd, xml
+          php-version: "8.4"
+          extensions: mbstring, intl, pdo_sqlite, zip, gd, xml, sodium
           coverage: none
 
       - name: Valider composer.json
@@ -40,6 +40,5 @@ jobs:
         run: composer test
 
       - name: Vulnérabilités connues (informatif)
-        # 5 alertes API Platform non applicables (GraphQL, JSON:API/HAL...) : voir docs/AUDIT.md.
         continue-on-error: true
         run: composer audit

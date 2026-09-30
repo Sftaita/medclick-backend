@@ -10,11 +10,12 @@ Le frontend (SPA, repo séparé) consomme cette API. Documentation détaillée :
 
 ## Stack
 
-- **PHP 8.2** (production : Hostinger, LiteSpeed, PHP 8.2 ; dev local WAMP), **Symfony 5.4 LTS**
-- **API Platform 2.6** (annotations `@ApiResource`, namespace `ApiPlatform\Core`)
-- Doctrine ORM 2.20 / DBAL 3 / DoctrineBundle 2.13 + MySQL (`DATABASE_URL`), annotations `@ORM\...`
-- Auth : **LexikJWT** (`POST /api/login_check`, body `{username, password}`), stateless, système
-  d'authenticators Symfony 5.4 (`jwt: ~`, `login_throttling`). Limites par IP sur l'inscription
+- **PHP 8.4** (production : Hostinger, LiteSpeed ; dev local : WAMP avec PHP 8.4), **Symfony 8.1**
+  (version non LTS : suivre 8.2, 8.3… jusqu'à la LTS 8.4, prévue en novembre 2027)
+- **API Platform 4** (`#[ApiResource]`, namespace `ApiPlatform\Metadata`, state processors dans `src/State/`)
+- Doctrine ORM 3 / DBAL 4 / DoctrineBundle 3 (objets paresseux natifs PHP 8.4) + MySQL (`DATABASE_URL`)
+- Auth : **LexikJWT 3** (`POST /api/login_check`, body `{username, password}`), stateless,
+  authenticators Symfony (`jwt: ~`, `login_throttling`). Limites par IP sur l'inscription
   et le reset : `config/packages/rate_limiter.yaml` + `src/Security/PublicEndpointRateLimiter.php`.
 - PhpSpreadsheet (export carnet de stage), Symfony Mailer (Gmail), Twig (emails)
 - Tests fonctionnels : `tests/` (ApiTestCase, base SQLite `var/test.db` recréée à chaque test).
@@ -26,7 +27,7 @@ Le frontend (SPA, repo séparé) consomme cette API. Documentation détaillée :
 ```bash
 cp .env.example .env                      # première installation, puis renseigner les valeurs
 composer install                          # lance aussi cache:clear + migrations (auto-scripts)
-composer test                             # PHPUnit 9.6 (sans Xdebug)
+composer test                             # PHPUnit 12 (sans Xdebug)
 symfony serve  |  php -S 0.0.0.0:8000 -t public
 php bin/console debug:router              # liste des routes custom + API Platform
 php bin/console doctrine:migrations:diff  # générer une migration après modif d'entité
@@ -51,23 +52,28 @@ Doc OpenAPI générée par API Platform : `GET /api` (ne couvre pas les contrôl
   API Platform (et la résolution des IRI) aux données de l'utilisateur connecté. Ne
   s'applique PAS aux contrôleurs custom (`findOneBy` direct).
 - `src/Security/Voter/OwnershipVoter.php` — attribut `OWNER` : la ressource appartient-elle
-  au user ? Utilisé en `security_post_denormalize` sur les `@ApiResource` et via
+  au user ? Utilisé en `securityPostDenormalize` sur les `#[ApiResource]` et via
   `$this->isGranted('OWNER', $x)` dans les contrôleurs custom.
-- `src/Events/` — subscribers `KernelEvents::VIEW` (API Platform) : hash du mot de passe et
-  email d'activation à l'inscription, user auto-assigné aux `Years`/`Favorites`, unicité du
-  maître de stage, suppression en cascade des interventions d'un chirurgien, claims JWT.
+- `src/State/` — state processors API Platform branchés par opération (`processor:`) :
+  `UserProcessor` (hash du mot de passe, email d'activation), `CurrentUserAssignProcessor`
+  (propriétaire des `Years`/`Favorites`), `SurgeonProcessor` (maître de stage unique),
+  `SurgeonRemoveProcessor` (interventions supprimées avec le chirurgien), `FormationProcessor`.
+- `src/Events/JwtCreatedSubscriber.php` — claims ajoutés au JWT.
+- `tests/Api/FrontCompatibilityTest.php` — contrat attendu par les fronts React (`hydra:member`,
+  `PUT` partiel, `violations`, dates ISO 8601) : ne pas le casser.
 - `src/Security/UserChecker.php` — bloque le login si compte non activé (`token` non null) et
   journalise la connexion dans `ConnectionHistory`.
 - `src/Controller/` — endpoints custom (JSON manuel). `AdminControllers/` sous `/api/admin/*`
   (ROLE_ADMIN via `access_control`). `ExcelNewVersion.php` (`/api/excel2/{year}`) est l'export
   courant ; `ExcelGeneratorController.php` (`/api/excel/{year}`) est l'ancienne version.
-- `public/ExcelTemplate.xlsx` — gabarit du carnet de stage (chargé par chemin relatif).
+- `public/ExcelTemplate.xlsx` — gabarit du carnet de stage (chargé via `kernel.project_dir`).
 - Contrôle d'accès : `config/packages/security.yaml` (`access_control` par préfixe d'URL).
 
 ## Conventions du code existant
 
 - Code, commentaires, messages d'erreur et commits **en français**.
-- Annotations (pas d'attributs PHP 8) : `@Route`, `@ApiResource`, `@ORM`, `@Groups`, `@Assert`.
+- Attributs PHP 8 uniquement : `#[Route]`, `#[ApiResource]`, `#[ORM\...]`, `#[Groups]`, `#[Assert\...]`
+  (les annotations en docblock ne sont plus lues).
 - Contrôleurs custom : `json_decode($request->getContent(), true)` + `JsonResponse`.
 - Les nouvelles versions d'endpoints coexistent avec les anciennes pour ne pas casser les
   anciens frontends (ex. `/api/surgeries/add` vs `/api/surgeries/addNewSurgery`,

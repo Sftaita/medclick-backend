@@ -32,7 +32,7 @@ class UpdateSurgeriesCommand extends Command
         $this->surgeriesRepository = $surgeriesRepository;
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->setDescription('Update surgeries with corresponding nomenclature, with a limit of 40,000 surgeries per run.');
     }

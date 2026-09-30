@@ -2,36 +2,34 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
+use App\State\SurgeonProcessor;
+use App\State\SurgeonRemoveProcessor;
 use App\Repository\SurgeonsRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\Collection;
 
-
-
 use Doctrine\Common\Collections\ArrayCollection;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 
-/**
- * @ApiResource(
- *      normalizationContext={
- *          "groups"={"surgeons_read"}
- *      },
- *      collectionOperations={
- *          "get",
- *          "post"={"security_post_denormalize"="is_granted('OWNER', object)", "security_post_denormalize_message"="Cette ressource ne vous appartient pas."}
- *      },
- *      itemOperations={
- *          "get",
- *          "put"={"security_post_denormalize"="is_granted('OWNER', object)", "security_post_denormalize_message"="Cette ressource ne vous appartient pas."},
- *          "patch"={"security_post_denormalize"="is_granted('OWNER', object)", "security_post_denormalize_message"="Cette ressource ne vous appartient pas."},
- *          "delete"
- *      },
- *      attributes={
- *          "order": {"lastName": "ASC"}
- *      }
- * )
- */
+#[ApiResource(
+    operations: [
+        new Get(),
+        new GetCollection(),
+        new Post(securityPostDenormalize: "is_granted('OWNER', object)", securityPostDenormalizeMessage: 'Cette ressource ne vous appartient pas.', processor: SurgeonProcessor::class),
+        new Put(securityPostDenormalize: "is_granted('OWNER', object)", securityPostDenormalizeMessage: 'Cette ressource ne vous appartient pas.', processor: SurgeonProcessor::class),
+        new Patch(securityPostDenormalize: "is_granted('OWNER', object)", securityPostDenormalizeMessage: 'Cette ressource ne vous appartient pas.', processor: SurgeonProcessor::class),
+        new Delete(processor: SurgeonRemoveProcessor::class),
+    ],
+    normalizationContext: ['groups' => ['surgeons_read']],
+    order: ['lastName' => 'ASC'],
+)]
 #[ORM\Entity(repositoryClass: SurgeonsRepository::class)]
 class Surgeons
 {

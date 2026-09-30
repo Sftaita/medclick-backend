@@ -9,6 +9,7 @@ use App\Entity\Surgeries;
 use App\Entity\User;
 use App\Entity\Years;
 use App\Tests\ApiTestBase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 /**
  * Aucune donnée d'un autre utilisateur ne doit être lisible, et /api exige un JWT
@@ -156,9 +157,7 @@ class DataLeakTest extends ApiTestBase
 
     // ---------------------------------------------------------------- Accès anonyme
 
-    /**
-     * @dataProvider privateEndpoints
-     */
+    #[DataProvider('privateEndpoints')]
     public function testPrivateEndpointsRequireAuthentication(string $method, string $url): void
     {
         static::createClient()->request($method, $url);
@@ -166,7 +165,7 @@ class DataLeakTest extends ApiTestBase
         $this->assertResponseStatusCodeSame(401);
     }
 
-    public function privateEndpoints(): array
+    public static function privateEndpoints(): array
     {
         return [
             'nomenclature' => ['GET', '/api/nomenclature/ortho'],
@@ -177,9 +176,7 @@ class DataLeakTest extends ApiTestBase
         ];
     }
 
-    /**
-     * @dataProvider publicEndpoints
-     */
+    #[DataProvider('publicEndpoints')]
     public function testPublicEndpointsStayReachable(string $method, string $url): void
     {
         $response = static::createClient()->request($method, $url, ['json' => []]);
@@ -187,7 +184,7 @@ class DataLeakTest extends ApiTestBase
         $this->assertNotSame(401, $response->getStatusCode());
     }
 
-    public function publicEndpoints(): array
+    public static function publicEndpoints(): array
     {
         return [
             'cgu' => ['GET', '/api/terms-conditions'],

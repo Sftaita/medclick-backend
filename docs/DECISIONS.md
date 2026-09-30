@@ -83,8 +83,11 @@ Décision : `User` n'accepte en écriture que `email`, `password` (plainPassword
 ne sont jamais inscriptibles via l'API.
 
 ## ADR-103 — Montée de version : Symfony 6.4 LTS / 7.x, API Platform 3.x, PHP 8.2+
-**Statut : En cours** — étape 1 faite le 30/09/2026 : Symfony 5.4 LTS, API Platform 2.6.8,
-DoctrineBundle 2.13, lockfile PHP 8.2 (version de la prod Hostinger).
+**Statut : Acceptée** — 30/09/2026 : Symfony 5.4 LTS, puis le même jour **Symfony 8.1**,
+API Platform 4.4, Doctrine ORM 3 / DBAL 4, lexik 3, PHPUnit 12, **PHP 8.4** (à la demande du
+porteur du projet, plutôt que 7.4 LTS). Conséquence : 8.1 n'est pas LTS, prévoir les montées
+mineures jusqu'à la LTS 8.4 (novembre 2027). Les subscribers `kernel.view` sont devenus des
+state processors (`src/State/`) ; le format JSON du front est figé par `FrontCompatibilityTest`.
 Raison : Symfony 5.1 et API Platform 2.5 ne reçoivent plus de correctifs de sécurité.
 Approche : 5.1 → 5.4 (déprécations) → 6.4 LTS ; API Platform 2.5 → 2.7 → 3.x ;
 annotations → attributs PHP 8 (Rector).

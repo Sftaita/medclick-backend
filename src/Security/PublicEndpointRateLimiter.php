@@ -6,7 +6,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\RateLimiter\RateLimiterFactory;
+use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
 
 /**
  * Limite, par adresse IP, les routes publiques exposées aux abus (création de comptes en masse,
@@ -17,20 +17,20 @@ use Symfony\Component\RateLimiter\RateLimiterFactory;
 class PublicEndpointRateLimiter implements EventSubscriberInterface
 {
     /**
-     * @var array<string, RateLimiterFactory> nom de route => limiteur
+     * @var array<string, RateLimiterFactoryInterface> nom de route => limiteur
      */
     private $limiters;
 
-    public function __construct(RateLimiterFactory $registrationLimiter, RateLimiterFactory $passwordResetLimiter)
+    public function __construct(RateLimiterFactoryInterface $registrationLimiter, RateLimiterFactoryInterface $passwordResetLimiter)
     {
         $this->limiters = [
-            'api_users_post_collection' => $registrationLimiter,
+            '_api_/users{._format}_post' => $registrationLimiter,
             'forgotten_password' => $passwordResetLimiter,
             'reset_password' => $passwordResetLimiter,
         ];
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         // Après le routeur (32), avant le firewall (8).
         return [

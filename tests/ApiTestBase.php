@@ -2,8 +2,8 @@
 
 namespace App\Tests;
 
-use ApiPlatform\Core\Bridge\Symfony\Bundle\Test\ApiTestCase;
-use ApiPlatform\Core\Bridge\Symfony\Bundle\Test\Client;
+use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Symfony\Bundle\Test\Client;
 use App\Entity\Nomenclature;
 use App\Entity\User;
 use App\Entity\Years;
@@ -19,6 +19,8 @@ abstract class ApiTestBase extends ApiTestCase
 {
     protected const PASSWORD = 'motdepasse';
 
+    protected static ?bool $alwaysBootKernel = true;
+
     /** @var EntityManagerInterface */
     protected $em;
 
@@ -30,7 +32,7 @@ abstract class ApiTestBase extends ApiTestCase
         // Repart de compteurs vierges pour le rate limiter (pools de cache fichier).
         (new Filesystem())->remove(static::$kernel->getCacheDir() . '/pools');
 
-        $this->em = static::$container->get('doctrine')->getManager();
+        $this->em = static::getContainer()->get('doctrine')->getManager();
 
         $metadata = $this->em->getMetadataFactory()->getAllMetadata();
         $schemaTool = new SchemaTool($this->em);

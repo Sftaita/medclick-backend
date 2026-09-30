@@ -2,7 +2,19 @@
 
 ## Infrastructure
 
-- Hébergement mutualisé **Hostinger** (LiteSpeed), PHP **8.2**, MySQL.
+- Hébergement mutualisé **Hostinger** (LiteSpeed), MySQL. PHP **8.4 obligatoire** depuis
+  Symfony 8 (réglage hPanel → Avancé → Configuration PHP ; binaire CLI :
+  `/opt/alt/php84/usr/bin/php`). Vérifier `php -v` en SSH avant tout `composer install`.
+
+### Premier déploiement de Symfony 8 (branche `migration/symfony-8`)
+
+1. Sauvegardes (voir procédure), en particulier `vendor/` : c'est le retour arrière.
+2. hPanel : passer le site `easymed.fun` en **PHP 8.4**, puis enchaîner immédiatement la
+   procédure (la compatibilité de l'ancienne version avec PHP 8.4 n'a pas été vérifiée).
+   Retour arrière : repasser en PHP 8.2 et restaurer `vendor/` + `git checkout` de la sauvegarde.
+3. Suivre la procédure ci-dessous (aucune migration de base de données dans cette version).
+4. Vérifier en plus : `curl -s https://api-medclick.easymed.fun/api/years -H "Authorization: Bearer <jeton>"`
+   contient `hydra:member` (le front en dépend).
 - Accès SSH : port `65002`, compte de l'hébergement `easymed.fun` (voir `~/.ssh/config`).
 - API : `https://api-medclick.easymed.fun` → racine web `backend/public/`.
 - Code : `~/domains/easymed.fun/public_html/medclick/backend`, **clone Git de `master`**.

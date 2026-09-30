@@ -30,7 +30,7 @@ class UpdateFavoritesCommand extends Command
         $this->entityManager = $entityManager;
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->setDescription('Update favorites with corresponding nomenclature.');
     }

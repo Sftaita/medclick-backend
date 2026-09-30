@@ -11,7 +11,7 @@ class AccountDisabledException extends AccountStatusException
     /**
      * {@inheritdoc}
      */
-    public function getMessageKey()
+    public function getMessageKey(): string
     {
         return "Votre compte doit d'abord être validé par email";
     }

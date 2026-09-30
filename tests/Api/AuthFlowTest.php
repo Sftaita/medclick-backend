@@ -185,7 +185,7 @@ class AuthFlowTest extends ApiTestBase
 
     private function freshEm()
     {
-        $em = static::$container->get('doctrine')->getManager();
+        $em = static::getContainer()->get('doctrine')->getManager();
         $em->clear();
 
         return $em;

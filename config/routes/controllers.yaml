@@ -1,0 +1,3 @@
+# Routes déclarées par attributs #[Route] dans src/Controller/.
+controllers:
+    resource: routing.controllers

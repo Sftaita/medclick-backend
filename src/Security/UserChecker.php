@@ -6,6 +6,7 @@ use App\Entity\ConnectionHistory;
 use App\Entity\User;
 use App\Exceptions\AccountDisabledException;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 
@@ -18,7 +19,7 @@ class UserChecker implements UserCheckerInterface
     {
         $this->em = $em;
     }
-    public function checkPreAuth(UserInterface $user)
+    public function checkPreAuth(UserInterface $user): void
     {
 
 
@@ -36,7 +37,7 @@ class UserChecker implements UserCheckerInterface
      * Appelé après la vérification du mot de passe : seules les connexions réussies
      * sont enregistrées dans l'historique.
      */
-    public function checkPostAuth(UserInterface $user)
+    public function checkPostAuth(UserInterface $user, ?TokenInterface $token = null): void
     {
         if ($user instanceof User) {
             $Connection = new ConnectionHistory();

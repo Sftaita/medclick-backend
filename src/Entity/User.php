@@ -2,30 +2,37 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
+use App\State\UserProcessor;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\Collection;
-use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
-/**
- * @ApiResource(
- *      normalizationContext={
- *          "groups"={"user_read"}
- *      },
- *      denormalizationContext={
- *          "groups"={"user_write"}
- *      },
- *      attributes={
- *          "order": {"lastname": "ASC"}
- *      }
- * )
- */
+#[ApiResource(
+    operations: [
+        new Get(),
+        new GetCollection(),
+        new Post(processor: UserProcessor::class),
+        new Put(processor: UserProcessor::class),
+        new Patch(processor: UserProcessor::class),
+        new Delete(),
+    ],
+    normalizationContext: ['groups' => ['user_read']],
+    denormalizationContext: ['groups' => ['user_write']],
+    order: ['lastname' => 'ASC'],
+)]
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[UniqueEntity('email', message: 'Cet utilisateur existe déjà')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
@@ -421,7 +428,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
-
 
     public function getTermsAcceptedDate(): ?\DateTimeInterface
     {

@@ -11,6 +11,7 @@ use App\Entity\Surgeries;
 use App\Entity\User;
 use App\Entity\Years;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authorization\Voter\Vote;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
 /**
@@ -27,7 +28,7 @@ class OwnershipVoter extends Voter
 {
     public const OWNER = 'OWNER';
 
-    protected function supports($attribute, $subject)
+    protected function supports(string $attribute, mixed $subject): bool
     {
         return $attribute === self::OWNER && (
             $subject instanceof User
@@ -41,7 +42,7 @@ class OwnershipVoter extends Voter
         );
     }
 
-    protected function voteOnAttribute($attribute, $subject, TokenInterface $token)
+    protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token, ?Vote $vote = null): bool
     {
         $user = $token->getUser();
 

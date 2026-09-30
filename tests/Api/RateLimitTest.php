@@ -2,7 +2,7 @@
 
 namespace App\Tests\Api;
 
-use ApiPlatform\Core\Bridge\Symfony\Bundle\Test\Client;
+use ApiPlatform\Symfony\Bundle\Test\Client;
 use App\Tests\ApiTestBase;
 
 /**

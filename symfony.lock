@@ -16,29 +16,8 @@
             "./src/Entity/.gitignore"
         ]
     },
-    "composer/package-versions-deprecated": {
-        "version": "1.11.99"
-    },
-    "doctrine/annotations": {
-        "version": "1.0",
-        "recipe": {
-            "repo": "github.com/symfony/recipes",
-            "branch": "master",
-            "version": "1.0",
-            "ref": "a2759dd6123694c8d901d0ec80006e044c2e6457"
-        },
-        "files": [
-            "./config/routes/annotations.yaml"
-        ]
-    },
-    "doctrine/cache": {
-        "version": "1.10.2"
-    },
     "doctrine/collections": {
         "version": "1.6.7"
-    },
-    "doctrine/common": {
-        "version": "3.0.2"
     },
     "doctrine/data-fixtures": {
         "version": "1.4.4"
@@ -119,9 +98,6 @@
     "ezyang/htmlpurifier": {
         "version": "v4.13.0"
     },
-    "fig/link-util": {
-        "version": "1.1.1"
-    },
     "fzaninotto/faker": {
         "version": "v1.9.1"
     },
@@ -157,9 +133,6 @@
     },
     "myclabs/php-enum": {
         "version": "1.7.6"
-    },
-    "namshi/jose": {
-        "version": "7.2.3"
     },
     "nelmio/cors-bundle": {
         "version": "1.5",
@@ -234,18 +207,6 @@
     },
     "psr/simple-cache": {
         "version": "1.0.1"
-    },
-    "sensio/framework-extra-bundle": {
-        "version": "5.2",
-        "recipe": {
-            "repo": "github.com/symfony/recipes",
-            "branch": "master",
-            "version": "5.2",
-            "ref": "fb7e19da7f013d0d422fa9bce16f5c510e27609b"
-        },
-        "files": [
-            "./config/packages/sensio_framework_extra.yaml"
-        ]
     },
     "symfony/apache-pack": {
         "version": "1.0",
@@ -497,12 +458,6 @@
     "symfony/polyfill-mbstring": {
         "version": "v1.18.1"
     },
-    "symfony/polyfill-php73": {
-        "version": "v1.18.1"
-    },
-    "symfony/polyfill-php80": {
-        "version": "v1.18.1"
-    },
     "symfony/process": {
         "version": "v5.1.5"
     },
@@ -545,9 +500,6 @@
         "version": "v5.1.5"
     },
     "symfony/security-csrf": {
-        "version": "v5.1.5"
-    },
-    "symfony/security-guard": {
         "version": "v5.1.5"
     },
     "symfony/security-http": {

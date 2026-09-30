@@ -7,7 +7,7 @@ use DatePeriod;
 use DateInterval;
 use App\Repository\UserRepository;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use App\Repository\ConnectionHistoryRepository;
 

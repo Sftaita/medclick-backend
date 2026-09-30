@@ -2,32 +2,30 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\SurgeriesRepository;
-use ApiPlatform\Core\Annotation\ApiResource;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
-/**
- * @ApiResource(
- *      normalizationContext={
- *          "groups"={"surgeries_read"}
- *      },
- *      collectionOperations={
- *          "get",
- *          "post"={"security_post_denormalize"="is_granted('OWNER', object)", "security_post_denormalize_message"="Cette ressource ne vous appartient pas."}
- *      },
- *      itemOperations={
- *          "get",
- *          "put"={"security_post_denormalize"="is_granted('OWNER', object)", "security_post_denormalize_message"="Cette ressource ne vous appartient pas."},
- *          "patch"={"security_post_denormalize"="is_granted('OWNER', object)", "security_post_denormalize_message"="Cette ressource ne vous appartient pas."},
- *          "delete"
- *      },
- *      attributes={
- *          "order": {"date": "DESC", "id" : "DESC"}
- *      }
- * )
- */
+#[ApiResource(
+    operations: [
+        new Get(),
+        new GetCollection(),
+        new Post(securityPostDenormalize: "is_granted('OWNER', object)", securityPostDenormalizeMessage: 'Cette ressource ne vous appartient pas.'),
+        new Put(securityPostDenormalize: "is_granted('OWNER', object)", securityPostDenormalizeMessage: 'Cette ressource ne vous appartient pas.'),
+        new Patch(securityPostDenormalize: "is_granted('OWNER', object)", securityPostDenormalizeMessage: 'Cette ressource ne vous appartient pas.'),
+        new Delete(),
+    ],
+    normalizationContext: ['groups' => ['surgeries_read']],
+    order: ['date' => 'DESC', 'id' => 'DESC'],
+)]
 #[ORM\Entity(repositoryClass: SurgeriesRepository::class)]
 class Surgeries
 {
