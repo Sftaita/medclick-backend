@@ -136,6 +136,10 @@ class AuthFlowTest extends ApiTestBase
         $user = $this->reloadUser('nouveau@test.be');
         $this->assertNull($user->getToken());
         $this->assertNotNull($user->getValidatedAt());
+
+        // Second clic sur le même lien : pas d'erreur, retour à la connexion.
+        static::createClient()->request('GET', '/activation/' . $token);
+        $this->assertResponseRedirects('https://www.medclick.be/#/login');
     }
 
     public function testActivationWithMalformedTokenReturns404(): void

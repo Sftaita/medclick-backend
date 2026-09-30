@@ -21,9 +21,10 @@ class TokenActivatorController extends AbstractController
             // On vérifie si un utilisateur possède ce token.
             $user= $userRepo->findOneBy(['token' => $token]);
     
-            // Si aucun utilisateur possède ce token
+            // Aucun utilisateur avec ce token : lien déjà utilisé (compte déjà activé) ou inconnu.
+            // On renvoie vers la connexion plutôt que d'afficher une erreur.
             if(!$user){
-                throw $this->createNotFoundException("Cet utlisateur n'existe pas");
+                return $this->redirect('https://www.medclick.be/#/login');
             }
     
             // On supprime le token.
