@@ -29,22 +29,22 @@ class UserChecker implements UserCheckerInterface
             if ($token !== null) {
              throw new AccountDisabledException();
             }
-
-            // Ajoute la date de connection.
-          
-            $Connection = new ConnectionHistory();
-            $Connection->setUser($user)
-                        ->setDate(new \DateTime());
-    
-            $this->em->persist($Connection);
-            $this->em->flush();
-          
-        } else {
-            return;
         }
     }
 
+    /**
+     * Appelé après la vérification du mot de passe : seules les connexions réussies
+     * sont enregistrées dans l'historique.
+     */
     public function checkPostAuth(UserInterface $user)
     {
+        if ($user instanceof User) {
+            $Connection = new ConnectionHistory();
+            $Connection->setUser($user)
+                        ->setDate(new \DateTime());
+
+            $this->em->persist($Connection);
+            $this->em->flush();
+        }
     }
 }

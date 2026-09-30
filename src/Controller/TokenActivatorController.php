@@ -15,7 +15,7 @@ class TokenActivatorController extends AbstractController
     public function VerifyToken($token, UserRepository $userRepo)
     {
         if(strlen($token) !== 32){
-            die;
+            throw $this->createNotFoundException("Lien d'activation invalide");
         }else{
 
             // On vérifie si un utilisateur possède ce token.

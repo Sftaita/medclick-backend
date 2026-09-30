@@ -56,7 +56,7 @@ class StatisticsController
 
         $user = $this->userRepository->find($userId);
         if ($user == null) {
-            die;
+            return new JsonResponse(['message' => 'Utilisateur introuvable'], JsonResponse::HTTP_NOT_FOUND);
         }
 
         // 2. On recherche dans Year Entity toutes les années de l'utilisateurs.
@@ -112,7 +112,6 @@ class StatisticsController
             $statistics->setUser($user);
         } else {
             $statistics = $request;
-            $statistics->setConsultations(5);
         }
         $statistics->setFirstHandSurgeries($final['firstHand'])
             ->setSecondHandSurgeries($final['secondHand'])

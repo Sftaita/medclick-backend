@@ -153,6 +153,13 @@ class User implements UserInterface
     private $resetToken;
 
     /**
+     * Date de la demande de réinitialisation (le token expire après un délai).
+     *
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $resetTokenRequestedAt;
+
+    /**
      * @ORM\Column(type="boolean", nullable=true)
      */
     private $acceptedTerms;
@@ -428,6 +435,18 @@ class User implements UserInterface
     public function setResetToken(?string $resetToken): self
     {
         $this->resetToken = $resetToken;
+
+        return $this;
+    }
+
+    public function getResetTokenRequestedAt(): ?\DateTimeInterface
+    {
+        return $this->resetTokenRequestedAt;
+    }
+
+    public function setResetTokenRequestedAt(?\DateTimeInterface $resetTokenRequestedAt): self
+    {
+        $this->resetTokenRequestedAt = $resetTokenRequestedAt;
 
         return $this;
     }

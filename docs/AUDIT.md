@@ -16,8 +16,10 @@ médecins, noms de chirurgiens) exigent un niveau de rigueur « données sensibl
 
 ## P0 — Sécurité et intégrité (à traiter immédiatement)
 
-> **Suivi (30/09/2026)** — Points 0, 1 et 2 **corrigés**, couverts par `tests/Api/OwnershipTest.php`
-> (15 tests ; 9 d'entre eux échouent sur le code d'origine). Voter `src/Security/Voter/OwnershipVoter.php`.
+> **Suivi (30/09/2026)** — Points 0 à 5 et 7 **corrigés** (branche `securite/p0-controle-proprietaire`),
+> couverts par 45 tests fonctionnels (`tests/Api/`). Restent : le **point 6** (action manuelle
+> sur les secrets) et la **limitation de débit** (point 4, nécessite Symfony ≥ 5.2).
+> ⚠️ Déploiement : exécuter la migration `Version20260930180000` (expiration du token de reset).
 
 ### 0. Modification locale non commitée qui casse `User` — ✅ corrigé
 `src/Entity/User.php` (working tree) supprime le constructeur qui initialisait `$years` et
@@ -47,7 +49,7 @@ POST/PUT/PATCH, `security="is_granted('ROLE_ADMIN') or object == user"` sur les 
   continue et plante sur `null`.
 **Action** : Voter `OwnershipVoter` + `security_post_denormalize` (ADR-101) ; tests fonctionnels.
 
-### 3. Fuite de données
+### 3. Fuite de données — ✅ corrigé
 - `GET /api/excel/{year}` (ancienne version, `ExcelGeneratorController`) ne vérifie pas le
   propriétaire de l'année : tout utilisateur connecté peut exporter le carnet complet
   d'un autre (nom, email, interventions).
@@ -58,8 +60,13 @@ POST/PUT/PATCH, `security="is_granted('ROLE_ADMIN') or object == user"` sur les 
 **Action** : retirer ou sécuriser l'ancien export, ajouter une règle
 `^/api` ⇒ `IS_AUTHENTICATED_FULLY` en dernière ligne de `access_control` (liste blanche
 des routes publiques au-dessus), vérifier la propriété dans chaque contrôleur.
+**Fait** : liste blanche + `^/api` authentifié ; contrôles `OWNER`/admin sur les 4 endpoints.
+Découverts en corrigeant : `/api/statistics/fetch` plantait toujours (`getResult()` au lieu de
+`getOneOrNullResult()`), `/api/userStat` aussi (`JsonResponse` avec `json=true` sur un tableau),
+et les deux exports déclaraient une fonction globale `getRow()` (« Cannot redeclare » au 2e appel
+dans un même processus). L'ancien export envoyait `Access-Control-Allow-Origin: *` à la main.
 
-### 4. Flux mot de passe / activation
+### 4. Flux mot de passe / activation — ✅ corrigé (sauf limitation de débit)
 - `ForgottenPasswordController::forgottenPassword` : appelle `$user->getFirstname()` avant
   le `if ($user)` ⇒ erreur 500 pour un email inconnu (et énumération des comptes) ; le
   contrôleur ne retourne pas de `Response`.
@@ -71,25 +78,36 @@ des routes publiques au-dessus), vérifier la propriété dans chaque contrôleu
 - Pas de limitation de débit sur `/api/login_check`, `/api/forgottenPassword`, `/api/users`.
 **Action** : SymfonyCasts `reset-password-bundle`, `symfony/rate-limiter` (login throttling),
 réponse identique que l'email existe ou non.
+**Fait** : réponse identique (plus d'énumération ; `forgottenPassword` renvoyait toujours 500,
+le front affichait donc une erreur même en cas de succès), token expirant après 1 h
+(`user.reset_token_requested_at`), comparaison `hash_equals`, un mauvais token n'annule plus
+la demande, validation 6–50 caractères, token d'activation `random_bytes`, classes mortes
+supprimées. **Reste** : limitation de débit — `symfony/rate-limiter` et le login throttling
+exigent Symfony 5.2+ ; à faire avec la montée de version (P1) ou au niveau du serveur web.
 
-### 5. Journal de connexion faussé
+### 5. Journal de connexion faussé — ✅ corrigé
 `UserChecker::checkPreAuth` enregistre la connexion **avant** la vérification du mot de
 passe : chaque tentative échouée compte comme une connexion dans les statistiques admin.
 **Action** : écouter `LoginSuccessEvent` / `AuthenticationSuccessEvent` à la place.
+**Fait** : enregistrement déplacé dans `UserChecker::checkPostAuth` (appelé après la
+vérification du mot de passe). Les statistiques historiques restent gonflées par les échecs passés.
 
-### 6. Secrets et configuration
+### 6. Secrets et configuration — ⏳ action manuelle
 - `.env` local contient, en commentaire, des identifiants de base de production en clair.
   Il n'est pas versionné, mais doit être nettoyé et les identifiants **changés**.
 - `APP_ENV=dev` / `APP_DEBUG=true` dans `.env` : vérifier que la prod tourne bien avec
   `APP_ENV=prod` (le profiler/`dd()` exposent des données sinon).
 - Gérer les secrets via `bin/console secrets:set` ou les variables de l'hébergeur.
 
-### 7. Bugs fonctionnels relevés
+### 7. Bugs fonctionnels relevés — ✅ corrigé
 - `SurgeriesController::updateSurgery` : `$surgery` utilisé avant le test `if(!$surgery)` ;
   en `position == 3`, `secondHand` reçoit `$data['firstHand']` (au lieu de `secondHand`).
 - `StatisticsController::update` : `setConsultations(5)` résiduel (écrasé ensuite, mais à retirer).
 - `ExcelNewVersion::ExcelGenerator2` : `$searchedYear->getUser()` plante si l'année n'existe
   pas (avant le contrôle).
+- Restant (non bloquant) : les exports Excel plantent en mode debug sur une année sans
+  chirurgien ni intervention (index de tableau inexistant) ; `PUT /api/users` sans mot de
+  passe échoue en validation (`Length max=50` appliqué au hash) — non utilisé par le front.
 
 ---
 
@@ -108,7 +126,7 @@ passe : chaque tentative échouée compte comme une connexion dans les statistiq
 |---|---|---|
 | Framework | Symfony 5.1 (fin de support 01/2021), API Platform 2.5, `guard` déprécié | Montée 5.4 → 6.4 LTS, API Platform 3, nouveau système d'authentification (ADR-103) |
 | PHP | `composer.json` : `>=7.2.5` ; dev en 8.2 | Fixer `>=8.2`, attributs PHP 8, types stricts, Rector |
-| Tests | `tests/` vide | PHPUnit + `ApiTestCase` : auth, isolation multi-user, export Excel (golden file) ; viser les chemins P0 d'abord |
+| Tests | 45 tests fonctionnels (P0) | Étendre : contenu des exports Excel (golden file), admin, marketing, nomenclature |
 | Migrations | 2 migrations pour 15 entités | Baseline + `doctrine:schema:validate` en CI (ADR-105) |
 | Architecture | Contrôleurs de 1 300–1 500 lignes, logique dupliquée v1/v2 | `src/Service/` : `SurgeryFactory`, `LogbookExporter` (une classe par feuille), suppression de l'ancien export (ADR-104) |
 | Validation | `json_decode` + accès direct à `$data['x']` (notices, 500) | DTO + `#[MapRequestPayload]` (Symfony 6.3+) ou Validator |

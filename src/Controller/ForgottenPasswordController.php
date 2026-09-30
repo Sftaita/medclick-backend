@@ -4,9 +4,8 @@ namespace App\Controller;
 
 
 use App\Repository\UserRepository;
-use Exception;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
@@ -15,46 +14,47 @@ use Symfony\Component\Security\Csrf\TokenGenerator\TokenGeneratorInterface;
 class ForgottenPasswordController extends AbstractController
 {
     /**
+     * Durée de validité du lien de réinitialisation.
+     */
+    public const TOKEN_TTL = '+1 hour';
+
+    private const INVALID_LINK = "Lien de réinitialisation invalide ou expiré.";
+
+    /**
+     * Envoie un lien de réinitialisation. La réponse est identique que le compte existe ou non
+     * (pas d'énumération des emails).
+     *
      * @Route("api/forgottenPassword", name="forgotten_password" , methods={"POST"})
      */
     public function forgottenPassword(Request $request, UserRepository $userRepository, TokenGeneratorInterface $tokenGenerator, MailerController $mailer)
     {
-        // on récupère le mot de passe
         $parameters = json_decode($request->getContent(), true);
-        $username = $parameters['username'];
+        $username = $parameters['username'] ?? null;
+
+        if (!is_string($username) || $username === '') {
+            return new JsonResponse(['message' => "L'email doit être renseigné"], JsonResponse::HTTP_BAD_REQUEST);
+        }
 
         //On cherche l'utilisateur dans la base de donnée
         $user = $userRepository->findOneByEmail($username);
-        $firstname = $user->getFirstname();
-        
-        if($user){
+
+        if ($user) {
             $token = $tokenGenerator->generateToken();
-            
-            try{
-                $user->setResetToken($token);
-                $em = $this->getDoctrine()->getManager();
-                $em->persist($user);
-                $em->flush();
-            }catch(Exception $e){
-                throw new \Exception("Impossible de réinitialiser le mot de passe de ce compte!");
-            }
 
-            //On envoie un email avec le code d'activation.
-            
-            $to = $username;
-            $subect = "Ré-initialisation du mot de passse";
-            $template = "email/emailReseterEmail.html.twig"; 
-            $parameters = array(
-                "firstname" => $firstname,
+            $user->setResetToken($token)
+                ->setResetTokenRequestedAt(new \DateTime());
+            $this->getDoctrine()->getManager()->flush();
+
+            //On envoie un email avec le lien de réinitialisation.
+            $mailer->sendEmail($user->getEmail(), "Ré-initialisation du mot de passse", "email/emailReseterEmail.html.twig", [
+                "firstname" => $user->getFirstname(),
                 "token" => $token
-            );
-
-            $mailer->sendEmail($to,$subect, $template,$parameters);
-
-            return;
-
+            ]);
         }
-       
+
+        return new JsonResponse([
+            'message' => "Si un compte existe pour cet email, un lien de réinitialisation vient d'être envoyé."
+        ]);
     }
 
     /**
@@ -62,47 +62,39 @@ class ForgottenPasswordController extends AbstractController
      */
     public function resetPassword(Request $request, UserRepository $userRepository, UserPasswordEncoderInterface $encoder)
     {
-        // on récupère le mot de passe
         $parameters = json_decode($request->getContent(), true);
-        $token = $parameters['token'];
-        $username = $parameters['email'];
-        $password = $parameters['password'];
+        $token = $parameters['token'] ?? null;
+        $username = $parameters['email'] ?? null;
+        $password = $parameters['password'] ?? null;
 
-        $user= $userRepository-> findOneByEmail($username);
-
-        if(!$user){
-            throw new \Exception("Cet utilisateurs n'existe pas");
-        }else{
-            $registeredToken = $user->getResetToken();
-
-            if($registeredToken){
-
-                if($registeredToken === $token){
-                    $hash = $encoder->encodePassword($user, $password);
-                    $user->setPassword($hash)
-                        ->setResetToken(null)
-                    ;
-                    $em = $this->getDoctrine()->getManager();
-                    $em->persist($user);
-                    $em->flush();
-                    dd("Ca fonctionne");
-                }else{
-                    $user->setResetToken(null);
-                    $em = $this->getDoctrine()->getManager();
-                    $em->persist($user);
-                    $em->flush();
-                    throw new \Exception("Erreur de token");
-                }
-
-            }else{
-                throw new \Exception("Aucune demande de réinitialisation d'email n'a été introduite pour ce compte!");
-            }
+        if (!is_string($token) || !is_string($username) || !is_string($password)) {
+            return new JsonResponse(['message' => self::INVALID_LINK], JsonResponse::HTTP_BAD_REQUEST);
         }
 
+        // Mêmes règles que l'entité User.
+        if (mb_strlen($password) < 6 || mb_strlen($password) > 50) {
+            return new JsonResponse(['message' => "Le mot de passe doit contenir entre 6 et 50 caractères"], JsonResponse::HTTP_BAD_REQUEST);
+        }
 
-        
+        $user = $userRepository->findOneByEmail($username);
 
-        
-       
+        $registeredToken = $user ? $user->getResetToken() : null;
+        $requestedAt = $user ? $user->getResetTokenRequestedAt() : null;
+
+        $isValid = $registeredToken !== null
+            && $requestedAt !== null
+            && hash_equals($registeredToken, $token)
+            && (clone $requestedAt)->modify(self::TOKEN_TTL) > new \DateTime();
+
+        if (!$isValid) {
+            return new JsonResponse(['message' => self::INVALID_LINK], JsonResponse::HTTP_BAD_REQUEST);
+        }
+
+        $user->setPassword($encoder->encodePassword($user, $password))
+            ->setResetToken(null)
+            ->setResetTokenRequestedAt(null);
+        $this->getDoctrine()->getManager()->flush();
+
+        return new JsonResponse(['message' => "Mot de passe modifié"]);
     }
 }

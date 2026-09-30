@@ -85,10 +85,12 @@ Points notables :
 - **Activation** : `GET /activation/{token}` ⇒ `token = null`, `validatedAt = now`,
   redirection vers `https://www.medclick.be/#/login`.
 - **Login** : `POST /api/login_check` `{username, password}` ⇒ JWT. `UserChecker` refuse les
-  comptes non activés et enregistre une ligne `ConnectionHistory`. `JwtCreatedSubscriber`
+  comptes non activés (`checkPreAuth`) et enregistre une ligne `ConnectionHistory` après un
+  login réussi (`checkPostAuth`). `JwtCreatedSubscriber`
   ajoute au payload : `firstname`, `lastname`, `email`, `acceptedTerms`, `termsAcceptedDate`.
-- **Mot de passe oublié** : `POST /api/forgottenPassword {username}` ⇒ `resetToken` + email ;
-  `POST /api/resetPassword {email, token, password}`.
+- **Mot de passe oublié** : `POST /api/forgottenPassword {username}` ⇒ `resetToken` +
+  `resetTokenRequestedAt` + email (réponse identique si l'email est inconnu) ;
+  `POST /api/resetPassword {email, token, password}` ⇒ token valable 1 h, usage unique.
 - **CGU** : `GET /api/terms-conditions` (public), `PUT /api/acceptTerms` (connecté).
 - **Autorisation** : `access_control` par préfixe dans `security.yaml` ;
   `/api/admin/*` ⇒ `ROLE_ADMIN`. Isolation des données : `CurrentUserExtension` (lecture
@@ -106,8 +108,8 @@ Points notables :
 | GET | `/api/terms-conditions` | public | Dernières CGU |
 | PUT | `/api/acceptTerms` | user | Acceptation des CGU |
 | GET | `/api/marketing/active` | public | Campagne active aléatoire (+1 vue) |
-| GET | `/api/nomenclature/{speciality}` | public* | Nomenclature d'une spécialité |
-| GET | `/api/list/{id}` | public* | Chirurgiens d'une année |
+| GET | `/api/nomenclature/{speciality}` | user | Nomenclature d'une spécialité |
+| GET | `/api/list/{id}` | propriétaire | Chirurgiens d'une année |
 | POST | `/api/years/create` | user | Création d'année (unicité année/user) |
 | POST | `/api/surgeries/add` | user | Création d'intervention (v1) |
 | POST | `/api/surgeries/addNewSurgery` | user | Création d'intervention (v2, `createdAt`) |
@@ -115,18 +117,19 @@ Points notables :
 | GET | `/api/favorites/getMyList` | user | Favoris du user |
 | POST | `/api/favorites/addNew` | user | Ajout favori |
 | PUT | `/api/favorites/updateNew` | user | Modification favori |
-| GET | `/api/excel/{year}` | user | Export Excel (ancienne version) |
-| GET | `/api/excel2/{year}` | user | Export Excel (version courante) |
-| GET | `/api/statistics/fetch/{userId}` | user | Statistiques |
+| GET | `/api/excel/{year}` | propriétaire | Export Excel (ancienne version) |
+| GET | `/api/excel2/{year}` | propriétaire | Export Excel (version courante) |
+| GET | `/api/statistics/fetch/{userId}` | soi / admin | Statistiques |
 | POST | `/api/statistics/update/{userId}` | admin | Recalcul des statistiques |
-| GET | `/api/userStat/{id}` | user | Ids des années d'un user |
+| GET | `/api/userStat/{id}` | soi / admin | Ids des années d'un user |
 | GET | `/api/admin/users` | admin | Liste des utilisateurs + connexions |
 | GET | `/api/admin/fetchUserById/{id}` | admin | Profil + années d'un user |
 | GET | `/api/admin/history/quick` | admin | Tableau de bord des connexions |
 | GET/POST/PUT | `/api/admin/nomenclature…` | admin | CRUD nomenclature, type, sous-type |
 | GET/POST/PUT/DELETE | `/api/admin/marketing…` | admin | CRUD campagnes, statut |
 
-\* aucune règle `access_control` ne couvre ce préfixe : l'endpoint est accessible sans JWT.
+Tout `/api` non listé comme public exige un JWT (dernière règle de `access_control`).
+« propriétaire » = contrôle `isGranted('OWNER', ...)` via `OwnershipVoter`.
 
 ## 6. Flux « ajouter une intervention » (v2)
 

@@ -40,7 +40,7 @@ class ActivationTokenEncoder implements EventSubscriberInterface{
         if ($result instanceof User && $method === "POST") {   
             
             //On génére le token d'activation
-            $token = md5(uniqid());
+            $token = bin2hex(random_bytes(16));
             $result->setToken($token)
                     ->setCreatedAt(new \DateTime())
             ;  

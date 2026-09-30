@@ -213,7 +213,7 @@ class SurgeriesController extends AbstractController
                 break;
             case 3:
                 $surgery->setFirstHand($resident->getId());
-                $surgery->setSecondHand($data['firstHand']);
+                $surgery->setSecondHand($data['secondHand'] ?? null);
                 break;
         }
 
