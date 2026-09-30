@@ -48,13 +48,6 @@ class ExcelNewVersion extends AbstractController
      */
     public function ExcelGenerator2(int $year): Response
     {
-        // Premier check, l'utilisateur est il un admin qui cherche à avoir acces aux information
-        // 1. Si $this->security->getUser() est admin
-
-        // Alors on cherche à qui appartient année
-        $searchedYear = $this->yearsRepository->findOneBy(['id'=> $year]);
-        $user = $searchedYear->getUser();
-        // Sinon
         $user = $this->userRepository->findOneBy(['id' => $this->security->getUser()]);
 
         if (!$user) {
@@ -84,7 +77,7 @@ class ExcelNewVersion extends AbstractController
         // Création de la table
         $spreadsheet = new Spreadsheet();
         $reader = IOFactory::createReader('Xlsx');
-        $spreadsheet = $reader->load('ExcelTemplate.xlsx');
+        $spreadsheet = $reader->load($this->getParameter('kernel.project_dir') . '/public/ExcelTemplate.xlsx');
 
         // Récupération de l'année en cours
         $currentYearOfFormation = reset($currentYear); // Prend le premier élément correspondant
@@ -290,7 +283,7 @@ class ExcelNewVersion extends AbstractController
 
             // Décompte final
             // Définir une fonction pour remplir les cellules
-            function fillSupervisorRow($currentSheet, $currentRow, $currentSupervisor) {
+            $fillSupervisorRow = function ($currentSheet, $currentRow, $currentSupervisor) {
                 $totalAssistance = $currentSupervisor['isFirsthand'] + $currentSupervisor['isSecondhand'];
                 $percentageFirsthand = ($totalAssistance == 0) ? 0 : round(($currentSupervisor['isFirsthand'] / $totalAssistance) * 100, 1);
                 $percentageSecondhand = ($totalAssistance == 0) ? 0 : round(($currentSupervisor['isSecondhand'] / $totalAssistance) * 100, 1);
@@ -310,7 +303,7 @@ class ExcelNewVersion extends AbstractController
 
                 $currentSheet->getStyle('K' . $currentRow)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
 
-            }
+            };
 
             // Décompte final
             $currentRow += 11;
@@ -329,7 +322,7 @@ class ExcelNewVersion extends AbstractController
                 if ($currentSupervisor['isManager']) {
                     $hasManager = true;
                     $currentRow++;
-                    fillSupervisorRow($currentSheet, $currentRow, $currentSupervisor);
+                    $fillSupervisorRow($currentSheet, $currentRow, $currentSupervisor);
                     break;
                 }
             }
@@ -343,7 +336,7 @@ class ExcelNewVersion extends AbstractController
             foreach ($supervisors as $currentSupervisor) {
                 if (!$currentSupervisor['isManager']) {
                     $currentRow++;
-                    fillSupervisorRow($currentSheet, $currentRow, $currentSupervisor);
+                    $fillSupervisorRow($currentSheet, $currentRow, $currentSupervisor);
                    // $currentSheet->getStyle('G' . $currentRow. ":J" . $currentRow)->getBorders()->getBottom()->setBorderStyle(Border::BORDER_THICK);
                 }
             }
@@ -920,7 +913,7 @@ class ExcelNewVersion extends AbstractController
      * @param int $month
      * @return int Numéro de ligne
      */
-    function getRow($month)
+    $getRow = function ($month)
     {
         if ($month <= 2 || $month >= 9) {
             $row = 4;
@@ -929,7 +922,7 @@ class ExcelNewVersion extends AbstractController
         }
 
         return $row;
-    }
+    };
 
     // Consultations :
 
@@ -940,7 +933,7 @@ class ExcelNewVersion extends AbstractController
 
         for ($month = 1; $month <= 12; $month++) {
 
-            $row = getRow($month);
+            $row = $getRow($month);
 
             /**
              * @var array Ensemble des consultations du mois en cours (n du foreach) 
@@ -1021,7 +1014,7 @@ class ExcelNewVersion extends AbstractController
 
             for ($month = 1; $month <= 12; $month++) {
 
-                $row = getRow($month);
+                $row = $getRow($month);
                 $days = [1 => 0, 2 => 0, 3 => 0, 4 => 0, 5 => 0, 6 => 0, 7 => 0];
 
                 // Comptage par jours : 
@@ -1057,7 +1050,7 @@ class ExcelNewVersion extends AbstractController
 
             for ($month = 1; $month <= 12; $month++) {
 
-                $row = getRow($month);
+                $row = $getRow($month);
                 $days = [1 => 0, 2 => 0, 3 => 0, 4 => 0, 5 => 0, 6 => 0, 7 => 0];
 
                 // Comptage par jours : 
@@ -1098,7 +1091,7 @@ class ExcelNewVersion extends AbstractController
         for ($n = 1; $n <= 12; $n++) {
 
             $table = ["staff" => [1 => [0, 0, 0], 2 => [0, 0, 0], 3 => [0, 0, 0], 4 => [0, 0, 0], 5 => [0, 0, 0], 6 => [0, 0, 0], 7 => [0, 0, 0]],  "journal" => [1 => [0, 0, 0], 2 => [0, 0, 0], 3 => [0, 0, 0], 4 => [0, 0, 0], 5 => [0, 0, 0], 6 => [0, 0, 0], 7 => [0, 0, 0]], "lesson" => [1 => [0, 0, 0], 2 => [0, 0, 0], 3 => [0, 0, 0], 4 => [0, 0, 0], 5 => [0, 0, 0], 6 => [0, 0, 0], 7 => [0, 0, 0]], "congres" => [1 => [0, 0, 0], 2 => [0, 0, 0], 3 => [0, 0, 0], 4 => [0, 0, 0], 5 => [0, 0, 0], 6 => [0, 0, 0], 7 => [0, 0, 0]]];
-            $row = getRow($n);
+            $row = $getRow($n);
 
             foreach ($formations as $formation) {
 
@@ -1274,7 +1267,7 @@ class ExcelNewVersion extends AbstractController
         for ($n = 1; $n <= 12; $n++) {
 
             $table = [1 => [0, 0, 0], 2 => [0, 0, 0], 3 => [0, 0, 0], 4 => [0, 0, 0], 5 => [0, 0, 0], 6 => [0, 0, 0], 7 => [0, 0, 0]];
-            $row = getRow($n);
+            $row = $getRow($n);
 
             foreach ($gardes as $garde) {
 

@@ -2,58 +2,30 @@
 
 namespace App\Controller;
 
-use App\Entity\Surgeons;
 use App\Repository\YearsRepository;
 use App\Repository\SurgeonsRepository;
-use Symfony\Component\Serializer\Serializer;
-use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Serializer\Encoder\JsonEncoder;
-use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 
 class GetSurgeonsController extends AbstractController
 {
     /**
+     * Liste des chirurgiens (id, prénom, nom, maître de stage) d'une année de l'utilisateur connecté.
+     *
      * @Route("/api/list/{id}", name="list", methods={"GET"})
      */
-    public function CheckDate($id, SurgeonsRepository $Years)
+    public function CheckDate($id, SurgeonsRepository $surgeonsRepository, YearsRepository $yearsRepository)
     {
-        
-        $list = $Years->findSurgeons($id);
-         
-        
-        // On spécifie que l'on utilise un encoder en JSON
-        $encoders = [new JsonEncoder()];
+        $year = $yearsRepository->find($id);
 
-        //On instancie le "normaliseur" pour convertir la collection en tableau
-        $normalizers = [new ObjectNormalizer()];
+        // L'année doit exister et appartenir à l'utilisateur connecté.
+        if (!$year || !$this->isGranted('OWNER', $year)) {
+            return new JsonResponse(['message' => "Cette année ne vous appartient pas"], JsonResponse::HTTP_FORBIDDEN);
+        }
 
-        
-
-        // On fait la conversion en json
-        // On instencie le convertisseur
-        $serializer = new Serializer($normalizers, $encoders);
-
-        // On converit en json
-        $jsonContent = $serializer->serialize($list, 'json');
-        //, [
-        //    'circular_reference_handler' => function($test){
-        //        return $test->getId();
-        //   }
-        //]);
-
-        
-
-        // On instancie la réponse
-        $respone = new Response($jsonContent);
-
-        // On ajoute l'entête HTTP
-        $respone->headers->set('Content-Type', 'application/json');
-
-        // On envoie la réponse
-        return $respone;
-
+        // findSurgeons() renvoie des tableaux scalaires (id, firstName, lastName, boss).
+        return new JsonResponse($surgeonsRepository->findSurgeons($year));
     }
 }

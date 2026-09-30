@@ -31,7 +31,7 @@ class StatisticsRepository extends ServiceEntityRepository
             ->setParameter('val', $user)
             ->select('s')
             ->getQuery()
-            ->getResult();
+            ->getOneOrNullResult();
     }
 
 

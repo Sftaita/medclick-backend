@@ -50,9 +50,14 @@ class UsersController extends AbstractController
      */
     public function userStat(int $id, YearsRepository $yearsRepository): JsonResponse
     {
+        // Uniquement ses propres statistiques, sauf pour un administrateur.
+        if ($this->getUser()->getId() !== $id && !$this->isGranted('ROLE_ADMIN')) {
+            return new JsonResponse(['message' => 'Accès refusé'], JsonResponse::HTTP_FORBIDDEN);
+        }
+
         $yearsData = $yearsRepository->getUserStat($id);
 
-        return new JsonResponse($yearsData, JsonResponse::HTTP_OK, [], true);
+        return new JsonResponse($yearsData);
     }
 
     /**

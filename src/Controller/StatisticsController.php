@@ -12,11 +12,11 @@ use App\Repository\SurgeriesRepository;
 use App\Repository\UserRepository;
 use App\Repository\YearsRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
-use Symfony\Component\Serializer\Encoder\JsonEncoder;
-use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
-use Symfony\Component\Serializer\Serializer;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Security\Core\Security;
 
 
 /**
@@ -130,41 +130,30 @@ class StatisticsController
     /**
      * @Route("fetch/{userId<\d+>}", name="fetch", methods={"GET"})
      */
-    public function fetch($userId)
+    public function fetch($userId, Security $security, AuthorizationCheckerInterface $authorizationChecker)
     {
+        // Statistiques de l'utilisateur $userId.
+        $statistics = $this->statisticsRepository->findOneById($userId);
 
-        $list = $this->statisticsRepository->findOneById($userId);
+        if (!$statistics) {
+            return new JsonResponse(null);
+        }
 
+        // Uniquement ses propres statistiques, sauf pour un administrateur.
+        $owner = $statistics->getUser();
+        if ((!$owner || $owner->getId() !== $security->getUser()->getId()) && !$authorizationChecker->isGranted('ROLE_ADMIN')) {
+            return new JsonResponse(['message' => 'Accès refusé'], JsonResponse::HTTP_FORBIDDEN);
+        }
 
-        // On spécifie que l'on utilise un encoder en JSON
-        $encoders = [new JsonEncoder()];
-
-        //On instancie le "normaliseur" pour convertir la collection en tableau
-        $normalizers = [new ObjectNormalizer()];
-
-
-
-        // On fait la conversion en json
-        // On instencie le convertisseur
-        $serializer = new Serializer($normalizers, $encoders);
-
-        // On converit en json
-        $jsonContent = $serializer->serialize($list, 'json');
-        //, [
-        //    'circular_reference_handler' => function($test){
-        //        return $test->getId();
-        //   }
-        //]);
-
-
-
-        // On instancie la réponse
-        $respone = new Response($jsonContent);
-
-        // On ajoute l'entête HTTP
-        $respone->headers->set('Content-Type', 'application/json');
-
-        // On envoie la réponse
-        return $respone;
+        // Champs explicites : ne jamais sérialiser l'entité User liée (hash du mot de passe, tokens).
+        return new JsonResponse([
+            'id' => $statistics->getId(),
+            'firstHandSurgeries' => $statistics->getFirstHandSurgeries(),
+            'secondHandSurgeries' => $statistics->getSecondHandSurgeries(),
+            'fistHandHelpedSurgeries' => $statistics->getFistHandHelpedSurgeries(),
+            'consultations' => $statistics->getConsultations(),
+            'gardes' => $statistics->getGardes(),
+            'formations' => $statistics->getFormations(),
+        ]);
     }
 }

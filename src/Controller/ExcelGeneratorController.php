@@ -16,6 +16,9 @@ use DateInterval;
 use DatePeriod;
 use DateTime;
 use Symfony\Component\Security\Core\Security;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -66,7 +69,7 @@ class ExcelGeneratorController extends AbstractController
         $user = $this->security->getUser();
 
         if (!$user) {
-            dd("Pas d'utilisateur retrouvé");
+            return new Response('User not found', Response::HTTP_NOT_FOUND);
         }
 
         $request = $this->userRepo->getUserInfo($user);
@@ -96,6 +99,11 @@ class ExcelGeneratorController extends AbstractController
          * @var obj Année en cour de traitement
          */
         $testo = $this->year->find($year);
+
+        // L'année doit exister et appartenir à l'utilisateur connecté.
+        if (!$testo || !$this->isGranted('OWNER', $testo)) {
+            return new Response('No rights on this year', Response::HTTP_FORBIDDEN);
+        }
 
 
         /**
@@ -214,7 +222,7 @@ class ExcelGeneratorController extends AbstractController
         /*----------------------------------------------------- PAGE DE GARDE ---------------------------------------------------------------------*/
         $reader = IOFactory::createReader('Xlsx');
 
-        $spreadsheet = $reader->load('ExcelTemplateOldVersion.xlsx');
+        $spreadsheet = $reader->load($this->getParameter('kernel.project_dir') . '/public/ExcelTemplateOldVersion.xlsx');
 
         $sheet1 = $spreadsheet->getSheet(0);
 
@@ -711,7 +719,7 @@ class ExcelGeneratorController extends AbstractController
          * @param int $month
          * @return int Numéro de ligne
          */
-        function getRow($month)
+        $getRow = function ($month)
         {
             if ($month <= 2 || $month >= 9) {
                 $row = 4;
@@ -720,7 +728,7 @@ class ExcelGeneratorController extends AbstractController
             }
 
             return $row;
-        }
+        };
 
         // Consultations :
 
@@ -731,7 +739,7 @@ class ExcelGeneratorController extends AbstractController
 
             for ($month = 1; $month <= 12; $month++) {
 
-                $row = getRow($month);
+                $row = $getRow($month);
 
                 /**
                  * @var array Ensemble des consultations du mois en cours (n du foreach) 
@@ -811,7 +819,7 @@ class ExcelGeneratorController extends AbstractController
 
             for ($month = 1; $month <= 12; $month++) {
 
-                $row = getRow($month);
+                $row = $getRow($month);
                 $days = [1 => 0, 2 => 0, 3 => 0, 4 => 0, 5 => 0, 6 => 0, 7 => 0];
 
                 // Comptage par jours : 
@@ -846,7 +854,7 @@ class ExcelGeneratorController extends AbstractController
 
             for ($month = 1; $month <= 12; $month++) {
 
-                $row = getRow($month);
+                $row = $getRow($month);
                 $days = [1 => 0, 2 => 0, 3 => 0, 4 => 0, 5 => 0, 6 => 0, 7 => 0];
 
                 // Comptage par jours : 
@@ -884,7 +892,7 @@ class ExcelGeneratorController extends AbstractController
             for ($n = 1; $n <= 12; $n++) {
 
                 $table = ["staff" => [1 => [0, 0, 0], 2 => [0, 0, 0], 3 => [0, 0, 0], 4 => [0, 0, 0], 5 => [0, 0, 0], 6 => [0, 0, 0], 7 => [0, 0, 0]],  "journal" => [1 => [0, 0, 0], 2 => [0, 0, 0], 3 => [0, 0, 0], 4 => [0, 0, 0], 5 => [0, 0, 0], 6 => [0, 0, 0], 7 => [0, 0, 0]], "lesson" => [1 => [0, 0, 0], 2 => [0, 0, 0], 3 => [0, 0, 0], 4 => [0, 0, 0], 5 => [0, 0, 0], 6 => [0, 0, 0], 7 => [0, 0, 0]], "congres" => [1 => [0, 0, 0], 2 => [0, 0, 0], 3 => [0, 0, 0], 4 => [0, 0, 0], 5 => [0, 0, 0], 6 => [0, 0, 0], 7 => [0, 0, 0]]];
-                $row = getRow($n);
+                $row = $getRow($n);
 
                 foreach ($formations as $formation) {
 
@@ -1060,7 +1068,7 @@ class ExcelGeneratorController extends AbstractController
             for ($n = 1; $n <= 12; $n++) {
 
                 $table = [1 => [0, 0, 0], 2 => [0, 0, 0], 3 => [0, 0, 0], 4 => [0, 0, 0], 5 => [0, 0, 0], 6 => [0, 0, 0], 7 => [0, 0, 0]];
-                $row = getRow($n);
+                $row = $getRow($n);
 
                 foreach ($gardes as $garde) {
 
@@ -1290,12 +1298,18 @@ class ExcelGeneratorController extends AbstractController
 
         /*----------------------------------------------------- FIN ------------------------------------------------------------------------*/
 
-        header("Content-Type:   application/vnd.ms-excel; charset=utf-8");
-        header("Content-Disposition: attachment; filename=abc.xls");
-        header('Access-Control-Allow-Origin: *');
-        //header('Content-Disposition: attachment;filename="test.xlsx"');
-        $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
-        $writer->save('php://output');
-        exit();
+        // CORS géré par nelmio_cors (plus de "Access-Control-Allow-Origin: *" manuel).
+        $response = new StreamedResponse(function () use ($spreadsheet) {
+            $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
+            $writer->save('php://output');
+        });
+
+        $response->headers->set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        $response->headers->set('Content-Disposition', $response->headers->makeDisposition(
+            ResponseHeaderBag::DISPOSITION_ATTACHMENT,
+            'export.xlsx'
+        ));
+
+        return $response;
     }
 }

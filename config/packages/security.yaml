@@ -54,7 +54,11 @@ security:
   # Easy way to control access for large sections of your site
   # Note: Only the *first* access control that matches will be used
   access_control:
+    # Routes publiques (liste blanche). Tout le reste de /api exige un JWT (dernière règle).
     - { path: ^/api/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+    - { path: ^/api/users$, roles: IS_AUTHENTICATED_ANONYMOUSLY, methods: [POST] }
+    - { path: ^/api/forgottenPassword$, roles: IS_AUTHENTICATED_ANONYMOUSLY, methods: [POST] }
+    - { path: ^/api/resetPassword$, roles: IS_AUTHENTICATED_ANONYMOUSLY, methods: [POST] }
     - { path: ^/api/autre, roles: IS_AUTHENTICATED_ANONYMOUSLY }
     - { path: ^/api/terms-conditions, roles: IS_AUTHENTICATED_ANONYMOUSLY,  methods: [GET]  }
     - { path: ^/api/marketing/active, roles: IS_AUTHENTICATED_ANONYMOUSLY }
@@ -78,4 +82,5 @@ security:
         roles: IS_AUTHENTICATED_FULLY,
         methods: [GET, PUT, DELETE],
       }
+    - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
     #  - { path: '^/admin', roles: ROLE_ADMIN }
