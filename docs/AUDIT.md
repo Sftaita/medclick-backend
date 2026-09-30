@@ -111,7 +111,7 @@ vérification du mot de passe). Les statistiques historiques restent gonflées p
 
 ---
 
-### 8. Outillage cassé en local (constaté pendant les correctifs)
+### 8. Outillage cassé en local — ✅ corrigé (branche `outillage/php82-doctrine`)
 - Les commandes `doctrine:schema:*` plantent (`ConnectionHelper` introuvable) : DBAL 3.9 est
   installé avec DoctrineBundle 2.3, incompatibles.
 - `composer.lock` n'est pas installable en PHP 8.2 (`laminas/laminas-code 4.7.1` exige
@@ -119,15 +119,26 @@ vérification du mot de passe). Les statistiques historiques restent gonflées p
 - `cache:clear` exige une connexion MySQL (pas de `server_version` dans `doctrine.yaml`).
 - `simple-phpunit` échoue sous Windows (le pont n'est pas lié) ; contournement documenté
   dans `CLAUDE.md`.
+**Fait** : Symfony 5.4 + DoctrineBundle 2.13 (commandes Doctrine réparées), lockfile PHP 8.2,
+PHPUnit 9.6 en dépendance de dev (`composer test`), `.env.example`, CI GitHub Actions.
+`doctrine:schema:validate` a aussitôt révélé un mapping invalide (`User` avait deux relations
+inverses vers `Statistics`), corrigé. `cache:clear` sans MySQL : renseigner `serverVersion`.
+
+### 9. Exposition publique
+- Le dépôt GitHub est **public** : chaque correctif poussé rend visible la faille qu'il corrige
+  tant qu'il n'est pas déployé. Déployer rapidement les branches de sécurité, ou passer le
+  dépôt en privé.
+- La production renvoie `X-Powered-By: PHP/8.2.33` : désactiver `expose_php` (hPanel).
+- La documentation API Platform (`/api/docs`) est publique en production.
 
 ## P1 — Socle technique
 
 | Sujet | Constat | Action |
 |---|---|---|
-| Framework | Symfony 5.1 (fin de support 01/2021), API Platform 2.5, `guard` déprécié | Montée 5.4 → 6.4 LTS, API Platform 3, nouveau système d'authentification (ADR-103) |
-| PHP | `composer.json` : `>=7.2.5` ; dev en 8.2 | Fixer `>=8.2`, attributs PHP 8, types stricts, Rector |
+| Framework | ✅ Symfony 5.4 LTS (support sécurité jusqu'en 02/2029), API Platform 2.6. Reste : `guard` et `sensio/framework-extra-bundle` dépréciés/abandonnés ; `composer audit` : 5 alertes API Platform (GraphQL, JSON:API/HAL, sécurité par propriété : non utilisés ; « type confusion » des IRI : corrigée seulement en 4.x) | Nouveau système d'authentification (`enable_authenticator_manager`) et rate limiter (désormais disponibles en 5.4), puis 6.4 LTS + API Platform 3 (ADR-103) |
+| PHP | Prod et lockfile en 8.2 ; `composer.json` dit encore `>=7.2.5` | Fixer `>=8.2`, attributs PHP 8, types stricts, Rector |
 | Tests | 45 tests fonctionnels (P0) | Étendre : contenu des exports Excel (golden file), admin, marketing, nomenclature |
-| Migrations | 2 migrations pour 15 entités | Baseline + `doctrine:schema:validate` en CI (ADR-105) |
+| Migrations | 3 migrations pour 15 entités ; mapping validé en CI | Baseline depuis la prod + `doctrine:migrations:diff` vide (ADR-105) |
 | Architecture | Contrôleurs de 1 300–1 500 lignes, logique dupliquée v1/v2 | `src/Service/` : `SurgeryFactory`, `LogbookExporter` (une classe par feuille), suppression de l'ancien export (ADR-104) |
 | Validation | `json_decode` + accès direct à `$data['x']` (notices, 500) | DTO + `#[MapRequestPayload]` (Symfony 6.3+) ou Validator |
 | Erreurs | Mélange `die`, `dd`, `\Exception`, JSON `{message}` / `{error}` | Format unique (RFC 7807 `application/problem+json`), `ExceptionListener` |

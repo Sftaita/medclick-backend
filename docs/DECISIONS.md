@@ -83,7 +83,8 @@ Décision : `User` n'accepte en écriture que `email`, `password` (plainPassword
 ne sont jamais inscriptibles via l'API.
 
 ## ADR-103 — Montée de version : Symfony 6.4 LTS / 7.x, API Platform 3.x, PHP 8.2+
-**Statut : Proposée**
+**Statut : En cours** — étape 1 faite le 30/09/2026 : Symfony 5.4 LTS, API Platform 2.6.8,
+DoctrineBundle 2.13, lockfile PHP 8.2 (version de la prod Hostinger).
 Raison : Symfony 5.1 et API Platform 2.5 ne reçoivent plus de correctifs de sécurité.
 Approche : 5.1 → 5.4 (déprécations) → 6.4 LTS ; API Platform 2.5 → 2.7 → 3.x ;
 annotations → attributs PHP 8 (Rector).

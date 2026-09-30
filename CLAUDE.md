@@ -10,17 +10,21 @@ Le frontend (SPA, repo séparé) consomme cette API. Documentation détaillée :
 
 ## Stack
 
-- PHP (contrainte composer `>=7.2.5`, dev local en PHP 8.2 via WAMP), **Symfony 5.1**
-- **API Platform 2.5** (annotations `@ApiResource`, namespace `ApiPlatform\Core`)
-- Doctrine ORM 2.7 + MySQL (`DATABASE_URL`), annotations `@ORM\...`
+- **PHP 8.2** (production : Hostinger, LiteSpeed, PHP 8.2 ; dev local WAMP), **Symfony 5.4 LTS**
+- **API Platform 2.6** (annotations `@ApiResource`, namespace `ApiPlatform\Core`)
+- Doctrine ORM 2.20 / DBAL 3 / DoctrineBundle 2.13 + MySQL (`DATABASE_URL`), annotations `@ORM\...`
 - Auth : **LexikJWT** (`POST /api/login_check`, body `{username, password}`), stateless
 - PhpSpreadsheet (export carnet de stage), Symfony Mailer (Gmail), Twig (emails)
 - Tests fonctionnels : `tests/` (ApiTestCase, base SQLite `var/test.db` recréée à chaque test).
+- CI : `.github/workflows/ci.yml` (lint conteneur, `doctrine:schema:validate`, tests). Le dépôt
+  GitHub est **public** : ne jamais committer de secret, ni de détail d'une faille non déployée.
 
 ## Commandes
 
 ```bash
+cp .env.example .env                      # première installation, puis renseigner les valeurs
 composer install                          # lance aussi cache:clear + migrations (auto-scripts)
+composer test                             # PHPUnit 9.6 (sans Xdebug)
 symfony serve  |  php -S 0.0.0.0:8000 -t public
 php bin/console debug:router              # liste des routes custom + API Platform
 php bin/console doctrine:migrations:diff  # générer une migration après modif d'entité
@@ -28,13 +32,11 @@ php bin/console doctrine:migrations:migrate
 php bin/console app:update-surgeries      # relie Surgeries -> Nomenclature (lots de 40 000)
 php bin/console app:update-favorites      # relie Favorites -> Nomenclature
 php bin/console lexik:jwt:generate-keypair  # clés dans config/jwt/*.pem (gitignorées)
-
-# Tests (PHPUnit 9.6 téléchargé par le bridge ; simple-phpunit seul échoue sous Windows)
-php -d xdebug.mode=off -d auto_prepend_file=vendor/autoload.php vendor/bin/.phpunit/phpunit-9.6-0/phpunit
+php bin/console doctrine:schema:validate --skip-sync   # vérifie le mapping
 ```
 
-Sans MySQL démarré, `cache:clear` en env dev échoue (détection de version) ; les tests n'en
-ont pas besoin (SQLite). `doctrine:schema:*` est cassé (DBAL 3 / DoctrineBundle 2.3).
+Sans `serverVersion` dans `DATABASE_URL`, `cache:clear` en env dev exige MySQL démarré
+(détection de version) ; les tests n'en ont pas besoin (SQLite).
 
 Doc OpenAPI générée par API Platform : `GET /api` (ne couvre pas les contrôleurs custom).
 
