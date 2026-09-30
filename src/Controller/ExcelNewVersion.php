@@ -11,6 +11,7 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -196,6 +197,7 @@ class ExcelNewVersion extends AbstractController
                     $labelIndex++;
                 }
             } else {
+                $row = 40; // Même ligne à supprimer que lorsqu'il n'y a qu'un manager
                 $currentSheet->setCellValue('E39', "ATTENTION")
                             ->setCellValue('F39', "Pas de chirurgien")
                             ->setCellValue('G39', "renseigné !");
@@ -358,15 +360,42 @@ class ExcelNewVersion extends AbstractController
 
         $currentSheet = $spreadsheet->getSheet(2);
 
-        $formationYearColumns = [
-            1 => "E",
-            2 => "F",
-            3 => "G",
-            4 => "H",
-            5 => "I",
-            6 => "J",
-            7 => "K"
-        ];
+        // Le modèle prévoit 7 années : on ajoute des colonnes uniquement si l'utilisateur a des années au-delà
+        $maxYearOfFormation = 7;
+        foreach ($userAllYears as $yearOfFormation) {
+            $maxYearOfFormation = max($maxYearOfFormation, (int) $yearOfFormation->getYearOfFormation());
+        }
+        $extraYears = $maxYearOfFormation - 7;
+
+        if ($extraYears > 0) {
+            // Insertion à l'intérieur des blocs "Opérateur" (avant S) puis "Assistant" (avant K) pour que les fusions s'étendent
+            $currentSheet->insertNewColumnBefore('S', $extraYears);
+            $currentSheet->insertNewColumnBefore('K', $extraYears);
+        }
+
+        // Colonnes : E.. (assistant par année), total assistant, (opérateur par année), total opérateur, total A+O, %
+        $formationYearColumns = [];
+        $firstHandColumns = [];
+        for ($i = 1; $i <= $maxYearOfFormation; $i++) {
+            $formationYearColumns[$i] = Coordinate::stringFromColumnIndex(4 + $i);
+            $firstHandColumns[$i] = Coordinate::stringFromColumnIndex(5 + $maxYearOfFormation + $i);
+        }
+        $secondHandTotalColumn = Coordinate::stringFromColumnIndex(5 + $maxYearOfFormation);
+        $firstHandTotalColumn = Coordinate::stringFromColumnIndex(6 + 2 * $maxYearOfFormation);
+        $totalColumn = Coordinate::stringFromColumnIndex(7 + 2 * $maxYearOfFormation);
+        $percentageColumn = Coordinate::stringFromColumnIndex(8 + 2 * $maxYearOfFormation);
+
+        if ($extraYears > 0) {
+            // Réécrire les en-têtes d'années et donner aux nouvelles colonnes la largeur des colonnes d'années
+            $yearColumnWidth = $currentSheet->getColumnDimension('E')->getWidth();
+            for ($i = 1; $i <= $maxYearOfFormation; $i++) {
+                $currentSheet->setCellValue($formationYearColumns[$i] . 6, $i)
+                            ->setCellValue($formationYearColumns[$i] . 13, $i)
+                            ->setCellValue($firstHandColumns[$i] . 13, $i);
+                $currentSheet->getColumnDimension($formationYearColumns[$i])->setWidth($yearColumnWidth);
+                $currentSheet->getColumnDimension($firstHandColumns[$i])->setWidth($yearColumnWidth);
+            }
+        }
 
 
         $currentSheet->setCellValue("G3", "  Dr " . ucfirst($user->getFirstname()) . " " . ucfirst($user->getLastname()))
@@ -455,7 +484,7 @@ class ExcelNewVersion extends AbstractController
                             'speciality' => $speciality,
                             'years' => []
                         ];
-                        for ($i = 1; $i <= 7; $i++) {
+                        for ($i = 1; $i <= $maxYearOfFormation; $i++) {
                             $orthoTrauma[$subtype][$nomenclatureId]['years'][$i] = [
                                 'firstHand' => 0,
                                 'secondHand' => 0
@@ -481,7 +510,7 @@ class ExcelNewVersion extends AbstractController
                             'speciality' => $speciality,
                             'years' => []
                         ];
-                        for ($i = 1; $i <= 7; $i++) {
+                        for ($i = 1; $i <= $maxYearOfFormation; $i++) {
                             $orthoElective[$subtype][$nomenclatureId]['years'][$i] = [
                                 'firstHand' => 0,
                                 'secondHand' => 0
@@ -507,7 +536,7 @@ class ExcelNewVersion extends AbstractController
                             'speciality' => $speciality,
                             'years' => []
                         ];
-                        for ($i = 1; $i <= 7; $i++) {
+                        for ($i = 1; $i <= $maxYearOfFormation; $i++) {
                             $general[$subtype][$nomenclatureId]['years'][$i] = [
                                 'firstHand' => 0,
                                 'secondHand' => 0
@@ -544,34 +573,33 @@ class ExcelNewVersion extends AbstractController
                     $firstHandTotal = 0;
                     $secondHandTotal = 0;
         
-                    // Remplir les cellules E à K (seconde main) et calculer la somme
-                    for ($i = 1; $i <= 7; $i++) {
+                    // Remplir les colonnes assistant (seconde main) par année et calculer la somme
+                    for ($i = 1; $i <= $maxYearOfFormation; $i++) {
                         $secondHandValue = $details['years'][$i]['secondHand'];
                         $secondHandTotal += $secondHandValue; // Ajouter à la somme totale
                         $currentSheet->setCellValue($formationYearColumns[$i] . $currentRow, $secondHandValue);
                     }
         
-                    // Remplir les cellules M à S (première main) et calculer la somme
-                    $firstHandStartCol = 'M';
+                    // Remplir les colonnes opérateur (première main) par année et calculer la somme
                     foreach ($formationYearColumns as $year => $column) {
-                        $firstHandCol = chr(ord($firstHandStartCol) + ($year - 1));
+                        $firstHandCol = $firstHandColumns[$year];
                         $firstHandValue = $details['years'][$year]['firstHand'];
                         $firstHandTotal += $firstHandValue; // Ajouter à la somme totale
                         $currentSheet->setCellValue($firstHandCol . $currentRow, $firstHandValue);
                     }
         
-                    // Écrire les sommes totales dans les colonnes L, T et U
-                    $currentSheet->setCellValue('T' . $currentRow, $firstHandTotal); // Somme des premières mains
-                    $currentSheet->setCellValue('L' . $currentRow, $secondHandTotal); // Somme des secondes mains
-                    $currentSheet->setCellValue('U' . $currentRow, $firstHandTotal + $secondHandTotal); // Somme totale
+                    // Écrire les totaux assistant, opérateur et A+O
+                    $currentSheet->setCellValue($firstHandTotalColumn . $currentRow, $firstHandTotal); // Somme des premières mains
+                    $currentSheet->setCellValue($secondHandTotalColumn . $currentRow, $secondHandTotal); // Somme des secondes mains
+                    $currentSheet->setCellValue($totalColumn . $currentRow, $firstHandTotal + $secondHandTotal); // Somme totale
         
-                    // Calculer et écrire le pourcentage dans la colonne V, avec gestion de la division par zéro
+                    // Calculer et écrire le pourcentage, avec gestion de la division par zéro
                     if ($firstHandTotal + $secondHandTotal > 0) {
                         $percentage = ($firstHandTotal / ($firstHandTotal + $secondHandTotal)) * 100;
                     } else {
                         $percentage = 0;
                     }
-                    $currentSheet->setCellValue('V' . $currentRow, round($percentage, 2) . '%'); // Pourcentage avec arrondi à 2 décimales
+                    $currentSheet->setCellValue($percentageColumn . $currentRow, round($percentage, 2) . '%'); // Pourcentage avec arrondi à 2 décimales
         
                     $currentRow++;
                 }
@@ -604,34 +632,33 @@ class ExcelNewVersion extends AbstractController
                     $firstHandTotal = 0;
                     $secondHandTotal = 0;
 
-                    // Remplir les cellules E à K (seconde main) et calculer la somme
-                    for ($i = 1; $i <= 7; $i++) {
+                    // Remplir les colonnes assistant (seconde main) par année et calculer la somme
+                    for ($i = 1; $i <= $maxYearOfFormation; $i++) {
                         $secondHandValue = $details['years'][$i]['secondHand'];
                         $secondHandTotal += $secondHandValue; // Ajouter à la somme totale
                         $currentSheet->setCellValue($formationYearColumns[$i] . $currentRow, $secondHandValue);
                     }
 
-                    // Remplir les cellules M à S (première main) et calculer la somme
-                    $firstHandStartCol = 'M';
+                    // Remplir les colonnes opérateur (première main) par année et calculer la somme
                     foreach ($formationYearColumns as $year => $column) {
-                        $firstHandCol = chr(ord($firstHandStartCol) + ($year - 1));
+                        $firstHandCol = $firstHandColumns[$year];
                         $firstHandValue = $details['years'][$year]['firstHand'];
                         $firstHandTotal += $firstHandValue; // Ajouter à la somme totale
                         $currentSheet->setCellValue($firstHandCol . $currentRow, $firstHandValue);
                     }
 
-                    // Écrire les sommes totales dans les colonnes L, T et U
-                    $currentSheet->setCellValue('L' . $currentRow, $firstHandTotal); // Somme des premières mains
-                    $currentSheet->setCellValue('T' . $currentRow, $secondHandTotal); // Somme des secondes mains
-                    $currentSheet->setCellValue('U' . $currentRow, $firstHandTotal + $secondHandTotal); // Somme totale
+                    // Écrire les totaux assistant, opérateur et A+O
+                    $currentSheet->setCellValue($firstHandTotalColumn . $currentRow, $firstHandTotal); // Somme des premières mains
+                    $currentSheet->setCellValue($secondHandTotalColumn . $currentRow, $secondHandTotal); // Somme des secondes mains
+                    $currentSheet->setCellValue($totalColumn . $currentRow, $firstHandTotal + $secondHandTotal); // Somme totale
 
-                    // Calculer et écrire le pourcentage dans la colonne V, avec gestion de la division par zéro
+                    // Calculer et écrire le pourcentage, avec gestion de la division par zéro
                     if ($firstHandTotal + $secondHandTotal > 0) {
                         $percentage = ($firstHandTotal / ($firstHandTotal + $secondHandTotal)) * 100;
                     } else {
                         $percentage = 0;
                     }
-                    $currentSheet->setCellValue('V' . $currentRow, round($percentage, 2) . '%'); // Pourcentage avec arrondi à 2 décimales
+                    $currentSheet->setCellValue($percentageColumn . $currentRow, round($percentage, 2) . '%'); // Pourcentage avec arrondi à 2 décimales
 
                     $currentRow++;
                 }
@@ -669,34 +696,33 @@ class ExcelNewVersion extends AbstractController
                 $firstHandTotal = 0;
                 $secondHandTotal = 0;
         
-                // Remplir les cellules E à K (seconde main) et calculer la somme
-                for ($i = 1; $i <= 7; $i++) {
+                // Remplir les colonnes assistant (seconde main) par année et calculer la somme
+                for ($i = 1; $i <= $maxYearOfFormation; $i++) {
                     $secondHandValue = $details['years'][$i]['secondHand'];
                     $secondHandTotal += $secondHandValue; // Ajouter à la somme totale
                     $currentSheet->setCellValue($formationYearColumns[$i] . $currentRow, $secondHandValue);
                 }
         
-                // Remplir les cellules M à S (première main) et calculer la somme
-                $firstHandStartCol = 'M';
+                // Remplir les colonnes opérateur (première main) par année et calculer la somme
                 foreach ($formationYearColumns as $year => $column) {
-                    $firstHandCol = chr(ord($firstHandStartCol) + ($year - 1));
+                    $firstHandCol = $firstHandColumns[$year];
                     $firstHandValue = $details['years'][$year]['firstHand'];
                     $firstHandTotal += $firstHandValue; // Ajouter à la somme totale
                     $currentSheet->setCellValue($firstHandCol . $currentRow, $firstHandValue);
                 }
         
-                // Écrire les sommes totales dans les colonnes L, T et U
-                $currentSheet->setCellValue('T' . $currentRow, $firstHandTotal); // Somme des premières mains
-                $currentSheet->setCellValue('L' . $currentRow, $secondHandTotal); // Somme des secondes mains
-                $currentSheet->setCellValue('U' . $currentRow, $firstHandTotal + $secondHandTotal); // Somme totale
+                // Écrire les totaux assistant, opérateur et A+O
+                $currentSheet->setCellValue($firstHandTotalColumn . $currentRow, $firstHandTotal); // Somme des premières mains
+                $currentSheet->setCellValue($secondHandTotalColumn . $currentRow, $secondHandTotal); // Somme des secondes mains
+                $currentSheet->setCellValue($totalColumn . $currentRow, $firstHandTotal + $secondHandTotal); // Somme totale
         
-                // Calculer et écrire le pourcentage dans la colonne V, avec gestion de la division par zéro
+                // Calculer et écrire le pourcentage, avec gestion de la division par zéro
                 if ($firstHandTotal + $secondHandTotal > 0) {
                     $percentage = ($firstHandTotal / ($firstHandTotal + $secondHandTotal)) * 100;
                 } else {
                     $percentage = 0;
                 }
-                $currentSheet->setCellValue('V' . $currentRow, round($percentage, 2) . '%'); // Pourcentage avec arrondi à 2 décimales
+                $currentSheet->setCellValue($percentageColumn . $currentRow, round($percentage, 2) . '%'); // Pourcentage avec arrondi à 2 décimales
         
                 $currentRow++;
             }
