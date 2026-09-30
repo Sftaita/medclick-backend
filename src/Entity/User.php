@@ -18,6 +18,9 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  *      normalizationContext={
  *          "groups"={"user_read"}
  *      },
+ *      denormalizationContext={
+ *          "groups"={"user_write"}
+ *      },
  *      attributes={
  *          "order": {"lastname": "ASC"}   
  *      }
@@ -37,7 +40,7 @@ class User implements UserInterface
 
     /**
      * @ORM\Column(type="string", length=180, unique=true)
-     * @Groups({"user_read"})
+     * @Groups({"user_read", "user_write"})
      * 
      * @Assert\NotBlank(message="L'email doit être renseigné")
      * @Assert\Email(
@@ -54,7 +57,8 @@ class User implements UserInterface
     /**
      * @var string The hashed password
      * @ORM\Column(type="string")
-     * 
+     * @Groups({"user_write"})
+     *
      * @Assert\NotBlank(message="Un mot de passe est nécessaire")
      * @Assert\Length(
      *      min = 6,
@@ -67,8 +71,8 @@ class User implements UserInterface
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"user_read"})
-     * 
+     * @Groups({"user_read", "user_write"})
+     *
      * @Assert\NotBlank(message="Quel est votre prénom")
      * @Assert\Length(
      *      max = 50,
@@ -79,8 +83,8 @@ class User implements UserInterface
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"user_read"})
-     * 
+     * @Groups({"user_read", "user_write"})
+     *
      * @Assert\NotBlank(message="Quel est votre nom")
      * @Assert\Length(
      *      max = 50,
@@ -124,8 +128,8 @@ class User implements UserInterface
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * @Groups({"user_read"})
-     * 
+     * @Groups({"user_read", "user_write"})
+     *
      * @Assert\Length(
      *      max = 100,
      *      maxMessage = "Le nom de specialité est trop long"
@@ -457,4 +461,5 @@ class User implements UserInterface
 
         return $this;
     }
+
 }

@@ -72,6 +72,10 @@ class FavoritesController extends AbstractController
         //Search in nomenclature table the surgery by id
         $surgery = $nomenclatureRepository->findOneBy(['id' => $data['surgeryId']]);
 
+        if (!$surgery) {
+            return new JsonResponse(['error' => 'Surgery not found.'], 404);
+        }
+
         $favorite = new Favorites;
 
         
@@ -121,6 +125,11 @@ class FavoritesController extends AbstractController
         $favorite = $favoritesRepository->findOneBy(['id' => $data['favoriteId']]);
 
         if (!$favorite) {
+            return new JsonResponse(['error' => 'Favorite not found.'], 404);
+        }
+
+        // The favorite must belong to the connected user
+        if (!$this->isGranted('OWNER', $favorite)) {
             return new JsonResponse(['error' => 'Favorite not found.'], 404);
         }
 

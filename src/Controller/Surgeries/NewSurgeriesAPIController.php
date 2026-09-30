@@ -59,24 +59,31 @@ class NewSurgeriesAPIController extends AbstractController
         $resident = $userRepository->findOneBy(['id' => $this->security->getUser()]);
         
         if (!$resident) {
-            $this->handleMissingData("Aucun utilisateur retrouvé");
+            return $this->handleMissingData("Aucun utilisateur retrouvé");
         }
 
         // Get the POST data and decode it into an associative array.
         $data = json_decode($request->getContent(), true);
 
         // Find the current year by ID
-        $year = $yearsRepository->findOneBy(['id' => $data['year']]);
-        
+        $year = $yearsRepository->findOneBy(['id' => $data['year'] ?? null]);
+
         if (!$year) {
-            $this->handleMissingData("Année non retrouvé");
+            return $this->handleMissingData("Année non retrouvé");
+        }
+
+        // The year must belong to the connected user.
+        if (!$this->isGranted('OWNER', $year)) {
+            return new JsonResponse([
+                'message' => "Cette année ne vous appartient pas"
+            ], JsonResponse::HTTP_FORBIDDEN);
         }
 
         // Find the surgery reference by its ID.
-        $surgeryReference = $nomenclatureRepository->findOneBy(['id' => $data['surgeryId']]);
+        $surgeryReference = $nomenclatureRepository->findOneBy(['id' => $data['surgeryId'] ?? null]);
 
         if (!$surgeryReference) {
-            $this->handleMissingData("Cette intervention n'est pas retrouvée en base de données");
+            return $this->handleMissingData("Cette intervention n'est pas retrouvée en base de données");
         }
 
         // Create a unique code for the surgery.

@@ -19,6 +19,13 @@ use Doctrine\Common\Collections\ArrayCollection;
  *      normalizationContext={
  *          "groups"={"favorites_read"}
  *      },
+ *      collectionOperations={"get", "post"},
+ *      itemOperations={
+ *          "get",
+ *          "put"={"security_post_denormalize"="is_granted('OWNER', object)", "security_post_denormalize_message"="Cette ressource ne vous appartient pas."},
+ *          "patch"={"security_post_denormalize"="is_granted('OWNER', object)", "security_post_denormalize_message"="Cette ressource ne vous appartient pas."},
+ *          "delete"
+ *      },
  *      attributes={
  *          "order": {"speciality": "ASC", "shortcut" : "ASC"},
  *          "pagination_enabled"=false 

@@ -14,6 +14,16 @@ use Symfony\Component\Validator\Constraints as Assert;
  *      normalizationContext={
  *          "groups"={"surgeries_read"}
  *      },
+ *      collectionOperations={
+ *          "get",
+ *          "post"={"security_post_denormalize"="is_granted('OWNER', object)", "security_post_denormalize_message"="Cette ressource ne vous appartient pas."}
+ *      },
+ *      itemOperations={
+ *          "get",
+ *          "put"={"security_post_denormalize"="is_granted('OWNER', object)", "security_post_denormalize_message"="Cette ressource ne vous appartient pas."},
+ *          "patch"={"security_post_denormalize"="is_granted('OWNER', object)", "security_post_denormalize_message"="Cette ressource ne vous appartient pas."},
+ *          "delete"
+ *      },
  *      attributes={
  *          "order": {"date": "DESC", "id" : "DESC"}   
  *      }

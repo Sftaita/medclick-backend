@@ -13,7 +13,16 @@ use Symfony\Component\Serializer\Annotation\Groups;
  *      normalizationContext={
  *          "groups"={"statistics_read"}
  *      },
- * 
+ *      collectionOperations={
+ *          "get",
+ *          "post"={"security"="is_granted('ROLE_ADMIN')"}
+ *      },
+ *      itemOperations={
+ *          "get",
+ *          "put"={"security"="is_granted('ROLE_ADMIN')"},
+ *          "patch"={"security"="is_granted('ROLE_ADMIN')"},
+ *          "delete"={"security"="is_granted('ROLE_ADMIN')"}
+ *      },
  * ),
  * @ORM\Entity(repositoryClass=StatisticsRepository::class)
  */

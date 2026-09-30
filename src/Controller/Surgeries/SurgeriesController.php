@@ -78,6 +78,13 @@ class SurgeriesController extends AbstractController
             ], JsonResponse::HTTP_BAD_REQUEST, ['Access-Control-Allow-Origin' => $_ENV['CORS_ALLOW_ORIGIN']]);
         }
 
+        // The year must belong to the connected user.
+        if(!$this->isGranted('OWNER', $year)){
+            return new JsonResponse([
+                'message' => "Cette année ne vous appartient pas"
+            ], JsonResponse::HTTP_FORBIDDEN, ['Access-Control-Allow-Origin' => $_ENV['CORS_ALLOW_ORIGIN']]);
+        }
+
         // Code construction
         $code = $surgeryReference->getCodeHospitalisation().''.$surgeryReference->getN();
 
@@ -142,23 +149,21 @@ class SurgeriesController extends AbstractController
         // Find the existing surgery.
         $surgery = $surgeriesRepository->findOneBy(['id' => $id]);
 
-        // Check if the Surgery is linked to this User
-        if($resident->getId() !== $surgery->getYear()->getUser()->getId()){
-            return new JsonResponse([
-                'message' => "Cette évènement ne vous appartient pas" 
-            ], JsonResponse::HTTP_BAD_REQUEST, ['Access-Control-Allow-Origin' => $_ENV['CORS_ALLOW_ORIGIN']]);
-        }
-        
-        
-        // Get the POST data and decode it into an associative array.
-        $data = json_decode($request->getContent(), true);
-
-
         if(!$surgery){
             return new JsonResponse([
-                'message' => "Aucune chirurgie retrouvée avec cet ID" 
+                'message' => "Aucune chirurgie retrouvée avec cet ID"
             ], JsonResponse::HTTP_BAD_REQUEST, ['Access-Control-Allow-Origin' => $_ENV['CORS_ALLOW_ORIGIN']]);
         }
+
+        // Check if the Surgery is linked to this User
+        if(!$this->isGranted('OWNER', $surgery)){
+            return new JsonResponse([
+                'message' => "Cette évènement ne vous appartient pas"
+            ], JsonResponse::HTTP_BAD_REQUEST, ['Access-Control-Allow-Origin' => $_ENV['CORS_ALLOW_ORIGIN']]);
+        }
+
+        // Get the POST data and decode it into an associative array.
+        $data = json_decode($request->getContent(), true);
 
         // Find the surgery reference by its ID.
         $surgeryReference = $nomenclatureRepository->findOneBy(['id' => $data['surgeryId']]);
@@ -176,6 +181,13 @@ class SurgeriesController extends AbstractController
             return new JsonResponse([
                 'message' => "Année non retrouvé" 
             ], JsonResponse::HTTP_BAD_REQUEST, ['Access-Control-Allow-Origin' => $_ENV['CORS_ALLOW_ORIGIN']]);
+        }
+
+        // The target year must also belong to the connected user.
+        if(!$this->isGranted('OWNER', $year)){
+            return new JsonResponse([
+                'message' => "Cette année ne vous appartient pas"
+            ], JsonResponse::HTTP_FORBIDDEN, ['Access-Control-Allow-Origin' => $_ENV['CORS_ALLOW_ORIGIN']]);
         }
 
         // Code construction
