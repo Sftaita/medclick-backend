@@ -128,6 +128,11 @@ PHPUnit 9.6 en dépendance de dev (`composer test`), `.env.example`, CI GitHub A
 inverses vers `Statistics`), corrigé. `cache:clear` sans MySQL : renseigner `serverVersion`.
 
 ### 9. Exposition publique
+- **Constaté au déploiement du 30/09/2026 (traité)** : le projet est sous `public_html`, et
+  `config/jwt/private.pem` comme `var/log/dev.log` (30 Go) étaient téléchargeables. Accès
+  bloqués par `.htaccess`, clés JWT régénérées, `APP_DEBUG` passé à 0. **À décider** : le
+  contenu de `dev.log` (données personnelles possibles) a pu être récupéré — évaluer
+  l'obligation de notification RGPD ; supprimer ensuite ce fichier. Voir `docs/DEPLOIEMENT.md`.
 - Le dépôt GitHub est **public** : chaque correctif poussé rend visible la faille qu'il corrige
   tant qu'il n'est pas déployé. Déployer rapidement les branches de sécurité, ou passer le
   dépôt en privé.

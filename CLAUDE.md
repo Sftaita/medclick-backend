@@ -96,3 +96,4 @@ Doc OpenAPI générée par API Platform : `GET /api` (ne couvre pas les contrôl
 - `docs/ARCHITECTURE.md` — domaine, modèle de données, endpoints, flux.
 - `docs/DECISIONS.md` — décisions d'architecture (ADR) existantes et proposées.
 - `docs/AUDIT.md` — audit et feuille de route pour une application professionnelle.
+- `docs/DEPLOIEMENT.md` — procédure de mise en production (Hostinger), à suivre à la lettre.
