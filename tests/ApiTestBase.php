@@ -9,6 +9,7 @@ use App\Entity\User;
 use App\Entity\Years;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\SchemaTool;
+use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * Base des tests fonctionnels : recrée le schéma SQLite (voir .env.test) avant chaque test
@@ -25,6 +26,9 @@ abstract class ApiTestBase extends ApiTestCase
     {
         parent::setUp();
         self::bootKernel();
+
+        // Repart de compteurs vierges pour le rate limiter (pools de cache fichier).
+        (new Filesystem())->remove(static::$kernel->getCacheDir() . '/pools');
 
         $this->em = static::$container->get('doctrine')->getManager();
 

@@ -1,0 +1,3 @@
+framework:
+    # Verrous par fichier (compatible hébergement mutualisé). Utilisés par le rate limiter.
+    lock: 'flock'

@@ -1,0 +1,12 @@
+framework:
+    # Limites par adresse IP sur les routes publiques (voir App\Security\PublicEndpointRateLimiter).
+    # La connexion est limitée séparément par "login_throttling" (security.yaml).
+    rate_limiter:
+        registration:
+            policy: sliding_window
+            limit: 5
+            interval: '1 hour'
+        password_reset:
+            policy: sliding_window
+            limit: 5
+            interval: '15 minutes'

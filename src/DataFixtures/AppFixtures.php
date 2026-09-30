@@ -10,18 +10,18 @@ use App\Entity\Surgery;
 use App\Entity\Surgeries;
 use Doctrine\Persistence\ObjectManager;
 use Doctrine\Bundle\FixturesBundle\Fixture;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class AppFixtures extends Fixture
 {
     /**
      * Password encoder
      *
-     * @var UserPasswordEncoderInterface
+     * @var UserPasswordHasherInterface
      */
     private $encoder;
     
-    public function __construct(UserPasswordEncoderInterface $encoder){
+    public function __construct(UserPasswordHasherInterface $encoder){
         $this->encoder = $encoder;
     }
 
@@ -35,7 +35,7 @@ class AppFixtures extends Fixture
             
             $user = new User;
 
-            $hash = $this->encoder->encodePassword($user, "password");
+            $hash = $this->encoder->hashPassword($user, "password");
 
             $user-> setFirstName($faker->firstName())
                     ->setLastName($faker->lastName())

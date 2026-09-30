@@ -8,14 +8,14 @@ use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
 use ApiPlatform\Core\EventListener\EventPriorities;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class PasswordEncoderSubcriber implements EventSubscriberInterface {
 
     /**
      * Permet d'utiliser l'interface d'encodage mentionné de symfony
      *
-     * @var UserPasswordEncoderInterface
+     * @var UserPasswordHasherInterface
      */
     private $encoder;
 
@@ -24,7 +24,7 @@ class PasswordEncoderSubcriber implements EventSubscriberInterface {
      */
     private $em;
 
-    public function __construct(UserPasswordEncoderInterface $encoder, EntityManagerInterface $em)
+    public function __construct(UserPasswordHasherInterface $encoder, EntityManagerInterface $em)
     {
         $this->encoder = $encoder;
         $this->em = $em;
@@ -51,7 +51,7 @@ class PasswordEncoderSubcriber implements EventSubscriberInterface {
         }
 
         if ($method === "POST") {
-            $result->setPassword($this->encoder->encodePassword($result, $result->getPassword()));
+            $result->setPassword($this->encoder->hashPassword($result, $result->getPassword()));
 
             return;
         }
@@ -60,7 +60,7 @@ class PasswordEncoderSubcriber implements EventSubscriberInterface {
             $original = $this->em->getUnitOfWork()->getOriginalEntityData($result);
 
             if (($original['password'] ?? null) !== $result->getPassword()) {
-                $result->setPassword($this->encoder->encodePassword($result, $result->getPassword()));
+                $result->setPassword($this->encoder->hashPassword($result, $result->getPassword()));
             }
         }
     }

@@ -16,9 +16,10 @@ médecins, noms de chirurgiens) exigent un niveau de rigueur « données sensibl
 
 ## P0 — Sécurité et intégrité (à traiter immédiatement)
 
-> **Suivi (30/09/2026)** — Points 0 à 5 et 7 **corrigés** (branche `securite/p0-controle-proprietaire`),
-> couverts par 45 tests fonctionnels (`tests/Api/`). Restent : le **point 6** (action manuelle
-> sur les secrets) et la **limitation de débit** (point 4, nécessite Symfony ≥ 5.2).
+> **Suivi (30/09/2026)** — Points 0 à 5 et 7 **corrigés**, limitation de débit comprise
+> (branches `securite/p0-controle-proprietaire`, `outillage/php82-doctrine`,
+> `securite/authenticator-rate-limit`), couverts par 49 tests fonctionnels (`tests/Api/`).
+> Reste : le **point 6** (action manuelle sur les secrets).
 > ⚠️ Déploiement : exécuter la migration `Version20260930180000` (expiration du token de reset).
 
 ### 0. Modification locale non commitée qui casse `User` — ✅ corrigé
@@ -82,8 +83,10 @@ réponse identique que l'email existe ou non.
 le front affichait donc une erreur même en cas de succès), token expirant après 1 h
 (`user.reset_token_requested_at`), comparaison `hash_equals`, un mauvais token n'annule plus
 la demande, validation 6–50 caractères, token d'activation `random_bytes`, classes mortes
-supprimées. **Reste** : limitation de débit — `symfony/rate-limiter` et le login throttling
-exigent Symfony 5.2+ ; à faire avec la montée de version (P1) ou au niveau du serveur web.
+supprimées. **Limitation de débit** (après passage à Symfony 5.4) : `login_throttling` sur la
+connexion (5 échecs par email/IP, 25 par IP, par 15 min) ; `PublicEndpointRateLimiter` sur
+l'inscription (5/h par IP) et le mot de passe oublié/reset (5/15 min par IP) → 429 + `Retry-After`.
+Le front affiche son message générique d'échec de connexion en cas de blocage.
 
 ### 5. Journal de connexion faussé — ✅ corrigé
 `UserChecker::checkPreAuth` enregistre la connexion **avant** la vérification du mot de
@@ -135,7 +138,7 @@ inverses vers `Statistics`), corrigé. `cache:clear` sans MySQL : renseigner `se
 
 | Sujet | Constat | Action |
 |---|---|---|
-| Framework | ✅ Symfony 5.4 LTS (support sécurité jusqu'en 02/2029), API Platform 2.6. Reste : `guard` et `sensio/framework-extra-bundle` dépréciés/abandonnés ; `composer audit` : 5 alertes API Platform (GraphQL, JSON:API/HAL, sécurité par propriété : non utilisés ; « type confusion » des IRI : corrigée seulement en 4.x) | Nouveau système d'authentification (`enable_authenticator_manager`) et rate limiter (désormais disponibles en 5.4), puis 6.4 LTS + API Platform 3 (ADR-103) |
+| Framework | ✅ Symfony 5.4 LTS (support sécurité jusqu'en 02/2029), API Platform 2.6, ✅ nouveau système d'authentification (`enable_authenticator_manager`, `jwt: ~`, `password_hashers`). Reste : `sensio/framework-extra-bundle` abandonné (`@IsGranted`) ; `composer audit` : 5 alertes API Platform (GraphQL, JSON:API/HAL, sécurité par propriété : non utilisés ; « type confusion » des IRI : corrigée seulement en 4.x) | Retirer les dépréciations 5.4, puis 6.4 LTS + API Platform 3 (ADR-103) |
 | PHP | Prod et lockfile en 8.2 ; `composer.json` dit encore `>=7.2.5` | Fixer `>=8.2`, attributs PHP 8, types stricts, Rector |
 | Tests | 45 tests fonctionnels (P0) | Étendre : contenu des exports Excel (golden file), admin, marketing, nomenclature |
 | Migrations | 3 migrations pour 15 entités ; mapping validé en CI | Baseline depuis la prod + `doctrine:migrations:diff` vide (ADR-105) |

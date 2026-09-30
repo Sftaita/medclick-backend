@@ -13,7 +13,9 @@ Le frontend (SPA, repo séparé) consomme cette API. Documentation détaillée :
 - **PHP 8.2** (production : Hostinger, LiteSpeed, PHP 8.2 ; dev local WAMP), **Symfony 5.4 LTS**
 - **API Platform 2.6** (annotations `@ApiResource`, namespace `ApiPlatform\Core`)
 - Doctrine ORM 2.20 / DBAL 3 / DoctrineBundle 2.13 + MySQL (`DATABASE_URL`), annotations `@ORM\...`
-- Auth : **LexikJWT** (`POST /api/login_check`, body `{username, password}`), stateless
+- Auth : **LexikJWT** (`POST /api/login_check`, body `{username, password}`), stateless, système
+  d'authenticators Symfony 5.4 (`jwt: ~`, `login_throttling`). Limites par IP sur l'inscription
+  et le reset : `config/packages/rate_limiter.yaml` + `src/Security/PublicEndpointRateLimiter.php`.
 - PhpSpreadsheet (export carnet de stage), Symfony Mailer (Gmail), Twig (emails)
 - Tests fonctionnels : `tests/` (ApiTestCase, base SQLite `var/test.db` recréée à chaque test).
 - CI : `.github/workflows/ci.yml` (lint conteneur, `doctrine:schema:validate`, tests). Le dépôt

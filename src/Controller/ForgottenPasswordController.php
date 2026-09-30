@@ -8,7 +8,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Csrf\TokenGenerator\TokenGeneratorInterface;
 
 class ForgottenPasswordController extends AbstractController
@@ -60,7 +60,7 @@ class ForgottenPasswordController extends AbstractController
     /**
      * @Route("api/resetPassword", name="reset_password" , methods={"POST"})
      */
-    public function resetPassword(Request $request, UserRepository $userRepository, UserPasswordEncoderInterface $encoder)
+    public function resetPassword(Request $request, UserRepository $userRepository, UserPasswordHasherInterface $encoder)
     {
         $parameters = json_decode($request->getContent(), true);
         $token = $parameters['token'] ?? null;
@@ -90,7 +90,7 @@ class ForgottenPasswordController extends AbstractController
             return new JsonResponse(['message' => self::INVALID_LINK], JsonResponse::HTTP_BAD_REQUEST);
         }
 
-        $user->setPassword($encoder->encodePassword($user, $password))
+        $user->setPassword($encoder->hashPassword($user, $password))
             ->setResetToken(null)
             ->setResetTokenRequestedAt(null);
         $this->getDoctrine()->getManager()->flush();
