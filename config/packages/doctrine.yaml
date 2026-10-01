@@ -3,8 +3,6 @@ doctrine:
         url: '%env(resolve:DATABASE_URL)%'
     orm:
         naming_strategy: doctrine.orm.naming_strategy.underscore_number_aware
-        # Objets paresseux natifs de PHP 8.4 (plus de génération de proxies).
-        enable_native_lazy_objects: true
         auto_mapping: true
         mappings:
             App:

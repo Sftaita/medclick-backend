@@ -29,7 +29,7 @@ class SurgeriesRepository extends ServiceEntityRepository
             ->andWhere('u.year = :val')
             ->setParameter('val', $year)
             ->select('u.code, u.name, u.firstHand, u.secondHand, u.position, u.date')
-            ->orderBy('u.date', 'ASC')
+            ->orderBy('u.date', \SortDirection::Ascending)
             ->getQuery()
             ->getResult();
     }

@@ -47,7 +47,7 @@ class ConnectionHistoryRepository extends ServiceEntityRepository
             ->innerJoin('c.user', 'u')
             ->where('u.roles NOT LIKE :adminRole')
             ->setParameter('adminRole', '%ROLE_ADMIN%')
-            ->orderBy('c.date', 'DESC')
+            ->orderBy('c.date', \SortDirection::Descending)
             ->setMaxResults(10)
             ->select("c.id, c.date, u.id AS user_id, u.firstname, u.lastname, u.speciality")
             ->getQuery()
@@ -71,7 +71,7 @@ public function findByUserOrderedByDate($user)
     return $this->createQueryBuilder('u')
         ->andWhere('u.user = :val')
         ->setParameter('val', $user)
-        ->orderBy('u.date', 'DESC')
+        ->orderBy('u.date', \SortDirection::Descending)
         ->getQuery()
         ->getResult();
 }
@@ -115,7 +115,7 @@ public function findMonthlyStats(): array
     $query = $this->createQueryBuilder('ch')
         ->where('ch.date >= :oneYearAgo')
         ->setParameter('oneYearAgo', $oneYearAgo)
-        ->orderBy('ch.date', 'ASC')
+        ->orderBy('ch.date', \SortDirection::Ascending)
         ->getQuery();
 
     // On récupère toutes les entités (p. ex. ConnectionHistory) sous forme de tableau

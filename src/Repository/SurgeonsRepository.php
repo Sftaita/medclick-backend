@@ -30,7 +30,7 @@ class SurgeonsRepository extends ServiceEntityRepository
             ->andWhere('u.year = :val')
             ->setParameter('val', $id)
             ->select('u.id, u.firstName, u.lastName, u.boss')
-            ->orderBy('u.boss', 'DESC')
+            ->orderBy('u.boss', \SortDirection::Descending)
             ->getQuery()
             ->getResult()
         ;
@@ -79,7 +79,7 @@ class SurgeonsRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('s')
             ->andWhere('s.exampleField = :val')
             ->setParameter('val', $value)
-            ->orderBy('s.id', 'ASC')
+            ->orderBy('s.id', \SortDirection::Ascending)
             ->setMaxResults(10)
             ->getQuery()
             ->getResult()

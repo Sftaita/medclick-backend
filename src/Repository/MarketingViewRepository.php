@@ -56,7 +56,7 @@ class MarketingViewRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('m')
             ->andWhere('m.exampleField = :val')
             ->setParameter('val', $value)
-            ->orderBy('m.id', 'ASC')
+            ->orderBy('m.id', \SortDirection::Ascending)
             ->setMaxResults(10)
             ->getQuery()
             ->getResult()

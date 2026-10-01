@@ -56,7 +56,7 @@ class TermsConditionsRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('t')
             ->andWhere('t.exampleField = :val')
             ->setParameter('val', $value)
-            ->orderBy('t.id', 'ASC')
+            ->orderBy('t.id', \SortDirection::Ascending)
             ->setMaxResults(10)
             ->getQuery()
             ->getResult()

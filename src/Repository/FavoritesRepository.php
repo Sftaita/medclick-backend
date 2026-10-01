@@ -28,7 +28,7 @@ class FavoritesRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('f')
             ->andWhere('f.exampleField = :val')
             ->setParameter('val', $value)
-            ->orderBy('f.id', 'ASC')
+            ->orderBy('f.id', \SortDirection::Ascending)
             ->setMaxResults(10)
             ->getQuery()
             ->getResult()

@@ -143,7 +143,7 @@ inverses vers `Statistics`), corrigé. `cache:clear` sans MySQL : renseigner `se
 
 | Sujet | Constat | Action |
 |---|---|---|
-| Framework | ✅ **Symfony 8.1, API Platform 4.4, Doctrine ORM 3, PHP 8.4** (branche `migration/symfony-8`) ; `composer audit` : 0 alerte. Reste : dépréciations Doctrine ORM 4 (`orderBy` avec chaîne) | Suivre les versions mineures jusqu'à la LTS 8.4 |
+| Framework | ✅ **Symfony 8.1, API Platform 4.4, Doctrine ORM 3, PHP 8.4** (branche `migration/symfony-8`) ; `composer audit` : 0 alerte. Dépréciations restantes : `addOrderBy` interne à API Platform ; **dates du front parsées en mode souple** (`"2025-11-02"` pour un `DateTime`), qui lèvera une erreur en Symfony 9 → fixer un format par champ avec une revue du front | Suivre les versions mineures jusqu'à la LTS 8.4 |
 | Framework (historique) | ✅ Symfony 5.4 LTS (support sécurité jusqu'en 02/2029), API Platform 2.6, ✅ nouveau système d'authentification (`enable_authenticator_manager`, `jwt: ~`, `password_hashers`). Reste : `sensio/framework-extra-bundle` abandonné (`@IsGranted`) ; `composer audit` : 5 alertes API Platform (GraphQL, JSON:API/HAL, sécurité par propriété : non utilisés ; « type confusion » des IRI : corrigée seulement en 4.x) | Retirer les dépréciations 5.4, puis 6.4 LTS + API Platform 3 (ADR-103) |
 | PHP | Prod et lockfile en 8.2 ; `composer.json` dit encore `>=7.2.5` | Fixer `>=8.2`, attributs PHP 8, types stricts, Rector |
 | Tests | 45 tests fonctionnels (P0) | Étendre : contenu des exports Excel (golden file), admin, marketing, nomenclature |

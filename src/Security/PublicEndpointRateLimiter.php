@@ -2,6 +2,7 @@
 
 namespace App\Security;
 
+use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
@@ -21,7 +22,10 @@ class PublicEndpointRateLimiter implements EventSubscriberInterface
      */
     private $limiters;
 
-    public function __construct(RateLimiterFactoryInterface $registrationLimiter, RateLimiterFactoryInterface $passwordResetLimiter)
+    public function __construct(
+        #[Target('registration.limiter')] RateLimiterFactoryInterface $registrationLimiter,
+        #[Target('password_reset.limiter')] RateLimiterFactoryInterface $passwordResetLimiter,
+    )
     {
         $this->limiters = [
             '_api_/users{._format}_post' => $registrationLimiter,

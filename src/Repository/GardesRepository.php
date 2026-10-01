@@ -58,7 +58,7 @@ class GardesRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('g')
             ->andWhere('g.exampleField = :val')
             ->setParameter('val', $value)
-            ->orderBy('g.id', 'ASC')
+            ->orderBy('g.id', \SortDirection::Ascending)
             ->setMaxResults(10)
             ->getQuery()
             ->getResult()

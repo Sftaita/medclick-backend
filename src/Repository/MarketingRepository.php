@@ -73,7 +73,7 @@ class MarketingRepository extends ServiceEntityRepository
     public function findAllCampaign()
     {
         return $this->createQueryBuilder('m')
-            ->orderBy('m.id', 'DESC')
+            ->orderBy('m.id', \SortDirection::Descending)
             ->select("m.id, m.campaignName")
             ->getQuery()
             ->getResult()

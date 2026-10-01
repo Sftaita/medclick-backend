@@ -61,7 +61,7 @@ class NomenclatureRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('n')
             ->andWhere('n.exampleField = :val')
             ->setParameter('val', $value)
-            ->orderBy('n.id', 'ASC')
+            ->orderBy('n.id', \SortDirection::Ascending)
             ->setMaxResults(10)
             ->getQuery()
             ->getResult()

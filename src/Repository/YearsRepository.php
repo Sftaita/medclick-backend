@@ -181,7 +181,7 @@ class YearsRepository extends ServiceEntityRepository
             ->andWhere('y.user = :userId')
             ->setParameter('userId', $userId)
             ->select('y.id, y.yearOfFormation, y.dateOfStart, y.hospital, y.master')
-            ->orderBy('y.yearOfFormation', 'DESC')
+            ->orderBy('y.yearOfFormation', \SortDirection::Descending)
             ->getQuery()
             ->getResult();
     }
@@ -201,7 +201,7 @@ class YearsRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('y')
             ->andWhere('y.exampleField = :val')
             ->setParameter('val', $value)
-            ->orderBy('y.id', 'ASC')
+            ->orderBy('y.id', \SortDirection::Ascending)
             ->setMaxResults(10)
             ->getQuery()
             ->getResult()
