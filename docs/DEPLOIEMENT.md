@@ -34,6 +34,14 @@ le web sans les `.htaccess` « Require all denied » posés dans `config/`, `var
   redirection HTTPS) : `git pull` le conserve tant que le fichier n'est pas modifié dans le dépôt.
 - `config/jwt/*.pem` (régénérées le 30/09/2026 après exposition publique de l'ancienne clé).
 
+## Capture des erreurs
+
+- Variable `.env` de prod (optionnelle) : `ERROR_ALERT_EMAIL=adresse@exemple` → un email à chaque
+  nouvelle erreur (ou erreur résolue qui réapparaît).
+- Tâche planifiée quotidienne (RGPD, conservation 90 jours) :
+  `/opt/alt/php84/usr/bin/php ~/domains/easymed.fun/public_html/medclick/backend/bin/console app:errors:purge --env=prod`
+- Secours si la base est indisponible : `var/log/prod-AAAA-MM-JJ.log` (30 jours).
+
 ## Procédure
 
 ```bash

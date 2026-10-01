@@ -59,6 +59,11 @@ Doc OpenAPI générée par API Platform : `GET /api` (ne couvre pas les contrôl
   (propriétaire des `Years`/`Favorites`), `SurgeonProcessor` (maître de stage unique),
   `SurgeonRemoveProcessor` (interventions supprimées avec le chirurgien), `FormationProcessor`.
 - `src/Events/JwtCreatedSubscriber.php` — claims ajoutés au JWT.
+- **Capture des erreurs** : `src/Service/ErrorRecorder.php` (table `error_log`, regroupement par
+  empreinte), `src/EventListener/ErrorCaptureSubscriber.php` (réponses >= 500 et erreurs console,
+  enregistrées après l'envoi de la réponse), `POST /api/client-errors` (fronts),
+  `/api/admin/errors` (consultation). Ne jamais y stocker de corps de requête, mot de passe ou IP.
+  Les fronts envoient leurs erreurs via `src/js/Services/errorReporter.js` (PWA et admin).
 - `tests/Api/FrontCompatibilityTest.php` — contrat attendu par les fronts React (`hydra:member`,
   `PUT` partiel, `violations`, dates ISO 8601) : ne pas le casser.
 - `src/Security/UserChecker.php` — bloque le login si compte non activé (`token` non null) et
