@@ -1,0 +1,6 @@
+# Routes de test uniquement (erreurs volontaires) : tests/Fixtures/FailingController.php
+test_fixtures:
+    resource:
+        path: ../../../tests/Fixtures/
+        namespace: App\Tests\Fixtures
+    type: attribute

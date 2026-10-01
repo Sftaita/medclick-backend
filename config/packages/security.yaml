@@ -47,6 +47,8 @@ security:
     - { path: ^/api/users$, roles: PUBLIC_ACCESS, methods: [POST] }
     - { path: ^/api/forgottenPassword$, roles: PUBLIC_ACCESS, methods: [POST] }
     - { path: ^/api/resetPassword$, roles: PUBLIC_ACCESS, methods: [POST] }
+    # Rapports d'erreurs des fronts (aussi avant connexion ; limité en débit).
+    - { path: ^/api/client-errors$, roles: PUBLIC_ACCESS, methods: [POST] }
     - { path: ^/api/terms-conditions, roles: PUBLIC_ACCESS, methods: [GET] }
     - { path: ^/api/marketing/active, roles: PUBLIC_ACCESS }
 

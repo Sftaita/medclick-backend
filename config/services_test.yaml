@@ -1,0 +1,9 @@
+# Services chargés uniquement en environnement de test.
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+
+  App\Tests\Fixtures\:
+    resource: "../tests/Fixtures/"
+    tags: ["controller.service_arguments"]

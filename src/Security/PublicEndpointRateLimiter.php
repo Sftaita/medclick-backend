@@ -25,12 +25,14 @@ class PublicEndpointRateLimiter implements EventSubscriberInterface
     public function __construct(
         #[Target('registration.limiter')] RateLimiterFactoryInterface $registrationLimiter,
         #[Target('password_reset.limiter')] RateLimiterFactoryInterface $passwordResetLimiter,
+        #[Target('client_errors.limiter')] RateLimiterFactoryInterface $clientErrorsLimiter,
     )
     {
         $this->limiters = [
             '_api_/users{._format}_post' => $registrationLimiter,
             'forgotten_password' => $passwordResetLimiter,
             'reset_password' => $passwordResetLimiter,
+            'client_errors' => $clientErrorsLimiter,
         ];
     }
 
