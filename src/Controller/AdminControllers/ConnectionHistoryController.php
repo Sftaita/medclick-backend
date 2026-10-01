@@ -68,6 +68,9 @@ class ConnectionHistoryController extends AbstractController
         // Récupère les 10 dernières connexions d'utilisateurs non administrateurs
         $latestConnections = $history->findLastTenNonAdminConnections();
 
+        // Connaitre le nombre de connexions par mois d'utilisatyeur unique et le nombre total de connexions
+        $monthlyStats = $history->findMonthlyStats();
+
         // Compilation des données
         $data = [
             "daily_stats" => $formattedDailyStats,
@@ -75,6 +78,8 @@ class ConnectionHistoryController extends AbstractController
             "active_users_since_october" => count($activeUsers),
             "latest_users_registered" => $lastTenUsers,
             "latest_users_connected" => $latestConnections,
+            "monthly_stats" => $monthlyStats["results"],
+            "monthly_averages" => $monthlyStats["averages"],
         ];
 
         return new JsonResponse($data);

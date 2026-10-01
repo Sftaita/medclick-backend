@@ -15,6 +15,7 @@ class JwtCreatedSubscriber
         $data = $event->getData();
         $data['firstname'] = $user->getFirstname();
         $data['lastname'] = $user->getLastname();
+        $data['email'] = $user->getEmail();
         
         // Ajouter les informations d'acceptation des termes
         $data['acceptedTerms'] = $user->getAcceptedTerms();
