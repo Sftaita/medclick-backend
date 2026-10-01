@@ -76,3 +76,8 @@ depuis `$B`, puis vider le cache (et `zcat $B/db.sql.gz | mysql ...` si une migr
   téléchargeables publiquement → accès bloqués, clés régénérées ; `APP_DEBUG=true` → `0`.
   Correctif manuel en prod dans `TokenActivatorController` repris dans le dépôt.
   Sauvegarde : `~/backups/medclick-20260930/`.
+- **01/10/2026** — Déploiement de **Symfony 8.1 / API Platform 4 / Doctrine ORM 3** (`f1add9f`)
+  après passage du site `easymed.fun` en PHP 8.4 dans hPanel. Sans coupure (retour arrière
+  automatique prévu, non déclenché). Tests de fumée OK (accès public/protégé, CORS, activation,
+  validation, fichiers sensibles en 403). Sauvegarde : `~/backups/medclick-20261001-0510/`.
+  `DATABASE_URL` de prod sans `serverVersion` : DBAL détecte MariaDB 11.8 à la connexion.
