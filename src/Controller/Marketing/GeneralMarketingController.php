@@ -74,4 +74,23 @@ class GeneralMarketingController extends AbstractController
 
         return new JsonResponse($campaignData, JsonResponse::HTTP_OK);
     }
+
+    /**
+     * Clic sur la publicité (page de connexion de la PWA, sans JWT) : incrémente le compteur
+     * affiché dans l'admin. Public mais limité en débit (App\Security\PublicEndpointRateLimiter).
+     */
+    #[Route('/api/marketing/incrementCampaign/{id<\d+>}', name: 'increment_campaign_click', methods: ['PUT'])]
+    public function incrementClick(int $id): JsonResponse
+    {
+        // Incrément atomique en base : aucun clic perdu en cas d'appels simultanés.
+        $updated = $this->doctrine->getManager()->createQuery(
+            'UPDATE App\Entity\Marketing m SET m.clicks = m.clicks + 1 WHERE m.id = :id'
+        )->setParameter('id', $id)->execute();
+
+        if ($updated === 0) {
+            return new JsonResponse(['message' => 'Campagne introuvable.'], JsonResponse::HTTP_NOT_FOUND);
+        }
+
+        return new JsonResponse(['message' => 'ok']);
+    }
 }
