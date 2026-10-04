@@ -20,7 +20,7 @@ namespace App\Repair;
  */
 final class SurgeryNomenclatureRepairPlanner
 {
-    public const VERSION = 'repair-surgery-nomenclature/1';
+    public const VERSION = 'repair-surgery-nomenclature/2';
 
     public const REPAIRABLE = 'A1';               // incohérence certaine, cible unique : réparée
     public const HISTORICAL = 'A2';               // signature, cible unique, mais antérieure à createdAt
@@ -30,6 +30,14 @@ final class SurgeryNomenclatureRepairPlanner
     public const INCOMPLETE_TARGET = 'cible_incomplete';
     public const CONSISTENT = 'coherente';        // déjà correcte
     public const OUT_OF_SCOPE = 'D';              // autre incohérence (historique, favorites, sans nomenclature)
+
+    // Portée « favorites » (LOT 2D.3) : seule la spécialité « favorites » est remplacée.
+    public const FAVORITES_REPAIRABLE = 'F';
+    public const FAVORITES_NO_NOMENCLATURE = 'F_sans_nomenclature';
+    public const FAVORITES_INCOMPLETE = 'F_nomenclature_incomplete';
+    public const FAVORITES_CODE_MISMATCH = 'F_code_different';
+    public const FAVORITES_NAME_MISMATCH = 'F_nom_different';
+    public const NOT_FAVORITES = 'hors_favorites';
 
     /** @var array<int, array{id:int, name:?string, code:string, codeHospitalisation:?string, speciality:?string}> */
     private array $byId = [];
@@ -107,5 +115,38 @@ final class SurgeryNomenclatureRepairPlanner
         }
 
         return ['status' => self::REPAIRABLE, 'target' => $target];
+    }
+
+    /**
+     * Portée « favorites » : réparable (F) seulement si la nomenclature liée existe, est complète,
+     * et que le code et le nom actuels sont exactement les siens. TARGET = cette même nomenclature :
+     * seule la spécialité change.
+     *
+     * @param array{id:int|string, nomenclature_id:int|string|null, code:?string, name:?string, speciality:?string} $surgery
+     *
+     * @return array{status:string, target:?array{id:int, name:?string, code:string, codeHospitalisation:?string, speciality:?string}}
+     */
+    public function classifyFavorites(array $surgery): array
+    {
+        if ($surgery['speciality'] !== 'favorites') {
+            return ['status' => self::NOT_FAVORITES, 'target' => null];
+        }
+
+        $source = $surgery['nomenclature_id'] !== null ? ($this->byId[(int) $surgery['nomenclature_id']] ?? null) : null;
+        if ($source === null) {
+            return ['status' => self::FAVORITES_NO_NOMENCLATURE, 'target' => null];
+        }
+        if ($source['name'] === null || $source['name'] === '' || $source['speciality'] === null || $source['speciality'] === ''
+            || $source['speciality'] === 'favorites' || $source['codeHospitalisation'] === null || $source['codeHospitalisation'] === '') {
+            return ['status' => self::FAVORITES_INCOMPLETE, 'target' => null];
+        }
+        if (($surgery['code'] ?? '') !== $source['code']) {
+            return ['status' => self::FAVORITES_CODE_MISMATCH, 'target' => null];
+        }
+        if ($surgery['name'] !== $source['name']) {
+            return ['status' => self::FAVORITES_NAME_MISMATCH, 'target' => null];
+        }
+
+        return ['status' => self::FAVORITES_REPAIRABLE, 'target' => $source];
     }
 }

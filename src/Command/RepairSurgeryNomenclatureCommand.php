@@ -25,7 +25,11 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
  * - --rollback=FICHIER : restaure les valeurs « avant » d'un snapshot (dry-run sans --apply),
  *   uniquement pour les lignes qui ont toujours les valeurs « après ».
  *
+ * --scope=favorites (LOT 2D.3) : remplace uniquement la spécialité « favorites » par celle de la
+ * nomenclature liée (catégorie F) ; relation, code et nom doivent déjà être ceux de la nomenclature.
+ *
  * Aucune donnée personnelle dans les fichiers : identifiants techniques, codes et spécialités.
+ * Snapshot et journal sont créés d'emblée en 0600.
  */
 #[AsCommand(name: 'app:repair-surgery-nomenclature', description: 'Réaligne les interventions incohérentes avec leur nomenclature (dry-run par défaut).')]
 class RepairSurgeryNomenclatureCommand extends Command
@@ -48,6 +52,7 @@ class RepairSurgeryNomenclatureCommand extends Command
     protected function configure(): void
     {
         $this
+            ->addOption('scope', null, InputOption::VALUE_REQUIRED, 'nomenclature (LOT 2D.2, A1) ou favorites (LOT 2D.3, F)', 'nomenclature')
             ->addOption('apply', null, InputOption::VALUE_NONE, 'Applique réellement la correction (sinon dry-run)')
             ->addOption('snapshot-dir', null, InputOption::VALUE_REQUIRED, 'Dossier du snapshot CSV, hors du projet (obligatoire avec --apply)')
             ->addOption('batch-size', null, InputOption::VALUE_REQUIRED, 'Lignes par transaction', 200)
@@ -65,6 +70,13 @@ class RepairSurgeryNomenclatureCommand extends Command
             return Command::INVALID;
         }
 
+        $scope = (string) $input->getOption('scope');
+        if (!in_array($scope, ['nomenclature', 'favorites'], true)) {
+            $io->error('--scope doit valoir nomenclature ou favorites.');
+
+            return Command::INVALID;
+        }
+
         if ($input->getOption('rollback') !== null) {
             return $this->rollback($io, (string) $input->getOption('rollback'), $apply, $batchSize);
         }
@@ -77,25 +89,40 @@ class RepairSurgeryNomenclatureCommand extends Command
             }
         }
 
-        [$counts, $plans, $bySpeciality, $byMonth] = $this->plan();
+        [$stats, $plans, $bySpeciality, $byMonth] = $this->plan($scope);
+        $row = fn (string $label, string $key) => [
+            $label,
+            $stats[$key]['count'] ?? 0,
+            count($stats[$key]['users'] ?? []),
+            isset($stats[$key]['from']) ? $stats[$key]['from'] . ' → ' . $stats[$key]['to'] : '-',
+        ];
 
-        $io->title(($apply ? 'APPLICATION' : 'DRY-RUN (aucune écriture)') . ' — ' . Planner::VERSION);
-        $io->table(['Catégorie', 'Interventions'], [
-            ['Interventions analysées', $counts['total']],
-            ['Signature (code = SOURCE, nom ≠ SOURCE)', $counts['signature']],
-            ['A1 certaines — seraient modifiées', $counts[Planner::REPAIRABLE]],
-            ['A2 historiques (sans createdAt) — exclues', $counts[Planner::HISTORICAL]],
-            ['B spécialité inattendue — exclues', $counts[Planner::SPECIALITY_MISMATCH]],
-            ['C plusieurs nomenclatures de ce nom — exclues', $counts[Planner::AMBIGUOUS]],
-            ['Aucune nomenclature de ce nom exact — exclues', $counts[Planner::NO_EXACT_TARGET]],
-            ['Nomenclature cible incomplète — exclues', $counts[Planner::INCOMPLETE_TARGET]],
-            ['Déjà cohérentes', $counts[Planner::CONSISTENT]],
-            ['D autres incohérences (hors périmètre)', $counts[Planner::OUT_OF_SCOPE]],
+        $io->title(($apply ? 'APPLICATION' : 'DRY-RUN (aucune écriture)') . ' — ' . Planner::VERSION . ' — portée ' . $scope);
+        $io->table(['Catégorie', 'Interventions', 'Utilisateurs', 'Période (mois)'], $scope === 'favorites' ? [
+            $row('Interventions analysées', 'total'),
+            $row('Spécialité « favorites »', 'favorites'),
+            $row('F réparables — seraient modifiées', Planner::FAVORITES_REPAIRABLE),
+            $row('F exclues : sans nomenclature', Planner::FAVORITES_NO_NOMENCLATURE),
+            $row('F exclues : nomenclature incomplète', Planner::FAVORITES_INCOMPLETE),
+            $row('F exclues : code différent de la nomenclature', Planner::FAVORITES_CODE_MISMATCH),
+            $row('F exclues : nom différent de la nomenclature', Planner::FAVORITES_NAME_MISMATCH),
+        ] : [
+            $row('Interventions analysées', 'total'),
+            $row('Signature (code = SOURCE, nom ≠ SOURCE)', 'signature'),
+            $row('A1 certaines — seraient modifiées', Planner::REPAIRABLE),
+            $row('A2 historiques (sans createdAt) — exclues', Planner::HISTORICAL),
+            $row('B spécialité inattendue — exclues', Planner::SPECIALITY_MISMATCH),
+            $row('C plusieurs nomenclatures de ce nom — exclues', Planner::AMBIGUOUS),
+            $row('Aucune nomenclature de ce nom exact — exclues', Planner::NO_EXACT_TARGET),
+            $row('Nomenclature cible incomplète — exclues', Planner::INCOMPLETE_TARGET),
+            $row('Déjà cohérentes', Planner::CONSISTENT),
+            $row('D autres incohérences (hors périmètre)', Planner::OUT_OF_SCOPE),
         ]);
+        $repairable = $scope === 'favorites' ? 'F' : 'A1';
         ksort($byMonth);
         arsort($bySpeciality);
-        $io->table(['Spécialité cible', 'A1'], array_map(null, array_keys($bySpeciality), array_values($bySpeciality)));
-        $io->table(['Mois de l\'intervention', 'A1'], array_map(null, array_keys($byMonth), array_values($byMonth)));
+        $io->table(['Spécialité cible', $repairable], array_map(null, array_keys($bySpeciality), array_values($bySpeciality)));
+        $io->table(['Mois de l\'intervention', $repairable], array_map(null, array_keys($byMonth), array_values($byMonth)));
 
         if (!$apply) {
             $io->success(sprintf('Dry-run : %d intervention(s) seraient corrigées. Aucune donnée modifiée.', count($plans)));
@@ -109,11 +136,11 @@ class RepairSurgeryNomenclatureCommand extends Command
         }
 
         $runId = date('Ymd-His') . '-' . bin2hex(random_bytes(3));
-        $snapshot = $snapshotDir . '/repair-surgery-nomenclature-' . $runId . '.csv';
-        $applied = $snapshotDir . '/repair-surgery-nomenclature-' . $runId . '.applied.csv';
+        $snapshot = $snapshotDir . '/repair-surgery-' . $scope . '-' . $runId . '.csv';
+        $applied = $snapshotDir . '/repair-surgery-' . $scope . '-' . $runId . '.applied.csv';
         $this->writeSnapshot($snapshot, $runId, $plans);
 
-        $log = fopen($applied, 'x');
+        $log = $this->createPrivateFile($applied);
         fputcsv($log, ['run_id', 'surgery_id', 'applied_at', 'result'], escape: '');
         $updated = 0;
         $skipped = 0;
@@ -146,18 +173,25 @@ class RepairSurgeryNomenclatureCommand extends Command
     }
 
     /**
-     * Parcourt toutes les interventions par pages (SELECT uniquement) et construit le plan A1.
+     * Parcourt toutes les interventions par pages (SELECT uniquement) et construit le plan de la
+     * portée : A1 (nomenclature) ou F (favorites). Utilisateurs comptés, jamais identifiés.
      */
-    private function plan(): array
+    private function plan(string $scope): array
     {
         $planner = new Planner($this->connection->executeQuery(
             'SELECT id, name, code_hospitalisation, n, speciality FROM nomenclature'
         )->iterateAssociative());
+        $owners = $this->connection->fetchAllKeyValue('SELECT id, user_id FROM years');
+        $repairable = $scope === 'favorites' ? Planner::FAVORITES_REPAIRABLE : Planner::REPAIRABLE;
 
-        $counts = array_fill_keys([
-            'total', 'signature', Planner::REPAIRABLE, Planner::HISTORICAL, Planner::SPECIALITY_MISMATCH, Planner::AMBIGUOUS,
-            Planner::NO_EXACT_TARGET, Planner::INCOMPLETE_TARGET, Planner::CONSISTENT, Planner::OUT_OF_SCOPE,
-        ], 0);
+        $stats = [];
+        $count = function (string $key, array $row) use (&$stats, $owners): void {
+            $month = substr((string) $row['date'], 0, 7);
+            $stats[$key]['count'] = ($stats[$key]['count'] ?? 0) + 1;
+            $stats[$key]['users'][$owners[$row['year_id']] ?? 0] = true;
+            $stats[$key]['from'] = min($stats[$key]['from'] ?? $month, $month);
+            $stats[$key]['to'] = max($stats[$key]['to'] ?? $month, $month);
+        };
         $plans = [];
         $bySpeciality = [];
         $byMonth = [];
@@ -165,19 +199,24 @@ class RepairSurgeryNomenclatureCommand extends Command
 
         do {
             $rows = $this->connection->executeQuery(
-                'SELECT id, nomenclature_id, code, name, speciality, created_at, date FROM surgeries WHERE id > ? ORDER BY id LIMIT ' . self::PAGE,
+                'SELECT id, nomenclature_id, code, name, speciality, created_at, date, year_id FROM surgeries WHERE id > ? ORDER BY id LIMIT ' . self::PAGE,
                 [$lastId],
             )->fetchAllAssociative();
 
             foreach ($rows as $row) {
                 $lastId = (int) $row['id'];
-                ['status' => $status, 'target' => $target] = $planner->classify($row);
-                $counts['total']++;
-                $counts[$status]++;
-                if (!in_array($status, [Planner::CONSISTENT, Planner::OUT_OF_SCOPE], true)) {
-                    $counts['signature']++;
+                ['status' => $status, 'target' => $target] = $scope === 'favorites'
+                    ? $planner->classifyFavorites($row)
+                    : $planner->classify($row);
+                $count('total', $row);
+                $count($status, $row);
+                if ($scope === 'favorites' && $status !== Planner::NOT_FAVORITES) {
+                    $count('favorites', $row);
                 }
-                if ($status !== Planner::REPAIRABLE) {
+                if ($scope === 'nomenclature' && !in_array($status, [Planner::CONSISTENT, Planner::OUT_OF_SCOPE], true)) {
+                    $count('signature', $row);
+                }
+                if ($status !== $repairable) {
                     continue;
                 }
                 $plans[] = [
@@ -196,7 +235,7 @@ class RepairSurgeryNomenclatureCommand extends Command
             }
         } while (count($rows) === self::PAGE);
 
-        return [$counts, $plans, $bySpeciality, $byMonth];
+        return [$stats, $plans, $bySpeciality, $byMonth];
     }
 
     private function checkSnapshotDir(SymfonyStyle $io, mixed $dir): ?string
@@ -225,7 +264,7 @@ class RepairSurgeryNomenclatureCommand extends Command
     /** Snapshot complet écrit et synchronisé sur disque AVANT la première modification. */
     private function writeSnapshot(string $file, string $runId, array $plans): void
     {
-        $handle = fopen($file, 'x');
+        $handle = $this->createPrivateFile($file);
         fputcsv($handle, self::SNAPSHOT_COLUMNS, escape: '');
         foreach ($plans as $plan) {
             fputcsv($handle, [
@@ -238,6 +277,22 @@ class RepairSurgeryNomenclatureCommand extends Command
         fsync($handle);
         fclose($handle);
         chmod($file, 0600);
+    }
+
+    /** Fichier créé d'emblée en 0600 (umask) : jamais lisible par d'autres comptes, même brièvement. */
+    private function createPrivateFile(string $file)
+    {
+        $previous = umask(0077);
+        try {
+            $handle = fopen($file, 'x');
+        } finally {
+            umask($previous);
+        }
+        if ($handle === false) {
+            throw new \RuntimeException('Impossible de créer ' . $file);
+        }
+
+        return $handle;
     }
 
     private function rollback(SymfonyStyle $io, string $file, bool $apply, int $batchSize): int

@@ -184,7 +184,7 @@ class RepairSurgeryNomenclatureCommandTest extends ApiTestBase
         [$journal] = glob($this->snapshotDir . '/*.applied.csv');
         $rows = array_map(fn ($line) => str_getcsv($line, escape: ''), file($snapshot, FILE_IGNORE_NEW_LINES));
         $this->assertSame(['run_id', 'script_version', 'surgery_id', 'before_nomenclature_id', 'before_code', 'before_speciality', 'after_nomenclature_id', 'after_code', 'after_speciality'], $rows[0]);
-        $this->assertSame(['repair-surgery-nomenclature/1', (string) $buggy->getId(), (string) $this->hanche->getId(), '2890851', 'favorites', (string) $this->appendice->getId(), '2414152', 'dig'], array_slice($rows[1], 1));
+        $this->assertSame(['repair-surgery-nomenclature/2', (string) $buggy->getId(), (string) $this->hanche->getId(), '2890851', 'favorites', (string) $this->appendice->getId(), '2414152', 'dig'], array_slice($rows[1], 1));
         $this->assertCount(2, $rows);
         $this->assertStringContainsString($buggy->getId() . ',', file_get_contents($journal));
         $this->assertStringContainsString('corrigée', file_get_contents($journal));
@@ -207,6 +207,124 @@ class RepairSurgeryNomenclatureCommandTest extends ApiTestBase
         $this->repair(['--apply' => true, '--snapshot-dir' => $this->snapshotDir]);
 
         $this->assertSame(['2414152'], $this->exportedCodes($client, 'Appendicectomie'), 'après : export cohérent');
+    }
+
+    public function testSnapshotAndJournalAreCreatedPrivate(): void
+    {
+        if (PHP_OS_FAMILY === 'Windows') {
+            $this->markTestSkipped('Permissions POSIX non significatives sous Windows (vérifié en CI Linux).');
+        }
+        $this->buggySurgery('dig');
+
+        $this->repair(['--apply' => true, '--snapshot-dir' => $this->snapshotDir]);
+
+        $files = glob($this->snapshotDir . '/*.csv');
+        $this->assertCount(2, $files);
+        foreach ($files as $file) {
+            $this->assertSame('0600', substr(sprintf('%o', fileperms($file)), -4), basename($file));
+        }
+    }
+
+    // ---------------------------------------------------------------- Portée « favorites » (LOT 2D.3)
+
+    public function testFavoritesCandidateOnlyGetsTheNomenclatureSpeciality(): void
+    {
+        $candidate = $this->surgery($this->appendice, 'Appendicectomie', '2414152', 'favorites');
+        $before = $this->row($candidate);
+
+        $this->repair(['--scope' => 'favorites', '--apply' => true, '--snapshot-dir' => $this->snapshotDir]);
+
+        $after = $this->row($candidate);
+        $this->assertSame('dig', $after['speciality']);
+        unset($before['speciality'], $after['speciality']);
+        $this->assertSame($before, $after, 'seule la spécialité change');
+    }
+
+    public function testFavoritesExclusionsAreSkipped(): void
+    {
+        $this->nomenclature('Cure de hernie', 'dig', null, null);
+        $codeMismatch = $this->surgery($this->appendice, 'Appendicectomie', '9999999', 'favorites');
+        $nameMismatch = $this->surgery($this->appendice, 'Appendicectomie laparoscopique', '2414152', 'favorites');
+        $incomplete = $this->surgery($this->nomenclatureNamed('Cure de hernie'), 'Cure de hernie', '', 'favorites');
+        $withoutNomenclature = $this->surgeryWithoutNomenclature('favorites');
+        $alreadyCorrect = $this->surgery($this->appendice, 'Appendicectomie', '2414152', 'dig');
+        $before = $this->table();
+
+        $output = $this->repair(['--scope' => 'favorites', '--apply' => true, '--snapshot-dir' => $this->snapshotDir]);
+
+        $this->assertSame($before, $this->table());
+        $this->assertStringContainsString('Rien à corriger', $output);
+        $this->assertCounter('Spécialité « favorites »', 4, $output);
+        $this->assertCounter('F réparables — seraient modifiées', 0, $output);
+        $this->assertCounter('F exclues : code différent de la nomenclature', 1, $output);
+        $this->assertCounter('F exclues : nom différent de la nomenclature', 1, $output);
+        $this->assertCounter('F exclues : nomenclature incomplète', 1, $output);
+        $this->assertCounter('F exclues : sans nomenclature', 1, $output);
+        unset($codeMismatch, $nameMismatch, $incomplete, $withoutNomenclature, $alreadyCorrect);
+    }
+
+    public function testFavoritesDryRunIsTheDefaultAndWritesNothing(): void
+    {
+        $this->surgery($this->appendice, 'Appendicectomie', '2414152', 'favorites');
+        $before = $this->table();
+
+        $output = $this->repair(['--scope' => 'favorites']);
+
+        $this->assertSame($before, $this->table());
+        $this->assertSame([], glob($this->snapshotDir . '/*'));
+        $this->assertCounter('F réparables — seraient modifiées', 1, $output);
+        $this->assertStringContainsString('1 intervention(s) seraient corrigées', $output);
+    }
+
+    public function testFavoritesScopeDoesNotTouchA1AndA1ScopeDoesNotTouchFavorites(): void
+    {
+        $buggy = $this->buggySurgery('dig');
+        $favorite = $this->surgery($this->appendice, 'Appendicectomie', '2414152', 'favorites');
+
+        $this->repair(['--scope' => 'favorites', '--apply' => true, '--snapshot-dir' => $this->snapshotDir]);
+        $this->assertUnchanged($buggy);
+
+        $this->repair(['--scope' => 'nomenclature', '--apply' => true, '--snapshot-dir' => $this->snapshotDir]);
+        $this->assertSame('dig', $this->reload($favorite)->getSpeciality());
+        $this->assertAligned($buggy, $this->appendice, '2414152');
+    }
+
+    public function testFavoritesSecondApplyAndRollback(): void
+    {
+        $this->surgery($this->appendice, 'Appendicectomie', '2414152', 'favorites');
+        $initial = $this->table();
+
+        $this->repair(['--scope' => 'favorites', '--apply' => true, '--snapshot-dir' => $this->snapshotDir]);
+        $repaired = $this->table();
+        $this->assertStringContainsString('Rien à corriger', $this->repair(['--scope' => 'favorites', '--apply' => true, '--snapshot-dir' => $this->snapshotDir]));
+        $this->assertSame($repaired, $this->table());
+
+        [$snapshot] = array_values(array_filter(glob($this->snapshotDir . '/repair-surgery-favorites-*.csv'), fn ($f) => !str_ends_with($f, '.applied.csv')));
+        $rows = array_map(fn ($line) => str_getcsv($line, escape: ''), file($snapshot, FILE_IGNORE_NEW_LINES));
+        $this->assertCount(2, $rows);
+        [, , , $beforeNomenclature, $beforeCode, $beforeSpeciality, $afterNomenclature, $afterCode, $afterSpeciality] = $rows[1];
+        $this->assertSame([$beforeNomenclature, $beforeCode, 'favorites'], [$afterNomenclature, $afterCode, $beforeSpeciality], 'relation et code identiques avant/après');
+        $this->assertSame('dig', $afterSpeciality);
+
+        $this->assertStringContainsString('1 ligne(s) restaurée(s)', $this->repair(['--rollback' => $snapshot, '--apply' => true]));
+        $this->assertSame($initial, $this->table());
+    }
+
+    public function testFavoritesExcelSummaryBeforeAndAfterRepair(): void
+    {
+        $this->surgery($this->appendice, 'Appendicectomie', '2414152', 'favorites');
+        $client = $this->clientFor($this->alice);
+
+        $this->assertSame([true, false], $this->exportContains($client, '2414152'), 'avant : carnet oui, récapitulatif non');
+
+        $this->repair(['--scope' => 'favorites', '--apply' => true, '--snapshot-dir' => $this->snapshotDir]);
+
+        $this->assertSame([true, true], $this->exportContains($client, '2414152'), 'après : présent dans le récapitulatif');
+    }
+
+    public function testUnknownScopeIsRefused(): void
+    {
+        $this->repair(['--scope' => 'tout'], 2);
     }
 
     // ---------------------------------------------------------------- Helpers
@@ -292,6 +410,48 @@ class RepairSurgeryNomenclatureCommandTest extends ApiTestBase
         $em->clear();
 
         return $em->find(Surgeries::class, $surgery->getId());
+    }
+
+    private function row(Surgeries $surgery): array
+    {
+        return $this->em->getConnection()->fetchAssociative('SELECT * FROM surgeries WHERE id = ?', [$surgery->getId()]);
+    }
+
+    private function nomenclatureNamed(string $name): Nomenclature
+    {
+        return $this->em->getRepository(Nomenclature::class)->findOneBy(['name' => $name]);
+    }
+
+    private function surgeryWithoutNomenclature(string $speciality): Surgeries
+    {
+        $surgery = (new Surgeries())
+            ->setYear($this->year)
+            ->setDate(new \DateTime('2025-11-02'))
+            ->setName('Saisie libre')
+            ->setSpeciality($speciality)
+            ->setPosition('1')
+            ->setCreatedAt(new \DateTime('2025-11-02 10:00'));
+        $this->em->persist($surgery);
+        $this->em->flush();
+
+        return $surgery;
+    }
+
+    /** [code présent dans le carnet (feuille 1), code présent dans le récapitulatif (feuille 2)] */
+    private function exportContains($client, string $code): array
+    {
+        $file = tempnam(sys_get_temp_dir(), 'carnet');
+        file_put_contents($file, $client->request('GET', '/api/excel2/' . $this->year->getId())->getContent());
+        $book = IOFactory::load($file);
+        unlink($file);
+
+        $found = [];
+        foreach ([1, 2] as $index) {
+            $cells = array_map(fn ($value) => trim((string) $value), array_merge(...$book->getSheet($index)->toArray()));
+            $found[] = in_array($code, $cells, true);
+        }
+
+        return $found;
     }
 
     /** Codes (colonne B) des lignes du carnet (feuille « Carnet de stage ») portant ce nom. */
