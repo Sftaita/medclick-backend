@@ -51,6 +51,8 @@ security:
     - { path: ^/api/client-errors$, roles: PUBLIC_ACCESS, methods: [POST] }
     - { path: ^/api/terms-conditions, roles: PUBLIC_ACCESS, methods: [GET] }
     - { path: ^/api/marketing/active, roles: PUBLIC_ACCESS }
+    # Clic sur la publicité depuis la page de connexion (limité en débit).
+    - { path: ^/api/marketing/incrementCampaign/\d+$, roles: PUBLIC_ACCESS, methods: [PUT] }
 
     - { path: ^/api/admin, roles: ROLE_ADMIN }
     - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }

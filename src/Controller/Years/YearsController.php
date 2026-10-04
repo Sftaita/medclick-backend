@@ -21,27 +21,27 @@ class YearsController extends AbstractController
 
         // Vérifications des types des données
         if (!isset($data['yearOfFormation'], $data['hospital'], $data['master'], $data['dateOfStart'])) {
-            return new JsonResponse(['error' => 'Les champs yearOfFormation, hospital, master et dateOfStart sont requis'], 400);
+            return $this->errorResponse('Les champs yearOfFormation, hospital, master et dateOfStart sont requis', 400);
         }
 
         if (!is_string($data['yearOfFormation'])) {
-            return new JsonResponse(['error' => 'yearOfFormation doit être une chaîne de caractères'], 400);
+            return $this->errorResponse('yearOfFormation doit être une chaîne de caractères', 400);
         }
 
         if (!is_string($data['hospital']) || !is_string($data['master'])) {
-            return new JsonResponse(['error' => 'hospital et master doivent être des chaînes de caractères'], 400);
+            return $this->errorResponse('hospital et master doivent être des chaînes de caractères', 400);
         }
 
         // Validation de dateOfStart
         $dateOfStart = \DateTime::createFromFormat('Y-m-d', $data['dateOfStart']);
         if (!$dateOfStart || $dateOfStart->format('Y-m-d') !== $data['dateOfStart']) {
-            return new JsonResponse(['error' => 'dateOfStart doit être une date valide au format AAAA-MM-JJ'], 400);
+            return $this->errorResponse('dateOfStart doit être une date valide au format AAAA-MM-JJ', 400);
         }
 
         // Récupérer l'utilisateur actuel
         $user = $security->getUser();
         if (!$user) {
-            return new JsonResponse(['error' => 'Utilisateur non authentifié'], 401);
+            return $this->errorResponse('Utilisateur non authentifié', 401);
         }
 
         // Vérifier si le binôme yearOfFormation et utilisateur existe déjà
@@ -51,7 +51,7 @@ class YearsController extends AbstractController
         ]);
 
         if ($existingYear) {
-            return new JsonResponse(['error' => 'Cette année est déjà enregistrée pour cet utilisateur'], 409);
+            return $this->errorResponse('Cette année est déjà enregistrée pour cet utilisateur', 409);
         }
 
         // Enregistrer la nouvelle année
@@ -66,5 +66,14 @@ class YearsController extends AbstractController
         $entityManager->flush();
 
         return new JsonResponse(['message' => 'Année enregistrée avec succès'], 201);
+    }
+
+    /**
+     * Réponse d'erreur : "message" est la clé lue par la PWA (YearPage) ; "error" est
+     * conservée pour compatibilité avec les clients existants.
+     */
+    private function errorResponse(string $message, int $status): JsonResponse
+    {
+        return new JsonResponse(['error' => $message, 'message' => $message], $status);
     }
 }

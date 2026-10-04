@@ -10,6 +10,10 @@ framework:
             policy: sliding_window
             limit: 30
             interval: '1 minute'
+        marketing_click:
+            policy: sliding_window
+            limit: 20
+            interval: '1 minute'
         password_reset:
             policy: sliding_window
             limit: 5

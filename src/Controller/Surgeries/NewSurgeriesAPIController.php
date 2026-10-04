@@ -84,6 +84,23 @@ class NewSurgeriesAPIController extends AbstractController
             return $this->handleMissingData("Cette intervention n'est pas retrouvée en base de données");
         }
 
+        // Role during the surgery: 1 (first hand), 2 (second hand), 3 (first hand, assisted).
+        // Required: the column is NOT NULL and existing data only contains 1, 2 or 3.
+        $position = $data['position'] ?? null;
+        if (!in_array((string) $position, ['1', '2', '3'], true)) {
+            return $this->handleMissingData("Veuillez indiquer votre rôle durant l'intervention.");
+        }
+
+        // Same permissive parsing as before, but an unreadable date is a client error, not a 500.
+        try {
+            $date = new \DateTime((string) ($data['date'] ?? ''));
+        } catch (\Exception $e) {
+            return $this->handleMissingData("Veuillez indiquer une date valide.");
+        }
+        if (empty($data['date'])) {
+            return $this->handleMissingData("Veuillez indiquer une date valide.");
+        }
+
         // Create a unique code for the surgery.
         $code = $surgeryReference->getCodeHospitalisation() . '' . $surgeryReference->getN();
 
@@ -93,25 +110,25 @@ class NewSurgeriesAPIController extends AbstractController
         // Set the attributes of the new surgery entity.
         $surgery->setYear($year)
             ->setNomenclature($surgeryReference)
-            ->setDate(new \DateTime($data['date']))
+            ->setDate($date)
             ->setSpeciality($surgeryReference->getSpeciality())
             ->setCode($code)
             ->setName($surgeryReference->getName())
-            ->setPosition($data['position'])
+            ->setPosition((string) $position)
             ->setCreatedAt(new \DateTime()); // Set the current date and time.
 
         // Depending on the position, set the FirstHand and SecondHand attributes.
-        switch ($data['position']) {
+        switch ((int) $position) {
             case 1:
                 $surgery->setFirstHand($resident->getId());
                 break;
             case 2:
-                $surgery->setFirstHand($data['firstHand']);
+                $surgery->setFirstHand($data['firstHand'] ?? null);
                 $surgery->setSecondHand($resident->getId());
                 break;
             case 3:
                 $surgery->setFirstHand($resident->getId());
-                $surgery->setSecondHand($data['secondHand']);
+                $surgery->setSecondHand($data['secondHand'] ?? null);
                 break;
         }
 

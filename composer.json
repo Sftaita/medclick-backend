@@ -108,7 +108,13 @@
     "post-update-cmd": [
       "@auto-scripts"
     ],
-    "test": "@php -d xdebug.mode=off vendor/bin/phpunit"
+    "test": [
+      "Composer\\Config::disableProcessTimeout",
+      "@php -d xdebug.mode=off vendor/bin/phpunit"
+    ]
+  },
+  "scripts-descriptions": {
+    "test": "Suite PHPUnit complète sans Xdebug ; sans limite de durée (process-timeout de 300 s désactivé pour ce seul script, la suite pouvant durer plus de 5 minutes)."
   },
   "conflict": {
     "symfony/symfony": "*"

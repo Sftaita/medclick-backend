@@ -47,6 +47,30 @@ class FavoritesController extends AbstractController
         return($this->json($data, 200 , ['Access-Control-Allow-Origin' => $_ENV['CORS_ALLOW_ORIGIN']]));
     }
 
+    /**
+     * Favori à modifier (FavoritePage de la PWA, y compris les builds déjà en cache).
+     * GET /api/favorites/{id} (API Platform) ne fournit pas surgeryId, d'où cette route.
+     */
+    #[Route('/api/favorites/getById/{id<\d+>}', name: 'GetFavoriteById', methods: ['GET'])]
+    public function getFavorite(int $id, FavoritesRepository $favoritesRepository): JsonResponse
+    {
+        $favorite = $favoritesRepository->find($id);
+
+        // Favori inexistant ou appartenant à un autre utilisateur : même réponse.
+        if (!$favorite || !$this->isGranted('OWNER', $favorite)) {
+            return new JsonResponse(['message' => 'Favori introuvable.'], JsonResponse::HTTP_NOT_FOUND);
+        }
+
+        return new JsonResponse([
+            'id' => $favorite->getId(),
+            'shortcut' => $favorite->getShortcut(),
+            'SurgeryName' => $favorite->getSurgeryName(),
+            'codeHospitalisation' => $favorite->getCodeHospitalisation(),
+            'speciality' => $favorite->getSpeciality(),
+            'surgeryId' => $favorite->getSurgery()?->getId(),
+        ]);
+    }
+
     #[Route('/api/favorites/addNew', name: 'AddANewFavorites-NewVersion', methods: ['POST'])]
     public function addNewFavorite(Request $request,Security $security, NomenclatureRepository $nomenclatureRepository)
     {
