@@ -174,6 +174,61 @@ class SurgeryNomenclatureSyncTest extends ApiTestBase
         $this->assertSame(['2414152'], $rows);
     }
 
+    // ---------------------------------------------------------------- LOT 2D.3 : « favorites »
+
+    public function testPutWithFavoritesSpecialityAndNoSurgeryIdUsesTheNomenclatureSpeciality(): void
+    {
+        $surgery = $this->favoritesSurgery($this->appendice);
+
+        // Payload du front quand on modifie une intervention venue des favoris sans la rechoisir.
+        $this->clientFor($this->alice)->request('PUT', '/api/surgeries/' . $surgery->getId(), ['json' => [
+            'date' => '2025-11-02',
+            'year' => '/api/years/' . $this->year->getId(),
+            'speciality' => 'favorites',
+            'name' => 'Appendicectomie',
+            'surgeryId' => '',
+            'position' => '2',
+        ]]);
+        $this->assertResponseIsSuccessful();
+
+        $updated = $this->reload($surgery);
+        $this->assertSynced($updated, $this->appendice, '2414152');
+        $this->assertSame('2', $updated->getPosition());
+    }
+
+    public function testFavoritesSpecialityWithoutNomenclatureIsNotInvented(): void
+    {
+        $surgery = (new Surgeries())
+            ->setYear($this->year)
+            ->setDate(new \DateTime('2025-11-02'))
+            ->setSpeciality('ortho')
+            ->setName('Saisie libre')
+            ->setPosition('1');
+        $this->em->persist($surgery);
+        $this->em->flush();
+
+        $this->clientFor($this->alice)->request('PUT', '/api/surgeries/' . $surgery->getId(), ['json' => ['speciality' => 'favorites']]);
+        $this->assertResponseIsSuccessful();
+
+        $updated = $this->reload($surgery);
+        $this->assertNull($updated->getNomenclature());
+        $this->assertSame('favorites', $updated->getSpeciality());
+    }
+
+    public function testFavoritesSurgeryAppearsInTheExcelSummaryOnceNormalized(): void
+    {
+        $surgery = $this->favoritesSurgery($this->appendice);
+        $client = $this->clientFor($this->alice);
+
+        // État historique : présente dans le carnet, absente du récapitulatif.
+        $this->assertSame([true, false], $this->exportContains($client, '2414152'));
+
+        $client->request('PUT', '/api/surgeries/' . $surgery->getId(), ['json' => ['speciality' => 'favorites', 'position' => '1']]);
+        $this->assertResponseIsSuccessful();
+
+        $this->assertSame([true, true], $this->exportContains($client, '2414152'));
+    }
+
     // ---------------------------------------------------------------- Helpers
 
     /** Création par la route des fronts : nom, code, spécialité et relation cohérents. */
@@ -193,6 +248,42 @@ class SurgeryNomenclatureSyncTest extends ApiTestBase
         $this->assertSynced($surgery, $nomenclature, $nomenclature->getCodeHospitalisation() . $nomenclature->getN());
 
         return $surgery;
+    }
+
+    /** Intervention cohérente avec sa nomenclature, mais spécialité « favorites » (cas historique). */
+    private function favoritesSurgery(Nomenclature $nomenclature): Surgeries
+    {
+        $surgery = (new Surgeries())
+            ->setYear($this->year)
+            ->setDate(new \DateTime('2025-11-02'))
+            ->setNomenclature($nomenclature)
+            ->setCode($nomenclature->getCodeHospitalisation() . $nomenclature->getN())
+            ->setName($nomenclature->getName())
+            ->setSpeciality('favorites')
+            ->setPosition('1')
+            ->setFirstHand((string) $this->alice->getId())
+            ->setCreatedAt(new \DateTime('2025-11-02 10:00'));
+        $this->em->persist($surgery);
+        $this->em->flush();
+
+        return $surgery;
+    }
+
+    /** [code présent dans le carnet (feuille 1), code présent dans le récapitulatif (feuille 2)] */
+    private function exportContains($client, string $code): array
+    {
+        $file = tempnam(sys_get_temp_dir(), 'carnet');
+        file_put_contents($file, $client->request('GET', '/api/excel2/' . $this->year->getId())->getContent());
+        $book = IOFactory::load($file);
+        unlink($file);
+
+        $found = [];
+        foreach ([1, 2] as $index) {
+            $cells = array_map(fn ($value) => trim((string) $value), array_merge(...$book->getSheet($index)->toArray()));
+            $found[] = in_array($code, $cells, true);
+        }
+
+        return $found;
     }
 
     private function assertSynced(Surgeries $surgery, Nomenclature $nomenclature, string $code): void

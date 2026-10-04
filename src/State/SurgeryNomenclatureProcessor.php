@@ -15,6 +15,7 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
  * `surgeryId` (intervention choisie dans la nomenclature), la relation nomenclature, le code,
  * le nom et la spécialité sont recalculés comme à la création (/api/surgeries/addNewSurgery).
  * Sans `surgeryId` (ou vide), l'intervention garde sa nomenclature et son code.
+ * Une spécialité « favorites » est remplacée par celle de la nomenclature liée (LOT 2D.3).
  *
  * `surgeryId` n'est pas une propriété de l'entité : il est lu dans le corps de la requête.
  *
@@ -48,6 +49,13 @@ final class SurgeryNomenclatureProcessor implements ProcessorInterface
                 ->setCode($reference->getCodeHospitalisation() . '' . $reference->getN())
                 ->setName($reference->getName())
                 ->setSpeciality($reference->getSpeciality());
+        }
+
+        // « favorites » n'est pas une spécialité : l'ancien et le nouveau front l'envoient quand
+        // l'intervention vient des favoris. La nomenclature liée reste la source de vérité.
+        $nomenclature = $data instanceof Surgeries ? $data->getNomenclature() : null;
+        if ($nomenclature && $data->getSpeciality() === 'favorites' && ($nomenclature->getSpeciality() ?? '') !== '') {
+            $data->setSpeciality($nomenclature->getSpeciality());
         }
 
         return $this->persistProcessor->process($data, $operation, $uriVariables, $context);
