@@ -65,3 +65,19 @@ Les fichiers déjà téléchargés ne sont pas modifiables : ceux qui contiennen
 affichent le code de A à côté du nom de B, et la comptent sous A dans le récapitulatif. Après
 correction, un export régénéré est cohérent (test `testExcelExportIsIncoherentBeforeAndCoherentAfterRepair`).
 Informer ou non les utilisateurs concernés : décision séparée.
+
+## Portée « favorites » (LOT 2D.3)
+
+`--scope=favorites` traite les interventions dont `speciality = "favorites"` : l'ancien PUT recopiait
+cette valeur (choix « Mes favoris »). Effet : l'intervention figure dans le carnet mais **pas** dans le
+récapitulatif `excel2` (classement par spécialité). Depuis le correctif du processor (2D.3), le PUT
+remplace « favorites » par la spécialité de la nomenclature liée.
+
+| Catégorie | Condition | Action |
+|---|---|---|
+| F | nomenclature liée complète, code et nom actuels identiques aux siens | spécialité ← celle de la nomenclature, rien d'autre |
+| F exclues | sans nomenclature, nomenclature incomplète, code différent, nom différent | aucune |
+
+Le snapshot montre relation et code identiques avant/après ; seule la spécialité diffère.
+Même procédure que ci-dessus en ajoutant `--scope=favorites` (dry-run, `--apply --snapshot-dir`,
+`--rollback`). Snapshot et journal sont créés en `0600`.

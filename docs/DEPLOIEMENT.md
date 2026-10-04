@@ -94,3 +94,10 @@ depuis `$B`, puis vider le cache (et `zcat $B/db.sql.gz | mysql ...` si une migr
   correction de données ; LOT 1 non déployé. Contrôles OK (200/401/403, CORS), aucune nouvelle
   erreur. Sauvegarde : `~/backups/medclick-20261004-1456/`. À reprendre lors de l'intégration
   de LOT 1/LOT 2 (le même correctif y existe sous `d60b77f`).
+- **04/10/2026** — LOT 2D.2 (`2ad8e27`) : commande `app:repair-surgery-nomenclature`, puis
+  `--apply` (A1) : 2 583 interventions réalignées, 0 ignorée, rollback non utilisé. Sauvegarde
+  `~/backups/medclick-20261004-1557-pre-2d2/`, snapshot et journal `~/backups/repair-2d2-20261004/`
+  (copiés hors serveur).
+- **04/10/2026** — LOT 2D.3 : spécialité « favorites » remplacée par celle de la nomenclature au PUT,
+  portée `--scope=favorites` (dry-run uniquement, application soumise à accord), journal en 0600.
+  Sans migration.
