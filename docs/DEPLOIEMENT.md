@@ -89,3 +89,8 @@ depuis `$B`, puis vider le cache (et `zcat $B/db.sql.gz | mysql ...` si une migr
   automatique prévu, non déclenché). Tests de fumée OK (accès public/protégé, CORS, activation,
   validation, fichiers sensibles en 403). Sauvegarde : `~/backups/medclick-20261001-0510/`.
   `DATABASE_URL` de prod sans `serverVersion` : DBAL détecte MariaDB 11.8 à la connexion.
+- **04/10/2026** — Hotfix LOT 2D.1 (`4bb701b`, cherry-pick seul de `d60b77f` sur `46a59fe`) :
+  synchronisation nomenclature/code/spécialité au PUT d'une intervention. Sans migration ni
+  correction de données ; LOT 1 non déployé. Contrôles OK (200/401/403, CORS), aucune nouvelle
+  erreur. Sauvegarde : `~/backups/medclick-20261004-1456/`. À reprendre lors de l'intégration
+  de LOT 1/LOT 2 (le même correctif y existe sous `d60b77f`).
