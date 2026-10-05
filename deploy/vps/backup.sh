@@ -9,7 +9,7 @@ set -euo pipefail
 export PATH="$HOME/bin:$PATH"
 
 PROJECT=${1:?dossier du projet compose requis}
-ENV_NAME=${2:?nom de l'environnement requis}
+ENV_NAME=${2:?nom de l environnement requis}
 PASSFILE="$HOME/.medclick-backup-passphrase"
 DEST="$HOME/backups/medclick-$ENV_NAME"
 REMOTE="gdrive:INFORMATIQUE/Base de donnée/medclick-$ENV_NAME"
