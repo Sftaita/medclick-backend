@@ -1,0 +1,135 @@
+# Préproduction MedClick sur le VPS (projet Compose « medclick-staging »).
+# Répertoire sur le VPS : /opt/stack/apps/medclick-staging (voir docs/DEPLOIEMENT-VPS.md).
+#   src/backend  : clone du dépôt backend au SHA déployé (contexte du backend)
+#   src/pwa      : clone du dépôt pwa-medclick au SHA déployé (contexte : src/pwa/frontend)
+#   .env         : secrets (chmod 600), jamais versionné — modèle : deploy/vps/.env.staging.example
+#
+# Isolation : base MariaDB dédiée (ni la MySQL partagée, ni la production), réseau interne privé,
+# aucun port publié sauf l'interface Mailpit en local (tunnel SSH). Seuls frontend et backend sont
+# sur « proxy » (Traefik). Accès Internet restreint par liste d'IP (middleware de fichier Traefik).
+
+name: medclick-staging
+
+services:
+  db:
+    image: mariadb:11.8
+    container_name: medclick-staging-db
+    restart: unless-stopped
+    environment:
+      MARIADB_DATABASE: ${DB_NAME}
+      MARIADB_USER: ${DB_USER}
+      MARIADB_PASSWORD: ${DB_PASSWORD}
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+    command: ["--character-set-server=utf8mb4", "--collation-server=utf8mb4_unicode_ci"]
+    volumes:
+      - medclick_staging_db:/var/lib/mysql
+    networks:
+      - medclick-staging-internal
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  backend:
+    build:
+      context: ./src/backend
+      dockerfile: deploy/vps/backend.Dockerfile
+    image: medclick-backend:${BACKEND_TAG:-staging}
+    container_name: medclick-staging-backend
+    restart: unless-stopped
+    environment:
+      APP_ENV: prod
+      APP_DEBUG: "0"
+      APP_SECRET: ${APP_SECRET}
+      DATABASE_URL: mysql://${DB_USER}:${DB_PASSWORD}@db:3306/${DB_NAME}?serverVersion=11.8.9-MariaDB&charset=utf8mb4
+      CORS_ALLOW_ORIGIN: ${CORS_ALLOW_ORIGIN}
+      JWT_SECRET_KEY: "%kernel.project_dir%/config/jwt/private.pem"
+      JWT_PUBLIC_KEY: "%kernel.project_dir%/config/jwt/public.pem"
+      JWT_PASSPHRASE: ${JWT_PASSPHRASE}
+      # Tous les e-mails sont capturés par Mailpit : aucun envoi réel.
+      MAILER_DSN: smtp://mailpit:1025
+      ERROR_ALERT_EMAIL: ""
+      PUBLIC_FRONTEND_URL: ${PUBLIC_URL}
+      PUBLIC_API_URL: ${PUBLIC_URL}
+    volumes:
+      # Clés JWT propres à cet environnement, générées une fois (deploy.sh), jamais dans l'image.
+      - medclick_staging_jwt:/app/config/jwt
+      - medclick_staging_log:/app/var/log
+    networks:
+      - proxy
+      - medclick-staging-internal
+    depends_on:
+      db:
+        condition: service_healthy
+      mailpit:
+        condition: service_started
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=proxy"
+      # /api (API) et /activation (lien des e-mails d'activation) vont au backend.
+      - "traefik.http.routers.medclick-staging-api.rule=Host(`${PUBLIC_HOST}`) && (PathPrefix(`/api`) || PathPrefix(`/activation`))"
+      - "traefik.http.routers.medclick-staging-api.priority=100"
+      - "traefik.http.routers.medclick-staging-api.entrypoints=websecure"
+      - "traefik.http.routers.medclick-staging-api.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.medclick-staging-api.middlewares=medclick-staging-allow@file,secure-headers@file,compress@file"
+      - "traefik.http.routers.medclick-staging-api.service=medclick-staging-backend"
+      - "traefik.http.services.medclick-staging-backend.loadbalancer.server.port=80"
+
+  frontend:
+    build:
+      context: ./src/pwa/frontend
+      dockerfile: ../../backend/deploy/vps/frontend.Dockerfile
+      # Configuration nginx versionnée avec les fichiers de déploiement (dépôt backend).
+      additional_contexts:
+        deploy: ./src/backend/deploy/vps
+      args:
+        VITE_API_URL: ${PUBLIC_URL}/api/
+    image: medclick-frontend:${FRONTEND_TAG:-staging}
+    container_name: medclick-staging-frontend
+    restart: unless-stopped
+    networks:
+      - proxy
+    depends_on:
+      backend:
+        condition: service_healthy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=proxy"
+      - "traefik.http.routers.medclick-staging-web.rule=Host(`${PUBLIC_HOST}`)"
+      - "traefik.http.routers.medclick-staging-web.priority=10"
+      - "traefik.http.routers.medclick-staging-web.entrypoints=websecure"
+      - "traefik.http.routers.medclick-staging-web.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.medclick-staging-web.middlewares=medclick-staging-allow@file,secure-headers@file,compress@file"
+      - "traefik.http.routers.medclick-staging-web.service=medclick-staging-frontend"
+      - "traefik.http.services.medclick-staging-frontend.loadbalancer.server.port=80"
+
+  mailpit:
+    image: axllent/mailpit:v1.29
+    container_name: medclick-staging-mailpit
+    restart: unless-stopped
+    environment:
+      MP_MAX_MESSAGES: 500
+    # Interface web uniquement en local du VPS (tunnel SSH), jamais publique.
+    ports:
+      - "127.0.0.1:8026:8025"
+    networks:
+      - medclick-staging-internal
+    healthcheck:
+      test: ["CMD", "/mailpit", "readyz"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
+networks:
+  proxy:
+    name: proxy
+    external: true
+  medclick-staging-internal:
+    name: medclick-staging-internal
+
+volumes:
+  medclick_staging_db:
+  medclick_staging_jwt:
+  medclick_staging_log:

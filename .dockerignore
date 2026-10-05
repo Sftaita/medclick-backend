@@ -1,0 +1,16 @@
+# Contexte de build de deploy/vps/backend.Dockerfile : jamais de secret ni d'état local dans l'image.
+.git
+.github
+.env
+.env.local
+.env.*.local
+.env.test
+var
+vendor
+config/jwt/*.pem
+tests
+phpunit.xml
+phpunit.xml.dist
+deploy
+docs
+public/Labtop.png

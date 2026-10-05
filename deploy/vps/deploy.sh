@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+# Déploiement MedClick sur le VPS (préproduction) à des SHA explicites.
+# Usage (dans /opt/stack/apps/medclick-staging) :
+#   ./deploy.sh <sha_backend> <sha_frontend>
+# Étapes : sources aux SHA demandés → build → up → clés JWT (une fois) → cache → migrations.
+# S'arrête à la première erreur. Une migration en attente arrête le déploiement (décision humaine).
+set -euo pipefail
+cd "$(dirname "$0")"
+
+BACKEND_SHA=${1:?SHA backend requis}
+FRONTEND_SHA=${2:?SHA frontend requis}
+BACKEND_REPO=https://github.com/Sftaita/medclick-backend.git
+FRONTEND_REPO=https://github.com/Sftaita/pwa-medclick.git
+
+checkout() { # <dépôt> <dossier> <sha>
+  [ -d "$2/.git" ] || git clone --quiet "$1" "$2"
+  git -C "$2" fetch --quiet origin
+  git -C "$2" -c advice.detachedHead=false checkout --quiet --force "$3"
+  git -C "$2" clean -fdq
+  echo "$2 @ $(git -C "$2" rev-parse HEAD)"
+}
+
+[ -f .env ] || { echo ".env absent (modèle : src/backend/deploy/vps/.env.staging.example)"; exit 1; }
+[ "$(stat -c %a .env)" = "600" ] || { echo ".env doit être en 600"; exit 1; }
+
+mkdir -p src
+checkout "$BACKEND_REPO" src/backend "$BACKEND_SHA"
+checkout "$FRONTEND_REPO" src/pwa "$FRONTEND_SHA"
+cp src/backend/deploy/vps/docker-compose.staging.yml docker-compose.yml
+
+export BACKEND_TAG="${BACKEND_SHA:0:7}" FRONTEND_TAG="${FRONTEND_SHA:0:7}"
+docker compose build
+docker compose up -d --wait db mailpit
+
+# Clés JWT de CET environnement (phrase de passe du .env), générées une seule fois dans le volume.
+docker compose run --rm --no-deps -e APP_ENV=prod backend sh -c \
+  'php bin/console lexik:jwt:generate-keypair --skip-if-exists && chown www-data:www-data config/jwt/*.pem && chmod 600 config/jwt/private.pem && chmod 644 config/jwt/public.pem'
+
+docker compose up -d --wait backend
+docker compose exec -T backend php bin/console cache:clear --no-warmup
+docker compose exec -T backend php bin/console cache:warmup
+docker compose exec -T backend chown -R www-data:www-data var
+
+PENDING=$(docker compose exec -T backend php bin/console doctrine:migrations:status --no-interaction | awk -F'|' '$3 ~ /New/ {gsub(/ /,"",$4); print $4}')
+if [ "${PENDING:-0}" != "0" ]; then
+  echo "ARRÊT : ${PENDING} migration(s) en attente — à examiner avant toute exécution."
+  exit 2
+fi
+
+docker compose up -d --wait frontend
+docker compose ps
