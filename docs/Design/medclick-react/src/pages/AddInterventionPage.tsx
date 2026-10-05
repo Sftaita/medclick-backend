@@ -1,34 +1,38 @@
-import { useEffect, useMemo, useState } from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { api } from '@/api';
+import { useAsync } from '@/hooks/useAsync';
 import { Icon } from '@/components/Icon';
-import { ActeIcon, TopBar } from '@/components/ui';
+import { ActeIcon, Skeleton, TopBar } from '@/components/ui';
 import { CommonFieldsForm } from '@/components/CommonFieldsForm';
 import { SaveResult } from '@/components/SaveResult';
 import { CountStepper } from '@/motion';
-import { ACTES, actesById, FAVORITE_ACTE_IDS, SURGEONS } from '@/data/actes';
 import { todayISO } from '@/lib/format';
-import { ROLE_LABEL, ROLES, type BatchResponse, type CommonFields, type Role } from '@/types';
+import { ROLE_SHORT, ROLES, SUPERVISOR_LABEL, type Acte, type BatchResponse, type CommonFields, type Role } from '@/types';
 
 /* §7 BIS — encodage d'une ou plusieurs interventions identiques.
-   Quantité 1 par défaut ; "Personnaliser" permet un rôle différent par intervention (facultatif). */
+   Quantité 1 par défaut ; « Personnaliser » permet un rôle différent par intervention (facultatif).
+   Le superviseur demandé dépend du rôle : « Aidé par » (1re main aidée) ou « 1re main » (2e main). */
 export default function AddInterventionPage() {
   const nav = useNavigate();
+  const location = useLocation();
   const [params] = useSearchParams();
-  const [favorites, setFavorites] = useState<string[]>(FAVORITE_ACTE_IDS);
-  const [showAll, setShowAll] = useState(false);
-  const [acteId, setActeId] = useState('lca');
+  const picked = (location.state as { acte?: Acte } | null)?.acte;
+  const { data: favorites } = useAsync(() => api.listFavorites(), []);
+  const { data: profile } = useAsync(() => api.getProfile(), []);
+  const [acte, setActe] = useState<{ acte: Acte; label: string } | null>(picked ? { acte: picked, label: picked.name } : null);
   const [qty, setQty] = useState(1);
-  const [role, setRole] = useState<Role>('FIRST_HAND');
+  const [role, setRole] = useState<Role>('SOLO');
   const [custom, setCustom] = useState(false);
-  const [roles, setRoles] = useState<Role[]>(['FIRST_HAND']);
-  const [common, setCommon] = useState<CommonFields>({ date: params.get('date') ?? todayISO(), surgeon: SURGEONS[0], trainingYear: 3 });
+  const [roles, setRoles] = useState<Role[]>(['SOLO']);
+  const [common, setCommon] = useState<CommonFields>({ date: params.get('date') ?? todayISO(), yearId: '' });
   const [phase, setPhase] = useState<'form' | 'saving' | 'done'>('form');
   const [result, setResult] = useState<BatchResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => { api.getFavoriteActeIds().then(setFavorites).catch(() => undefined); }, []);
-
+  // Année en cours par défaut ; premier favori sélectionné si rien n'a été choisi.
+  useEffect(() => { if (profile?.currentYear && !common.yearId) setCommon((c) => ({ ...c, yearId: profile.currentYear!.id })); }, [profile, common.yearId]);
+  useEffect(() => { if (!acte && favorites?.[0]) setActe({ acte: favorites[0].acte, label: favorites[0].shortcut }); }, [favorites, acte]);
   // Garde le tableau des rôles aligné sur la quantité.
   useEffect(() => {
     setRoles((r) => {
@@ -38,22 +42,22 @@ export default function AddInterventionPage() {
     });
   }, [qty, role]);
 
-  const acte = actesById[acteId];
-  const list = useMemo(
-    () => (showAll ? ACTES : ACTES.filter((a) => favorites.includes(a.id) || a.id === acteId)),
-    [showAll, favorites, acteId],
-  );
-
+  const finalRoles = custom ? roles : Array<Role>(qty).fill(role);
+  const needsSupervisor = finalRoles.some((r) => r !== 'SOLO');
+  const supervisorLabel = custom ? (needsSupervisor ? 'Superviseur' : null) : SUPERVISOR_LABEL[role];
+  const missingSupervisor = needsSupervisor && !common.supervisorId;
   const saveLabel = qty === 1 ? 'Enregistrer' : `Enregistrer ${qty} interventions`;
+  const list = favorites ?? [];
+  const pickedOutsideFavorites = acte && !list.some((f) => f.acte.id === acte.acte.id);
 
   const save = async () => {
+    if (!acte) return;
     setPhase('saving');
     setError(null);
     try {
-      const finalRoles = custom ? roles : Array<Role>(qty).fill(role);
       const res = await api.createBatch({
-        common: { ...common, nomenclature: common.nomenclature ?? acte.nomenclature },
-        lines: [{ acteId, quantity: qty, roles: finalRoles }],
+        common: { ...common, supervisorId: needsSupervisor ? common.supervisorId : undefined },
+        lines: [{ acteId: acte.acte.id, quantity: qty, roles: finalRoles }],
       });
       setResult(res); // l'animation de succès ne démarre qu'ici, après confirmation backend (§37.8)
       setPhase('done');
@@ -63,20 +67,20 @@ export default function AddInterventionPage() {
     }
   };
 
-  const reset = () => { setQty(1); setCustom(false); setRole('FIRST_HAND'); setResult(null); setPhase('form'); };
+  const reset = () => { setQty(1); setCustom(false); setRole('SOLO'); setResult(null); setPhase('form'); };
 
-  if (phase === 'done' && result) {
+  if (phase === 'done' && result && acte) {
     const n = result.created.length;
     return (
       <div className="screen">
-        <TopBar title="Ajouter une intervention" back="/interventions" />
+        <TopBar title="Ajouter une intervention" back="/activites" />
         <SaveResult
           result={result}
           title={n === 1 ? `Intervention ${acte.label} enregistrée` : `${n} ${acte.label} enregistrées`}
           actions={<>
             <button type="button" className="btn btn--primary" onClick={reset}><Icon name="plus" size={18} stroke={2.6} />Ajouter une autre intervention</button>
             <button type="button" className="btn btn--secondary"
-              onClick={() => nav('/interventions', { state: { createdIds: result.created.map((c) => c.id), message: `${n} intervention${n > 1 ? 's' : ''} ${acte.label} enregistrée${n > 1 ? 's' : ''}` } })}>
+              onClick={() => nav('/activites', { state: { createdIds: result.created.map((c) => c.id), message: `${n} intervention${n > 1 ? 's' : ''} ${acte.label} enregistrée${n > 1 ? 's' : ''}` } })}>
               Voir les interventions
             </button>
           </>}
@@ -91,24 +95,34 @@ export default function AddInterventionPage() {
       <div className="screen-body">
         <nav className="segmented" aria-label="Mode d'encodage">
           <span aria-current="page">Une intervention</span>
-          <Link to="/interventions/journee">Journée opératoire</Link>
+          <Link to="/interventions/journee" replace>Journée opératoire</Link>
         </nav>
 
         <div className="split">
         <section className="split-main stack">
-          <h2 className="section-title"><Icon name="starFilled" size={18} />Favoris récents</h2>
-          <div className="acte-grid">
-          {list.map((a) => (
-            <button key={a.id} type="button" className="acte pressable" aria-pressed={a.id === acteId} onClick={() => setActeId(a.id)}>
-              <ActeIcon acte={a} size={18} />
-              <span className="grow">{a.label}</span>
-              {a.id === acteId && <span className="acte-check"><Icon name="check" size={14} stroke={3} /></span>}
-            </button>
-          ))}
-          </div>
-          <button type="button" className="btn btn--ghost" onClick={() => setShowAll((v) => !v)}>
-            {showAll ? 'Afficher seulement les favoris' : 'Tous les actes'}
-          </button>
+          <h2 className="section-title"><Icon name="starFilled" size={18} />Mes favoris</h2>
+          {!favorites ? <Skeleton h={160} r={14} /> : (
+            <div className="acte-grid">
+              {pickedOutsideFavorites && (
+                <button type="button" className="acte pressable" aria-pressed="true">
+                  <ActeIcon acte={acte.acte} size={18} />
+                  <span className="grow">{acte.label}</span>
+                  <span className="acte-check"><Icon name="check" size={14} stroke={3} /></span>
+                </button>
+              )}
+              {list.map((f) => {
+                const on = acte?.acte.id === f.acte.id;
+                return (
+                  <button key={f.id} type="button" className="acte pressable" aria-pressed={on} onClick={() => setActe({ acte: f.acte, label: f.shortcut })}>
+                    <ActeIcon acte={f.acte} size={18} />
+                    <span className="grow">{f.shortcut}</span>
+                    {on && <span className="acte-check"><Icon name="check" size={14} stroke={3} /></span>}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+          <Link to="/nomenclature" className="btn btn--ghost"><Icon name="search" size={18} />Chercher dans la nomenclature INAMI</Link>
         </section>
 
         <div className="split-side split-side--sticky">
@@ -116,9 +130,9 @@ export default function AddInterventionPage() {
           <div className="row" style={{ justifyContent: 'space-between' }}>
             <span className="stack" style={{ gap: 2 }}>
               <span className="eyebrow">Quantité</span>
-              <span style={{ fontSize: 17, fontWeight: 700 }}>{acte.label}</span>
+              <span style={{ fontSize: 17, fontWeight: 700 }}>{acte?.label ?? '—'}</span>
             </span>
-            <CountStepper value={qty} onChange={setQty} label={`Quantité de ${acte.label}`} />
+            <CountStepper value={qty} onChange={setQty} label={`Quantité de ${acte?.label ?? 'interventions'}`} />
           </div>
           <span className="muted" style={{ fontSize: 13 }}>
             {qty === 1 ? 'Réalisée plusieurs fois aujourd’hui ? Appuyez sur +.' : `${qty} interventions distinctes seront créées, avec les mêmes détails.`}
@@ -142,12 +156,12 @@ export default function AddInterventionPage() {
               <div key={i} className="card card--outline" style={{ padding: 12, gap: 8 }}>
                 <span className="row" style={{ gap: 8, fontWeight: 700 }}>
                   <span className="icon-chip" style={{ width: 24, height: 24, borderRadius: 8, background: 'var(--mc-ink)', color: '#fff', fontSize: 12 }}>{i + 1}</span>
-                  {acte.label} {i + 1}
+                  {acte?.label} {i + 1}
                 </span>
                 <RolePills value={r} onChange={(v) => setRoles((rs) => rs.map((x, j) => (j === i ? v : x)))} small />
               </div>
             ))}
-            <span className="muted small">Date, chirurgien, année et nomenclature restent communs.</span>
+            <span className="muted small">Date, superviseur et année restent communs.</span>
           </section>
         )}
 
@@ -159,7 +173,8 @@ export default function AddInterventionPage() {
               <RolePills value={role} onChange={setRole} />
             </div>
           )}
-          <CommonFieldsForm value={common} onChange={setCommon} />
+          <CommonFieldsForm value={common} onChange={setCommon} supervisorLabel={supervisorLabel}
+            supervisorHint={custom && needsSupervisor ? 'Enregistré comme « aidé par » (1re main aidée) ou comme 1re main (quand vous êtes 2e main).' : undefined} />
         </section>
         </div>
         </div>
@@ -168,8 +183,11 @@ export default function AddInterventionPage() {
       </div>
 
       <div className="bottom-action">
-        <button type="button" className="btn btn--primary pressable" onClick={save} disabled={phase === 'saving'} aria-busy={phase === 'saving'}>
-          {phase === 'saving' ? <><span className="spinner" />Enregistrement…</> : <>{saveLabel}<Icon name="arrowR" size={18} stroke={2.4} /></>}
+        <button type="button" className="btn btn--primary pressable" onClick={save}
+          disabled={phase === 'saving' || !acte || !common.yearId || missingSupervisor} aria-busy={phase === 'saving'}>
+          {phase === 'saving' ? <><span className="spinner" />Enregistrement…</>
+            : missingSupervisor ? `Choisissez « ${supervisorLabel} »`
+            : <>{saveLabel}<Icon name="arrowR" size={18} stroke={2.4} /></>}
         </button>
         <span className="row muted small" style={{ justifyContent: 'center', gap: 6 }}><Icon name="bolt" size={14} />Encodage en quelques secondes</span>
       </div>
@@ -182,7 +200,7 @@ export function RolePills({ value, onChange, small = false }: { value: Role; onC
     <div className="pill-group" role="group" aria-label="Rôle">
       {ROLES.map((r) => (
         <button key={r} type="button" className="pill" aria-pressed={r === value} style={small ? { height: 40, fontSize: 13 } : undefined}
-          onClick={() => onChange(r)}>{ROLE_LABEL[r]}</button>
+          onClick={() => onChange(r)}>{ROLE_SHORT[r]}</button>
       ))}
     </div>
   );

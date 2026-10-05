@@ -52,7 +52,7 @@
   .topbar { width: 100%; max-width: 1240px; margin: 0 auto; padding: 22px 32px 8px; }
   .topbar-title { font-size: 22px; }
   .screen-body { width: 100%; max-width: 1240px; margin: 0 auto; padding: 16px 32px 40px; gap: 20px; }
-  .screen-body--tabbed { padding-bottom: 40px; }
+  .screen-body--tabbed, .screen-body--fab { padding-bottom: 40px; }
   .tabs { width: calc(100% - 64px); max-width: 1176px; margin: 0 auto; }
   .h1 { font-size: 34px; }
   .narrow { max-width: 760px; margin-inline: auto; }

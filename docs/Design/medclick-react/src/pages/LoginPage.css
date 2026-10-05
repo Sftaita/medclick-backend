@@ -10,6 +10,16 @@
 .login-sponsor { margin-top: 22px; width: 296px; display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 18px 16px 20px; border-radius: 20px; background: rgba(255, 255, 255, 0.96); box-shadow: 0 14px 34px rgba(16, 44, 122, 0.1); z-index: 2; }
 .login-bottom { position: absolute; left: 22px; right: 22px; bottom: max(34px, env(safe-area-inset-bottom)); display: flex; flex-direction: column; align-items: center; gap: 22px; }
 .login-cta { min-height: 58px; border-radius: 18px; font-size: 17px; background: var(--mc-gradient-h); }
-.login-motto { font-size: 11px; font-weight: 600; letter-spacing: 2.6px; color: #2F4F94; text-align: center; line-height: 1.7; }
+.login-motto { font-size: 13px; font-weight: 600; letter-spacing: 0.2px; color: #2F4F94; text-align: center; line-height: 1.5; }
 .login-sheet-backdrop { position: absolute; inset: 0; background: rgba(11, 31, 77, 0.35); display: flex; align-items: flex-end; z-index: 40; }
 .login-sheet { width: 100%; background: #fff; border-radius: 24px 24px 0 0; padding: 22px 20px max(24px, env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 14px; }
+
+/* Écrans de compte (inscription, mot de passe) : même fond que la connexion */
+.account { min-height: 100dvh; }
+.account .screen-body { position: relative; }
+.account-hero { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 18px; padding-top: 72px; }
+@media (min-width: 768px) {
+  .account { display: block; }
+  .account .topbar, .account .screen-body, .account .bottom-action { max-width: 480px; margin-inline: auto; }
+  .account .bottom-action { flex-direction: column; }
+}

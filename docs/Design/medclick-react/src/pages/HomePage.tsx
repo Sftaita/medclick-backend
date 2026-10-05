@@ -3,10 +3,11 @@ import { Link } from 'react-router-dom';
 import { api } from '@/api';
 import { useAsync } from '@/hooks/useAsync';
 import { Icon } from '@/components/Icon';
-import { DecoCross, DeltaBadge, ErrorState, Logo, PartnerMark, Skeleton, Wordmark } from '@/components/ui';
+import { DecoCross, DeltaBadge, ErrorState, Logo, Skeleton, SponsorMark, Wordmark } from '@/components/ui';
 import { AchievementReveal, AnimatedNumber, AnimatedProgressRing, Reveal, StaggeredList } from '@/motion';
 import { DELAY, DURATION } from '@/motion/tokens';
-import { yearLabel } from '@/lib/format';
+import { YEAR_LABEL } from '@/data/referentiel';
+import { usePartner } from '@/hooks/usePartner';
 import type { Milestone } from '@/types';
 
 /* Séquence d'accueil (§37.24) :
@@ -16,6 +17,7 @@ const T = { card: 0, int: 60, fh: 120, ring: 140, week: 450, streak: 900, partne
 
 export default function HomePage() {
   const { data, error, reload } = useAsync(() => api.getDashboard(), []);
+  const { partner } = usePartner();
   const [celebrate, setCelebrate] = useState<Milestone | null>(null);
   const [flame, setFlame] = useState(false);
 
@@ -44,7 +46,7 @@ export default function HomePage() {
   return (
     <div className="screen" style={{ position: 'relative' }}>
       <DecoCross size={150} style={{ right: -36, top: 70, opacity: 0.18 }} />
-      <div className="screen-body screen-body--tabbed" style={{ gap: 14, paddingTop: 12 }}>
+      <div className="screen-body screen-body--tabbed screen-body--fab" style={{ gap: 14, paddingTop: 12 }}>
         <header className="row" style={{ gap: 8 }}>
           <span className="only-mobile" style={{ display: 'flex' }}><Logo size={28} /></span>
           <span className="grow"><span className="only-mobile"><Wordmark /></span></span>
@@ -71,7 +73,7 @@ export default function HomePage() {
           <Reveal className="card" delay={T.card}>
             <span className="section-title" style={{ fontSize: 14 }}>
               <span style={{ color: 'var(--mc-primary)', display: 'flex' }}><Icon name="chart" size={18} stroke={2.6} /></span>
-              Mon année ({yearLabel(data.user.trainingYear)})
+              Mon année{data.user.currentYear ? ` (${YEAR_LABEL(data.user.currentYear.yearOfFormation)} · ${data.user.currentYear.hospital})` : ''}
             </span>
             <div className="kpi-grid">
               <Kpi icon="pen" tone="blue" label="interventions cette année">
@@ -84,7 +86,7 @@ export default function HomePage() {
               </Kpi>
               <Reveal fadeOnly delay={200} className="kpi">
                 <div className="row">
-                  <span className="icon-chip tone-green" style={{ width: 40, height: 40 }}><Icon name="layers" size={20} /></span>
+                  <span className="icon-chip tone-purple" style={{ width: 40, height: 40 }}><Icon name="stetho" size={20} /></span>
                   <span className="stack" style={{ gap: 0 }}><span className="kpi-value">{y.consultations}</span><span className="kpi-label">consultations</span></span>
                 </div>
                 <DeltaBadge value={y.deltas.consultations} delay={400} style={{ marginLeft: 50 }} />
@@ -126,21 +128,21 @@ export default function HomePage() {
               <StaggeredList start={T.week} step={60}>
                 <WeekTile tone="blue" icon="pen" value={data.week.interventions} label="interventions encodées" />
                 <WeekTile tone="green" icon="hand" value={data.week.firstHand} label="première main" />
-                <WeekTile tone="red" icon="calendar" value={data.week.incompleteDays} label="jours non complétés" />
+                <WeekTile tone="red" icon="calendar" value={data.week.incompleteDays} label={data.week.incompleteDays > 1 ? 'jours sans activité' : 'jour sans activité'} />
               </StaggeredList>
             </div>
             <Link to="/semaine" className="btn btn--primary pressable">Compléter ma semaine <Icon name="arrowR" size={18} stroke={2.4} /></Link>
           </Reveal>
         )}
 
-        {data && (
-          // §37.20 — sponsor : simple fondu, jamais répété.
+        {data && partner && (
+          // §37.20 — sponsor : simple fondu, jamais répété. Sans partenaire, la carte disparaît.
           <Reveal fadeOnly delay={T.partner}>
             <Link to="/partenaires" className="partner-card pressable">
               <span className="stack grow" style={{ gap: 4, padding: '12px 14px' }}>
                 <span className="small muted" style={{ fontWeight: 600 }}>Partenaire du mois</span>
-                <span style={{ fontSize: 20 }}><PartnerMark name={data.partner.name} /></span>
-                <span className="small muted">Ensemble pour former les chirurgiens de demain</span>
+                <SponsorMark logoSize={22} textSize={20} />
+                <span className="small muted">{partner.tagline}</span>
               </span>
               <span className="partner-visual" />
             </Link>
@@ -149,6 +151,8 @@ export default function HomePage() {
         </div>
         </div>
       </div>
+
+      <Link to="/ajouter" className="fab fab--float" aria-label="Encoder une activité"><Icon name="plus" size={26} stroke={2.6} /></Link>
 
       {celebrate && (
         <AchievementReveal

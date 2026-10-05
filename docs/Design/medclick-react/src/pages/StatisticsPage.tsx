@@ -37,13 +37,13 @@ export default function StatisticsPage() {
             <figure className="card card--outline" style={{ margin: 0 }}>
               <figcaption style={{ fontSize: 14, fontWeight: 700 }}>Répartition par spécialité</figcaption>
               <div className="row" style={{ gap: 20 }}>
-                <Donut parts={s.byRegion.map((r) => r.percent)} total={s.year.interventions}
-                  label={s.byRegion.map((r) => `${r.region} ${r.percent} %`).join(', ')} />
+                <Donut parts={s.bySpeciality.map((r) => r.percent)} total={s.year.interventions}
+                  label={s.bySpeciality.map((r) => `${r.label} ${r.percent} %`).join(', ')} />
                 <Reveal fadeOnly delay={1100} className="grow stack" style={{ gap: 8 }}>
-                  {s.byRegion.map((r, i) => (
-                    <span key={r.region} className="row" style={{ fontSize: 13, gap: 8 }}>
+                  {s.bySpeciality.map((r, i) => (
+                    <span key={r.label} className="row" style={{ fontSize: 13, gap: 8 }}>
                       <span className="dot" style={{ width: 10, height: 10, background: DONUT_COLORS[i] }} />
-                      <span className="grow">{r.region}</span><strong>{r.percent} %</strong>
+                      <span className="grow">{r.label}</span><strong>{r.percent} %</strong>
                     </span>
                   ))}
                 </Reveal>

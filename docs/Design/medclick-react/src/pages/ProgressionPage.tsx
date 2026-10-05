@@ -1,4 +1,4 @@
-import { NavLink } from 'react-router-dom';
+import { Link, NavLink } from 'react-router-dom';
 import { api } from '@/api';
 import { useAsync } from '@/hooks/useAsync';
 import { Icon } from '@/components/Icon';
@@ -17,16 +17,17 @@ export function ProgressionTabs() {
 }
 
 // Objectifs du carnet : à charger depuis le backend (référentiel de formation) en production.
-const TARGETS = { interventions: 160, firstHand: 80, consultations: 40, guards: 30 };
+const TARGETS = { interventions: 160, firstHand: 80, consultations: 40, guards: 30, formations: 6 };
 
 export default function ProgressionPage() {
   const { data, error, reload } = useAsync(() => api.getDashboard(), []);
   const y = data?.year;
   const rows = y ? [
-    { label: 'Interventions', v: y.interventions, t: TARGETS.interventions, icon: 'joint' as const, tone: 'blue', bar: 'var(--mc-primary)' },
+    { label: 'Interventions', v: y.interventions, t: TARGETS.interventions, icon: 'knee' as const, tone: 'blue', bar: 'var(--mc-primary)' },
     { label: 'Première main', v: y.firstHand, t: TARGETS.firstHand, icon: 'hand' as const, tone: 'green', bar: '#14A37F' },
     { label: 'Consultations', v: y.consultations, t: TARGETS.consultations, icon: 'stetho' as const, tone: 'purple', bar: 'var(--mc-purple)' },
     { label: 'Gardes', v: y.guards, t: TARGETS.guards, icon: 'moon' as const, tone: 'orange', bar: '#F0A12B' },
+    { label: 'Formations', v: y.formations, t: TARGETS.formations, icon: 'cap' as const, tone: 'blue', bar: 'var(--mc-primary)' },
   ] : [];
 
   return (
@@ -69,6 +70,14 @@ export default function ProgressionPage() {
                   </div>
                 ))}
               </StaggeredList>
+              <div className="card card--tint row" style={{ flexDirection: 'row', gap: 12 }}>
+                <span className="icon-chip icon-chip--sq" style={{ width: 44, height: 44, background: '#fff' }}><Icon name="doc" size={22} /></span>
+                <span className="grow stack" style={{ gap: 2 }}>
+                  <strong style={{ fontSize: 14 }}>Carnet de stage officiel</strong>
+                  <span className="muted small">Excel · interventions, consultations, gardes et formations</span>
+                </span>
+                <Link to="/annees" className="btn btn--primary btn--sm">Exporter</Link>
+              </div>
             </section>
           </div>
         )}

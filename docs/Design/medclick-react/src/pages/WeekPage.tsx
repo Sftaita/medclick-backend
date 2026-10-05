@@ -28,7 +28,7 @@ export default function WeekPage() {
 
   const ringFrom = justCompleted ? previous! : 0;
   const ringDone = DURATION.ring + 300;
-  const incomplete = w?.days.find((d) => d.status === 'incomplete');
+  const incomplete = w?.days.find((d) => d.status === 'empty');
 
   return (
     <div className="screen">
@@ -88,13 +88,13 @@ export default function WeekPage() {
               <StaggeredList start={500} step={70}>
                 {w.days.map((d) => (
                   <Link key={d.date} to={`/jour/${d.date}`} className="list-row pressable" style={{ minHeight: 56 }}>
-                    <span className="icon-chip" style={{ width: 26, height: 26, color: '#fff', background: d.status === 'incomplete' ? 'var(--mc-danger)' : 'var(--mc-success)', fontWeight: 800 }}>
-                      {d.status === 'incomplete' ? '!' : <Icon name="check" size={15} stroke={3} />}
+                    <span className="icon-chip" style={{ width: 26, height: 26, color: '#fff', fontWeight: 800,
+                      background: d.status === 'empty' ? 'var(--mc-danger)' : d.status === 'future' ? 'var(--mc-border)' : 'var(--mc-success)' }}>
+                      {d.status === 'empty' ? '!' : d.status === 'future' ? '' : <Icon name="check" size={15} stroke={3} />}
                     </span>
                     <span className="grow stack" style={{ gap: 2 }}>
                       <span style={{ fontSize: 14, fontWeight: 700 }}>{d.label}</span>
-                      <span className="list-row-sub">{d.summary}</span>
-                      {d.missing && <span className="small" style={{ fontWeight: 600, color: 'var(--mc-danger)' }}>{d.missing}</span>}
+                      <span className={d.status === 'empty' ? 'small' : 'list-row-sub'} style={d.status === 'empty' ? { fontWeight: 600, color: 'var(--mc-danger)' } : undefined}>{d.summary}</span>
                     </span>
                     <Icon name="chevR" size={18} />
                   </Link>
@@ -105,7 +105,7 @@ export default function WeekPage() {
             {/* 3. Problème restant, puis 4. action */}
             {incomplete && (
               <Reveal delay={1400} className="banner banner--danger">
-                <span className="row" style={{ fontWeight: 700, fontSize: 14 }}><Icon name="alert" size={18} />{incomplete.label} : {incomplete.missing?.toLowerCase()}</span>
+                <span className="row" style={{ fontWeight: 700, fontSize: 14 }}><Icon name="alert" size={18} />{incomplete.label} : aucune activité encodée</span>
                 <Reveal delay={1600}>
                   <Link to={`/jour/${incomplete.date}`} className="btn btn--primary btn--block">Compléter maintenant</Link>
                 </Reveal>

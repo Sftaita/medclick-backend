@@ -1,14 +1,16 @@
 import { useState } from 'react';
-import { api } from '@/api';
-import { useAsync } from '@/hooks/useAsync';
+import { Navigate } from 'react-router-dom';
+import { usePartner } from '@/hooks/usePartner';
 import { Icon } from '@/components/Icon';
-import { PartnerMark, Skeleton, TopBar } from '@/components/ui';
+import { Skeleton, SponsorMark, TopBar } from '@/components/ui';
 import { Reveal } from '@/motion';
 
 // §37.20 — page sponsor : apparitions par simple fondu, aucune animation répétée, pas de vidéo automatique.
+// Sans partenaire (ou hors période), la page n'existe pas : retour à l'accueil.
 export default function PartnersPage() {
-  const { data: p } = useAsync(() => api.getPartner(), []);
+  const { partner: p } = usePartner();
   const [tab, setTab] = useState<'about' | 'resources'>('about');
+  if (p === null) return <Navigate to="/" replace />;
   return (
     <div className="screen">
       <TopBar title="Nos partenaires" center />
@@ -17,7 +19,7 @@ export default function PartnersPage() {
           <>
             <Reveal fadeOnly className="row" style={{ minHeight: 170, background: '#EEF4FB', alignItems: 'stretch', gap: 0 }}>
               <span className="grow stack" style={{ justifyContent: 'center', padding: 20, gap: 8 }}>
-                <span style={{ fontSize: 28 }}><PartnerMark size={32} name={p.name} /></span>
+                <SponsorMark logoSize={32} textSize={28} />
                 <span style={{ fontSize: 14, color: 'var(--mc-ink-2)' }}>{p.tagline}</span>
               </span>
               <span style={{ width: 140, background: '#DCE7F6' }} aria-hidden="true" />
@@ -29,7 +31,7 @@ export default function PartnersPage() {
             <div className="stack" style={{ padding: '18px 16px 24px', gap: 14 }}>
               {tab === 'about' ? (
                 <>
-                  <h2 className="h2">À propos d'{p.name}</h2>
+                  <h2 className="h2">À propos de notre partenaire</h2>
                   <p style={{ fontSize: 14, lineHeight: 1.5, color: 'var(--mc-ink-2)' }}>{p.about}</p>
                   <ul className="list" style={{ margin: 0, padding: 0, listStyle: 'none' }}>
                     {p.points.map((pt) => (
@@ -39,8 +41,8 @@ export default function PartnersPage() {
                     ))}
                   </ul>
                 </>
-              ) : <p className="muted">[Ressources du partenaire — à alimenter depuis le backend]</p>}
-              <a href={p.url} target="_blank" rel="noreferrer noopener" className="btn btn--primary">Découvrir {p.name}<Icon name="external" size={18} stroke={2.4} /></a>
+              ) : <p className="muted">[Ressources du partenaire — à alimenter depuis l'administration]</p>}
+              <a href={p.url} target="_blank" rel="noreferrer noopener" className="btn btn--primary">Visiter le site du partenaire<Icon name="external" size={18} stroke={2.4} /></a>
             </div>
           </>
         )}

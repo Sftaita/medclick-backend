@@ -41,9 +41,10 @@
   --mc-gold-ink: #A35F00;
   --mc-purple: #7C5CE0;
   --mc-purple-soft: #F3EFFD;
-  --mc-role-first: #0F8A5A;
-  --mc-role-assist: #7C5CE0;
-  --mc-role-observe: #8A97AB;
+  /* Rôles (Surgeries.position) : 1 = 1re main solo, 3 = 1re main aidée, 2 = 2e main */
+  --mc-role-solo: #0F8A5A;
+  --mc-role-assisted: #2F5BEA;
+  --mc-role-second: #7C5CE0;
 
   /* Formes */
   --mc-radius-sm: 10px;
