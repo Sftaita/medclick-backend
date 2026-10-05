@@ -1,0 +1,35 @@
+# Test de transition CRA → Vite (préproduction uniquement).
+# Sert, sur staging.medclick.be, une copie exacte de l'ancien front CRA de production (miroir dans
+# ../../cra-prod, service-worker.js identique à l'octet près, URL d'API réécrite vers le staging).
+# Même routeur Traefik que le frontend Vite : un seul des deux doit tourner à la fois.
+#   docker compose -p medclick-staging stop frontend
+#   docker compose -f docker-compose.cra.yml -p medclick-staging-cra up -d     # ancien front
+#   ... ouvrir le site, laisser le service worker CRA s'installer ...
+#   docker compose -f docker-compose.cra.yml -p medclick-staging-cra down
+#   docker compose -p medclick-staging up -d frontend                           # « nouveau serveur »
+name: medclick-staging-cra
+
+services:
+  cra:
+    image: nginx:1.29-alpine
+    container_name: medclick-staging-cra
+    volumes:
+      - ./cra-prod:/usr/share/nginx/html:ro
+      - ./src/backend/deploy/vps/cra-transition/cra-nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    networks:
+      - proxy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=proxy"
+      - "traefik.http.routers.medclick-staging-web.rule=Host(`staging.medclick.be`)"
+      - "traefik.http.routers.medclick-staging-web.priority=10"
+      - "traefik.http.routers.medclick-staging-web.entrypoints=websecure"
+      - "traefik.http.routers.medclick-staging-web.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.medclick-staging-web.middlewares=medclick-staging-allow@file,secure-headers@file,compress@file"
+      - "traefik.http.routers.medclick-staging-web.service=medclick-staging-cra"
+      - "traefik.http.services.medclick-staging-cra.loadbalancer.server.port=80"
+
+networks:
+  proxy:
+    name: proxy
+    external: true
