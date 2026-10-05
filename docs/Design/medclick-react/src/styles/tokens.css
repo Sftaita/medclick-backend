@@ -1,0 +1,59 @@
+/* Identité visuelle MedClick — à modifier ici uniquement. */
+:root {
+  --mc-font: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  /* Couleurs de marque */
+  --mc-primary: #2F5BEA;
+  --mc-primary-strong: #2447C8;
+  --mc-primary-soft: #E6EDFF;
+  --mc-primary-tint: #F4F8FF;
+  --mc-gradient: linear-gradient(135deg, #4A7BF7 0%, #2F55E4 100%);
+  --mc-gradient-h: linear-gradient(90deg, #4C7DF8 0%, #2F55E4 100%);
+  --mc-teal: #5FD6C8;
+  --mc-wordmark-a: #2F55E4;
+  --mc-wordmark-b: #102C7A;
+
+  /* Texte */
+  --mc-ink: #0B1F4D;
+  --mc-ink-2: #33435F;
+  --mc-muted: #3E4E73;
+  --mc-faint: #8A97AB;
+
+  /* Surfaces */
+  --mc-bg: #F7F9FD;
+  --mc-bg-grad: linear-gradient(180deg, #F4F8FF 0%, #F8FAFE 40%, #FFFFFF 100%);
+  --mc-surface: #FFFFFF;
+  --mc-border: #E3EAF3;
+  --mc-border-soft: #EDF1F8;
+  --mc-field: #F2F5FA;
+
+  /* Statuts / rôles */
+  --mc-success: #0F8A5A;
+  --mc-success-ink: #11704A;
+  --mc-success-soft: #E2F5EB;
+  --mc-ring: #1D7A4C;
+  --mc-ring-track: #E6ECF5;
+  --mc-danger: #C93030;
+  --mc-danger-ink: #A62626;
+  --mc-danger-soft: #FCEDEE;
+  --mc-warn: #E8890C;
+  --mc-warn-soft: #FFF4DF;
+  --mc-gold-ink: #A35F00;
+  --mc-purple: #7C5CE0;
+  --mc-purple-soft: #F3EFFD;
+  --mc-role-first: #0F8A5A;
+  --mc-role-assist: #7C5CE0;
+  --mc-role-observe: #8A97AB;
+
+  /* Formes */
+  --mc-radius-sm: 10px;
+  --mc-radius: 14px;
+  --mc-radius-lg: 18px;
+  --mc-radius-xl: 22px;
+  --mc-shadow: 0 8px 24px rgba(30, 58, 158, 0.08);
+  --mc-shadow-btn: 0 8px 20px rgba(47, 85, 228, 0.28);
+  --mc-shadow-pop: 0 16px 36px rgba(11, 31, 77, 0.18);
+
+  --mc-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --mc-tap: 44px;
+}

@@ -1,0 +1,52 @@
+/* Animations MedClick (§37). Uniquement opacity / transform / stroke : pas de recalcul de layout. */
+
+.mc-enter { animation: mc-enter 260ms var(--mc-ease) both; }
+.mc-fade { animation: mc-fade 300ms ease-out both; }
+.mc-enter-up { animation: mc-enter-up 320ms var(--mc-ease) both; }
+.mc-pop { animation: mc-pop 240ms var(--mc-ease) both; }
+.mc-draw { stroke-dasharray: 22; stroke-dashoffset: 22; animation: mc-draw 260ms ease-out 120ms forwards; }
+.mc-pulse { animation: mc-pulse 320ms ease-in-out; }
+.mc-wiggle { animation: mc-wiggle 800ms ease-out 100ms; }
+.mc-flame { animation: mc-flame 500ms ease-out; }
+.mc-bump-up { animation: mc-bump-up 160ms ease-out; }
+.mc-bump-down { animation: mc-bump-down 160ms ease-out; }
+.mc-star-pop { display: inline-flex; animation: mc-star 260ms var(--mc-ease); }
+
+@keyframes mc-enter { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@keyframes mc-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes mc-enter-up { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: none; } }
+@keyframes mc-pop { from { transform: scale(0.6); } to { transform: scale(1); } }
+@keyframes mc-draw { to { stroke-dashoffset: 0; } }
+@keyframes mc-pulse { 50% { transform: scale(1.07); } }
+@keyframes mc-wiggle { 0%, 100% { transform: rotate(0); } 20% { transform: rotate(-12deg) scale(1.06); } 45% { transform: rotate(9deg); } 70% { transform: rotate(-4deg); } }
+@keyframes mc-flame { 0%, 100% { transform: rotate(0) scale(1); } 30% { transform: rotate(-9deg) scale(1.18); } 60% { transform: rotate(6deg) scale(1.1); } }
+@keyframes mc-bump-up { 50% { transform: translateY(-6px); } }
+@keyframes mc-bump-down { 50% { transform: translateY(6px); } }
+@keyframes mc-star { 0% { transform: scale(0.8) rotate(0); } 40% { transform: scale(1.1) rotate(12deg); } 100% { transform: scale(1) rotate(0); } }
+@keyframes mc-particle {
+  0% { opacity: 1; transform: translate(0, 0) rotate(0); }
+  55% { opacity: 1; }
+  100% { opacity: 0; transform: translate(var(--dx), var(--dy)) rotate(140deg); }
+}
+@keyframes mc-spin { to { transform: rotate(360deg); } }
+@keyframes mc-shimmer { to { transform: translateX(100%); } }
+
+/* Transitions de page (§37.16) */
+.page { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+.page--forward { animation: mc-page-fwd 240ms var(--mc-ease) both; }
+.page--back { animation: mc-page-back 240ms var(--mc-ease) both; }
+.page--fade { animation: mc-fade 200ms ease-out both; }
+@keyframes mc-page-fwd { from { opacity: 0; transform: translateX(14px); } to { opacity: 1; transform: none; } }
+@keyframes mc-page-back { from { opacity: 0; transform: translateX(-14px); } to { opacity: 1; transform: none; } }
+
+/* §37.28 — mouvement réduit : état final immédiat, aucune translation, aucun confetti. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 1ms !important;
+    animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+  }
+  .particle, .skeleton::after { display: none; }
+  .mc-draw { stroke-dashoffset: 0; }
+}

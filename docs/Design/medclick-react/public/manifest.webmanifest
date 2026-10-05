@@ -1,0 +1,10 @@
+{
+  "name": "MedClick — Carnet de stage",
+  "short_name": "MedClick",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F4F8FF",
+  "theme_color": "#2F55E4",
+  "lang": "fr",
+  "icons": [{ "src": "/images/logo.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
+}

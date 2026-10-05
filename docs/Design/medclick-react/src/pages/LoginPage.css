@@ -1,0 +1,15 @@
+.login { background: linear-gradient(180deg, #F7F9FE 0%, #F1F5FD 50%, #F6F8FD 100%); min-height: 100dvh; }
+.login-halo { position: absolute; right: -150px; top: 300px; width: 330px; height: 330px; border-radius: 50%; background: radial-gradient(circle at 30% 40%, rgba(120, 224, 214, 0.55) 0%, rgba(150, 210, 240, 0.25) 55%, transparent 72%); }
+.login-photo { position: absolute; left: 0; right: 0; top: 420px; width: 100%; height: 272px; object-fit: cover; }
+.login-photo-fade { position: absolute; left: 0; right: 0; top: 412px; height: 80px; background: linear-gradient(180deg, #F2F6FD 0%, rgba(242, 246, 253, 0) 100%); }
+.login-wave { position: absolute; left: 0; width: 100%; top: 610px; height: 90px; }
+.login-top { position: relative; display: flex; flex-direction: column; align-items: center; padding-top: 64px; }
+.login-top > svg { margin-bottom: 10px; }
+.login-tagline { margin-top: 10px; font-size: 16px; font-weight: 500; color: #3E5582; text-align: center; line-height: 1.35; }
+.login-title { margin-top: 34px; font-size: 31px; font-weight: 800; letter-spacing: -0.7px; }
+.login-sponsor { margin-top: 22px; width: 296px; display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 18px 16px 20px; border-radius: 20px; background: rgba(255, 255, 255, 0.96); box-shadow: 0 14px 34px rgba(16, 44, 122, 0.1); z-index: 2; }
+.login-bottom { position: absolute; left: 22px; right: 22px; bottom: max(34px, env(safe-area-inset-bottom)); display: flex; flex-direction: column; align-items: center; gap: 22px; }
+.login-cta { min-height: 58px; border-radius: 18px; font-size: 17px; background: var(--mc-gradient-h); }
+.login-motto { font-size: 11px; font-weight: 600; letter-spacing: 2.6px; color: #2F4F94; text-align: center; line-height: 1.7; }
+.login-sheet-backdrop { position: absolute; inset: 0; background: rgba(11, 31, 77, 0.35); display: flex; align-items: flex-end; z-index: 40; }
+.login-sheet { width: 100%; background: #fff; border-radius: 24px 24px 0 0; padding: 22px 20px max(24px, env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 14px; }
