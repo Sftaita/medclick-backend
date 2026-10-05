@@ -3,6 +3,9 @@
 # Usage (dans /opt/stack/apps/medclick-staging) :
 #   ./deploy.sh <sha_backend> <sha_frontend>
 # Étapes : sources aux SHA demandés → build → up → clés JWT (une fois) → cache → migrations.
+# Le dépôt du frontend est privé : ses sources sont livrées dans src/pwa par
+#   git archive <sha> frontend | ssh <vps> "tar -x -C .../src/pwa" ; echo <sha> > src/pwa/.commit
+# (docs/DEPLOIEMENT-VPS.md), et le script vérifie que .commit correspond au SHA demandé.
 # S'arrête à la première erreur. Une migration en attente arrête le déploiement (décision humaine).
 set -euo pipefail
 cd "$(dirname "$0")"
@@ -10,7 +13,6 @@ cd "$(dirname "$0")"
 BACKEND_SHA=${1:?SHA backend requis}
 FRONTEND_SHA=${2:?SHA frontend requis}
 BACKEND_REPO=https://github.com/Sftaita/medclick-backend.git
-FRONTEND_REPO=https://github.com/Sftaita/pwa-medclick.git
 
 checkout() { # <dépôt> <dossier> <sha>
   [ -d "$2/.git" ] || git clone --quiet "$1" "$2"
@@ -25,7 +27,8 @@ checkout() { # <dépôt> <dossier> <sha>
 
 mkdir -p src
 checkout "$BACKEND_REPO" src/backend "$BACKEND_SHA"
-checkout "$FRONTEND_REPO" src/pwa "$FRONTEND_SHA"
+[ "$(cat src/pwa/.commit 2>/dev/null)" = "$FRONTEND_SHA" ] || { echo "src/pwa/.commit ne correspond pas à $FRONTEND_SHA"; exit 1; }
+echo "src/pwa @ $FRONTEND_SHA (archive)"
 cp src/backend/deploy/vps/docker-compose.staging.yml docker-compose.yml
 
 export BACKEND_TAG="${BACKEND_SHA:0:7}" FRONTEND_TAG="${FRONTEND_SHA:0:7}"

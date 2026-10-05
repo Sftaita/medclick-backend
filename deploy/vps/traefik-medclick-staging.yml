@@ -1,0 +1,10 @@
+# Middleware Traefik (fournisseur de fichiers) de la préproduction MedClick, à copier dans
+# /opt/stack/traefik/dynamic/medclick-staging.yml (rechargé à chaud, sans redémarrer Traefik).
+# Préproduction = copie de données réelles : accès restreint aux IP listées (HTTPS en plus).
+# Pas d'authentification HTTP Basic : elle utiliserait l'en-tête Authorization du jeton JWT.
+http:
+  middlewares:
+    medclick-staging-allow:
+      ipAllowList:
+        sourceRange:
+          - "203.0.113.10/32" # remplacer par les IP autorisées (poste de test)
