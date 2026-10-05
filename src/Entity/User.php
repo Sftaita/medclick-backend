@@ -423,7 +423,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         // Définir la date d'acceptation si elle n'est pas déjà définie
         if ($acceptedTerms && $this->termsAcceptedDate === null) {
-            $this->termsAcceptedDate = new \DateTimeImmutable();
+            $this->termsAcceptedDate = new \DateTime();
         }
 
         return $this;

@@ -56,7 +56,8 @@ class TermsConditionsController
 
         // Ajouter les informations d'acceptation des conditions
         $user->setAcceptedTerms(true);
-        $user->setTermsAcceptedDate(new \DateTimeImmutable());
+        // Colonne « datetime » (mutable) : DBAL 4 refuse un DateTimeImmutable.
+        $user->setTermsAcceptedDate(new \DateTime());
 
         // Sauvegarder les modifications
         $this->entityManager->persist($user);
