@@ -24,7 +24,8 @@ class FavoritesController extends AbstractController
         $this->doctrine = $doctrine;
     }
     
-    #[Route('/api/favorites/getMyList', name: 'GetFavoritesList', methods: ['GET'])]
+    // Priorité : sans elle, la route d'API Platform /api/favorites/{id} (chargée avant) l'intercepte.
+    #[Route('/api/favorites/getMyList', name: 'GetFavoritesList', methods: ['GET'], priority: 1)]
     public function addSurgery(Security $security, FavoritesRepository $favoritesRepository)
     {
         $user = $security->getUser();
@@ -116,7 +117,8 @@ class FavoritesController extends AbstractController
 
     }
 
-    #[Route('/api/favorites/updateNew', name: 'UpdateFavorites-NewVersion', methods: ['PUT'])]
+    // Priorité : sans elle, la route d'API Platform PUT /api/favorites/{id} l'intercepte.
+    #[Route('/api/favorites/updateNew', name: 'UpdateFavorites-NewVersion', methods: ['PUT'], priority: 1)]
     public function updateFavorite(Request $request,Security $security,FavoritesRepository $favoritesRepository, NomenclatureRepository $nomenclatureRepository)
     {
         $user = $security->getUser();
