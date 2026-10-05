@@ -1,112 +1,96 @@
 # Contrat backend
 
-Le front ne dépend que de l'interface `MedClickApi` (`src/api/types.ts`). L'implémentation HTTP est dans
-`src/api/http.ts`. Tous les payloads sont en JSON ; les dates métier sont au format `AAAA-MM-JJ`.
-Les rôles valent `FIRST_HAND` (1re main), `ASSISTANT` (assistance) ou `OBSERVER` (observation).
+Le front ne dépend que de l'interface `MedClickApi` (`src/api/types.ts`). Deux implémentations :
 
-## Endpoints
+- `src/api/mock.ts` : démo en mémoire (`VITE_USE_MOCK=true`), qui applique les mêmes règles que le serveur ;
+- `src/api/http.ts` : backend MedClick réel (`VITE_USE_MOCK=false`, `VITE_API_URL=/api`). Elle reprend les appels
+  du front actuel (`medclick-pwa`). Les routes qui n'existent pas encore renvoient une erreur 501 explicite.
 
-| Méthode | Route | Corps / réponse |
+Authentification : `POST /api/login_check` `{ username, password }` → `{ token }` (JWT), puis
+`Authorization: Bearer <token>` sur chaque appel. Les claims `firstname`, `lastname`, `email` et `acceptedTerms`
+viennent de `JwtCreatedSubscriber`.
+
+## Correspondance des modèles
+
+| Front (`src/types.ts`) | Backend | Remarque |
 |---|---|---|
-| POST | `/auth/login` | `{ email, password }` → `UserProfile` |
-| GET | `/me` | `UserProfile` |
-| GET | `/dashboard` | `Dashboard` |
-| GET | `/surgeries?region=&q=` | `Surgery[]` (plus récentes d'abord) |
-| GET | `/surgeries/{id}` | `Surgery` |
-| PATCH | `/surgeries/{id}` | champs partiels → `Surgery` |
-| DELETE | `/surgeries/{id}` | 204 |
-| **POST** | **`/surgeries/batch`** | `BatchRequest` → `BatchResponse` (voir plus bas) |
-| GET | `/me/favorite-actes` | `string[]` |
-| PUT / DELETE | `/me/favorite-actes/{acteId}` | 204 |
-| GET | `/weeks/current?offset=0` | `WeekSummary` (inclut `streak`) |
-| GET | `/days/{date}` | `DayDetail` |
-| GET | `/milestones` | `Milestone[]` |
-| POST | `/milestones/celebrated` | `{ ids: string[] }` → 204 |
-| POST | `/me/streak/ack` | `{ weeks }` → 204 |
-| GET | `/statistics` | `Statistics` |
-| GET | `/partners/current` | `Partner` |
+| `Role` `SOLO` / `ASSISTED` / `SECOND` | `Surgeries.position` 1 / 3 / 2 | |
+| `Surgery.supervisorId` | `firstHand` si 2e main, `secondHand` si 1re main aidée | id d'un `Surgeons`, stocké en chaîne |
+| `Surgery.acte` | `nomenclature` + `name`, `speciality`, `code` copiés | ADR-007 |
+| `Acte.orthoType` | `Nomenclature.type` 1 = électif, 2 = traumatologie | |
+| `Acte.region` | `Nomenclature.subType` (`knee`, `hip`, `shoulder`…) | l'icône en dépend |
+| `TrainingYear` | `Years` (`yearOfFormation` en chaîne côté backend) | |
+| `Surgeon.boss` | `Surgeons.boss` | un seul par année |
+| `Favorite` | `Favorites` (`shortcut`, `surgery`) | `getMyList` renvoie la clé `shorcut` (faute d'origine) |
+| `Consultation` | `Consultations` (`dayPart` morning/afternoon/night, `number` en chaîne) | `moment` n'est pas utilisé |
+| `Garde` | `Gardes` (`dateOfStart`, `dateOfEnd`, `number` = patients vus) | |
+| `Formation.local` | `Formations.location === 'local'` | sinon `location` = lieu libre |
 
-Un enregistrement simple est un lot d'une ligne avec une quantité de 1 : il n'y a qu'une seule route de création.
+## Routes existantes utilisées
 
-## POST `/surgeries/batch` — encodage multiple / journée opératoire
+| Méthode | Route | Appel front |
+|---|---|---|
+| POST | `/api/login_check` | `login` |
+| POST | `/api/users` | `register` (champs du groupe `user_write`) |
+| POST | `/api/forgottenPassword` | `forgotPassword` (`{ username }`, réponse identique que l'adresse existe ou non) |
+| POST | `/api/resetPassword` | `resetPassword` (`{ email, token, password }` ; 4xx → « lien expiré ») |
+| GET / PUT | `/api/terms-conditions`, `/api/acceptTerms` | `getTerms`, `acceptTerms` |
+| GET / PUT | `/api/marketing/active`, `/api/marketing/incrementCampaign/{id}` | `getCampaign`, `registerCampaignClick` |
+| GET | `/api/users` | profil (spécialité) |
+| GET / PUT | `/api/years`, `/api/years/{id}` ; POST `/api/years/create` | années |
+| GET | `/api/excel2/{year}` | `exportLogbook` (téléchargement `.xlsx`) |
+| GET | `/api/list/{year}` ; POST / PUT / DELETE `/api/surgeons` | chirurgiens |
+| GET | `/api/nomenclature/{speciality}` | `searchNomenclature` (filtres type, région et texte côté client) |
+| GET / POST / PUT / DELETE | `/api/favorites/getMyList`, `/addNew`, `/updateNew`, `/api/favorites/{id}` | favoris |
+| GET / PUT / DELETE | `/api/surgeries`, `/api/surgeries/{id}` | interventions (PUT = processeur qui resynchronise la nomenclature) |
+| GET / POST / PUT | `/api/consultations`, `/api/gardes`, `/api/formations` | listes et formulaires |
+
+## Routes à créer
+
+| Méthode | Route | Pour | Notes |
+|---|---|---|---|
+| **POST** | **`/api/surgeries/batch`** | quantité × N, journée opératoire | transaction unique, voir plus bas. Le front ne fait **pas** de boucle de POST non atomique. |
+| GET | `/api/partner/active` | logo et textes du sponsor | **public** (écran de connexion). 204 ou `null` s'il n'y a pas de partenaire ou hors période. |
+| GET / PUT / DELETE | `/api/admin/partner` (+ envoi du logo) | administration du partenaire | `ROLE_ADMIN`. Nom, logo, accroche, texte, URL, 4 engagements, début, fin facultative. |
+| GET | `/api/dashboard` | accueil | statistiques de l'année en cours, semaine, série, célébrations en attente |
+| GET | `/api/weeks/current?offset=` | Ma semaine | un jour est « complété » s'il porte au moins une activité |
+| GET | `/api/days/{date}` | vue du jour | interventions, consultations par `dayPart`, garde |
+| GET | `/api/statistics/me` | statistiques | mensuel + répartition par spécialité (électif / traumato séparés) |
+| GET / POST | `/api/milestones`, `/api/milestones/celebrated` | milestones | voir plus bas |
+| POST | `/api/me/streak/ack` | série de semaines | |
+| GET | `/api/nomenclature/item/{id}` | détail d'un acte | facultatif : les interventions et favoris portent déjà une copie de l'acte |
+
+Les objectifs du carnet (`completionTarget`, objectifs par activité dans Progression) n'ont pas de source :
+il faut un référentiel par année et par spécialité avant de les afficher en production.
+
+## POST `/api/surgeries/batch`
 
 ```json
 {
-  "common": { "date": "2026-10-04", "surgeon": "Dr De Muylder", "trainingYear": 3, "nomenclature": "K50 - Plastie LCA" },
+  "common": { "date": "2026-10-04", "yearId": "12", "supervisorId": "57" },
   "lines": [
-    { "acteId": "lca", "quantity": 3, "roles": ["FIRST_HAND", "FIRST_HAND", "ASSISTANT"] },
-    { "acteId": "arthro-genou", "quantity": 2, "roles": ["ASSISTANT", "ASSISTANT"] }
+    { "acteId": "3021", "quantity": 3, "roles": ["SOLO", "ASSISTED", "ASSISTED"] },
+    { "acteId": "4410", "quantity": 2, "roles": ["SECOND", "SECOND"] }
   ]
 }
 ```
 
 Règles :
-1. Ne **jamais** stocker une intervention avec `quantity = 3`. Le serveur crée **une ligne `Surgery` par
-   unité** (ici 5 enregistrements distincts), chacune modifiable et supprimable individuellement.
-2. **Atomique** : tout est validé, puis tout est écrit dans **une seule transaction**. En cas d'erreur,
-   rollback complet : on ne se retrouve jamais avec 1 ou 2 interventions sur 3.
-3. Validation : `1 ≤ quantity ≤ 20`, `roles.length === quantity`, acte connu, date non future.
-4. Réponse (calculée dans la même requête, après le commit) :
-
-```json
-{
-  "created": [ { "id": "…", "acteId": "lca", "date": "2026-10-04", "role": "FIRST_HAND", "…": "…" } ],
-  "before": { "interventions": 121, "firstHand": 44, "…": "…" },
-  "after":  { "interventions": 124, "firstHand": 47, "…": "…" },
-  "newlyAchieved": [ { "id": "fh-50", "title": "50 interventions en première main", "achievedAt": "…", "celebratedAt": null } ]
-}
-```
-
-`before` / `after` permettent l'animation 121 → 124. Le front ne lance l'animation de succès
-**qu'après** cette réponse.
-
-### Exemple Symfony / Doctrine (si le backend est en Symfony)
-
-```php
-#[Route('/api/surgeries/batch', methods: ['POST'])]
-public function batch(BatchRequest $req, EntityManagerInterface $em, StatsService $stats, MilestoneService $ms): JsonResponse
-{
-    $user = $this->getUser();
-    $before = $stats->year($user);
-    $created = $em->wrapInTransaction(function () use ($req, $em, $user) {
-        $out = [];
-        foreach ($req->lines as $line) {
-            $acte = $this->actes->find($line->acteId) ?? throw new BadRequestHttpException('Acte inconnu');
-            if ($line->quantity < 1 || $line->quantity > 20 || count($line->roles) !== $line->quantity) {
-                throw new BadRequestHttpException('Quantité ou rôles invalides');
-            }
-            foreach ($line->roles as $role) {
-                $s = (new Surgery())->setUser($user)->setActe($acte)->setRole($role)
-                    ->setDate($req->common->date)->setSurgeon($req->common->surgeon)
-                    ->setTrainingYear($req->common->trainingYear)->setNomenclature($req->common->nomenclature);
-                $em->persist($s);
-                $out[] = $s;
-            }
-        }
-        $em->flush();
-        return $out;
-    });
-    $newly = $ms->unlockNewlyReached($user); // pose achievedAt, laisse celebratedAt à null
-    return $this->json(['created' => $created, 'before' => $before, 'after' => $stats->year($user), 'newlyAchieved' => $newly]);
-}
-```
+1. Une ligne `Surgeries` **par unité** (ici 5), chacune modifiable et supprimable seule.
+2. **Atomique** : tout est validé, puis écrit dans une seule transaction (`wrapInTransaction`). En cas d'erreur, rien n'est créé.
+3. Validation : `1 ≤ quantity ≤ 20`, `roles.length === quantity`, nomenclature existante, date non future,
+   année appartenant à l'utilisateur (`OWNER`), superviseur obligatoire dès qu'un rôle n'est pas `SOLO`
+   et appartenant à cette année. `position`, `firstHand`, `secondHand`, `name`, `speciality`, `code`
+   sont calculés comme dans `NewSurgeriesAPIController`.
+4. Réponse : `{ created, before, after, newlyAchieved }`. Le front ne lance l'animation de succès qu'après cette réponse.
 
 ## Milestones — célébrer une seule fois (§37.6)
 
 Table `user_milestone` : `user_id`, `milestone_id`, `achieved_at`, `celebrated_at` (nullable).
-
-- Quand une écriture fait franchir un seuil : insérer avec `achieved_at = now()` et `celebrated_at = NULL`.
-- `GET /dashboard` → `pendingCelebrations` = milestones avec `achieved_at` renseigné et `celebrated_at` NULL.
-- Le front montre la célébration puis appelle `POST /milestones/celebrated` → `celebrated_at = now()`.
-- Ne jamais déduire « à célébrer » de `valeur >= seuil` : un badge déjà obtenu reste visible dans
-  Progression › Milestones sans rejouer l'animation.
-
-## Série de semaines (§37.13)
-
-`streak = { weeks, acknowledgedWeeks }`. Si `weeks > acknowledgedWeeks`, le front anime l'augmentation
-une fois puis appelle `POST /me/streak/ack`.
+Quand une écriture fait franchir un seuil : `achieved_at = now()`, `celebrated_at = NULL`. `GET /api/dashboard`
+renvoie `pendingCelebrations` ; le front montre la célébration puis appelle `POST /api/milestones/celebrated`.
+Ne jamais déduire « à célébrer » de `valeur >= seuil`.
 
 ## Évolutions (§37.15)
 
-`YearStats.deltas.*` vaut `null` quand la comparaison n'est pas calculable proprement (pas de période
-précédente, effectif trop faible…). Le front n'affiche alors aucun badge : aucune comparaison inventée.
+`YearStats.deltas.*` vaut `null` quand la comparaison n'est pas calculable proprement : le front n'affiche alors aucun badge.

@@ -108,3 +108,5 @@ Doc OpenAPI générée par API Platform : `GET /api` (ne couvre pas les contrôl
 - `docs/DECISIONS.md` — décisions d'architecture (ADR) existantes et proposées.
 - `docs/AUDIT.md` — audit et feuille de route pour une application professionnelle.
 - `docs/DEPLOIEMENT.md` — procédure de mise en production (Hostinger), à suivre à la lettre.
+- `docs/Design/medclick-react/` — maquette du nouveau front (React + TypeScript), alignée sur ce backend ;
+  `docs/API.md` y liste les routes encore à créer. `docs/Design/A-ALLEGER.md` — ce qui pourra être retiré.
