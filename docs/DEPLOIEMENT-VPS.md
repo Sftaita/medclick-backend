@@ -117,4 +117,22 @@ Restauration :
 - Servi sans cache HTTP (`no-cache, no-store`), comme `index.html` ; fichiers `assets/` immuables.
 - Un fichier `assets/` absent répond 404 (jamais `index.html` à la place d'un script).
 - Mise à jour du nouveau front : invite « Nouvelle version disponible » (jamais forcée).
-- Transition depuis l'ancien front CRA : voir le rapport du LOT 3 et `cra-transition/`.
+
+### Transition depuis l'ancien front CRA (mesurée au LOT 3)
+
+Test local reproductible : `cra-transition/transition-server.mjs` (une origine, `mode.txt` = `cra`
+ou `vite`, `delay.txt` = latence en ms), avec un miroir de l'ancien front et le build Vite.
+
+| Scénario | Résultat |
+|---|---|
+| Ancien front ouvert, serveur remplacé, rechargement | ancien front affiché (cache du SW CRA), nouveau SW installé puis **en attente** ; aucune page blanche |
+| Tous les onglets fermés puis réouverture | nouveau front, contrôlé par le nouveau SW |
+| Un ancien onglet (ou PWA installée) reste ouvert | les nouveaux onglets reçoivent encore l'ancien front, fonctionnel, jusqu'à fermeture du dernier |
+| Connexion lente (2 s par requête) | ancien front instantané ; installation en arrière-plan (~20 s) ; nouveau front ensuite servi du cache (< 0,2 s) |
+| Anciens liens `/#/login`, `/#/resetPassword/<jeton>` | redirigés vers les routes du nouveau front |
+
+Décision : **aucune prise de contrôle forcée** (`skipWaiting`/`clientsClaim` à l'installation).
+L'ancien front charge ses écrans à la demande (`/static/js/*.chunk.js`) ; un SW Vite activé de
+force sous un onglet CRA ouvert ferait échouer ces chargements (le nouveau serveur ne les a plus).
+Conséquence pour la bascule : pendant la période de transition, l'ancien front encore ouvert
+appelle toujours `https://api-medclick.easymed.fun/api/` : ce nom doit continuer à servir l'API.
