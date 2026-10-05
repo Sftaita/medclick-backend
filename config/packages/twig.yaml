@@ -1,2 +1,6 @@
 twig:
     default_path: '%kernel.project_dir%/templates'
+    # Adresses publiques de l'environnement (liens des e-mails) : voir config/services.yaml.
+    globals:
+        public_frontend_url: '%app.public_frontend_url%'
+        public_api_url: '%app.public_api_url%'

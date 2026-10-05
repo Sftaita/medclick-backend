@@ -6,6 +6,12 @@
 parameters:
   # Destinataire des alertes de nouvelles erreurs (vide = pas d'email). Voir App\Service\ErrorRecorder.
   env(ERROR_ALERT_EMAIL): ''
+  # Adresses publiques utilisées dans les e-mails et redirections (sans « / » final).
+  # Défaut = production actuelle ; chaque autre environnement (staging…) les définit explicitement.
+  env(PUBLIC_FRONTEND_URL): 'https://www.medclick.be'
+  env(PUBLIC_API_URL): 'https://api-medclick.easymed.fun'
+  app.public_frontend_url: '%env(PUBLIC_FRONTEND_URL)%'
+  app.public_api_url: '%env(PUBLIC_API_URL)%'
 
 services:
   # default configuration for services in *this* file
