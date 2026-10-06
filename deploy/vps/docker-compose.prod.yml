@@ -6,6 +6,8 @@
 # domaines de production :
 #   - www.medclick.be            : nouveau frontend ; /api et /activation → backend (même origine),
 #                                  routes actives seulement avec WWW_LIVE=true (bascule B) ;
+# Images nommées medclick-prod-* : jamais partagées avec la préproduction (le frontend embarque
+# l'URL d'API à la construction ; un même nom serait réécrit par un déploiement du staging).
 #   - api-medclick.easymed.fun   : backend entier (anciens fronts CRA et admin pendant la transition,
 #                                  liens d'activation déjà envoyés) ;
 #   - medclick.be                : redirection permanente vers https://www.medclick.be.
@@ -38,7 +40,7 @@ services:
     build:
       context: ./src/backend
       dockerfile: deploy/vps/backend.Dockerfile
-    image: medclick-backend:${BACKEND_TAG:-prod}
+    image: medclick-prod-backend:${BACKEND_TAG:-latest}
     container_name: medclick-prod-backend
     restart: unless-stopped
     environment:
@@ -84,7 +86,7 @@ services:
         deploy: ./src/backend/deploy/vps
       args:
         VITE_API_URL: https://www.medclick.be/api/
-    image: medclick-frontend:${FRONTEND_TAG:-prod}
+    image: medclick-prod-frontend:${FRONTEND_TAG:-latest}
     container_name: medclick-prod-frontend
     restart: unless-stopped
     networks:
