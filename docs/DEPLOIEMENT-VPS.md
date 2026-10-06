@@ -29,10 +29,11 @@ réseau privé medclick-<env>-internal :
 | `backend.Dockerfile` | image backend (extensions intl, zip, gd, pdo_mysql, opcache ; sodium intégré) |
 | `frontend.Dockerfile`, `frontend-nginx.conf` | build Node 24.21 puis nginx ; `service-worker.js`/`index.html` sans cache, `assets/` immuables, 404 (jamais `index.html`) pour un fichier absent ou sensible |
 | `docker-compose.staging.yml` | projet `medclick-staging` (db, backend, frontend, mailpit) |
+| `docker-compose.prod.yml`, `.env.prod.example` | projet `medclick-prod` (db, backend, frontend ; SMTP réel ; routes `www` activées par `WWW_LIVE`) — bascule : `docs/RUNBOOK-BASCULE.md` |
 | `.env.staging.example` | variables du projet (modèle, sans valeur secrète) |
 | `traefik-medclick-staging.yml` | modèle du middleware de liste d'IP |
-| `deploy.sh` | déploiement à SHA explicites |
-| `backup.sh`, `restore.sh` | sauvegarde chiffrée hors VPS, restauration (test jetable ou réelle) |
+| `deploy.sh` | déploiement à SHA explicites (environnement déduit du dossier `medclick-<env>`) |
+| `backup.sh`, `backup-retention.sh`, `restore.sh` | sauvegarde chiffrée hors VPS (rétention 7/4/6), restauration (test jetable ou réelle) |
 | `cra-transition/` | test de transition ancien front CRA → nouveau front Vite |
 
 ## Variables d'environnement (`/opt/stack/apps/medclick-<env>/.env`, chmod 600)
@@ -50,6 +51,9 @@ Le Compose fixe en plus : `APP_ENV=prod`, `APP_DEBUG=0`, `MAILER_DSN=smtp://mail
 (préproduction), `PUBLIC_FRONTEND_URL` = `PUBLIC_API_URL` = `PUBLIC_URL` (liens des e-mails et
 redirection d'activation ; non définies, ces variables valent la production Hostinger actuelle).
 Secrets générés sur le VPS : `openssl rand -hex 32`.
+
+Fuseau horaire : **UTC** partout (conteneurs, PHP, MariaDB), comme la production Hostinger
+(vérifié le 06/10/2026) : ne pas le modifier sans migration des dates déjà stockées.
 
 ## Premier déploiement
 

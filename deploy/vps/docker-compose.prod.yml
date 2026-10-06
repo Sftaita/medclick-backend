@@ -1,0 +1,134 @@
+# Production MedClick sur le VPS (projet Compose « medclick-prod »), cible de la bascule (LOT 4,
+# docs/RUNBOOK-BASCULE.md). Répertoire sur le VPS : /opt/stack/apps/medclick-prod.
+#   src/backend, src/pwa, .env (chmod 600, modèle deploy/vps/.env.prod.example) : comme la préproduction.
+#
+# Différences avec la préproduction : pas de Mailpit (SMTP réel du .env), pas de liste d'IP,
+# domaines de production :
+#   - www.medclick.be            : nouveau frontend ; /api et /activation → backend (même origine),
+#                                  routes actives seulement avec WWW_LIVE=true (bascule B) ;
+#   - api-medclick.easymed.fun   : backend entier (anciens fronts CRA et admin pendant la transition,
+#                                  liens d'activation déjà envoyés) ;
+#   - medclick.be                : redirection permanente vers https://www.medclick.be.
+
+name: medclick-prod
+
+services:
+  db:
+    image: mariadb:11.8
+    container_name: medclick-prod-db
+    restart: unless-stopped
+    environment:
+      MARIADB_DATABASE: ${DB_NAME}
+      MARIADB_USER: ${DB_USER}
+      MARIADB_PASSWORD: ${DB_PASSWORD}
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+    command: ["--character-set-server=utf8mb4", "--collation-server=utf8mb4_unicode_ci"]
+    volumes:
+      - medclick_prod_db:/var/lib/mysql
+    networks:
+      - medclick-prod-internal
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  backend:
+    build:
+      context: ./src/backend
+      dockerfile: deploy/vps/backend.Dockerfile
+    image: medclick-backend:${BACKEND_TAG:-prod}
+    container_name: medclick-prod-backend
+    restart: unless-stopped
+    environment:
+      APP_ENV: prod
+      APP_DEBUG: "0"
+      APP_SECRET: ${APP_SECRET}
+      DATABASE_URL: mysql://${DB_USER}:${DB_PASSWORD}@db:3306/${DB_NAME}?serverVersion=11.8.9-MariaDB&charset=utf8mb4
+      CORS_ALLOW_ORIGIN: ${CORS_ALLOW_ORIGIN}
+      JWT_SECRET_KEY: "%kernel.project_dir%/config/jwt/private.pem"
+      JWT_PUBLIC_KEY: "%kernel.project_dir%/config/jwt/public.pem"
+      JWT_PASSPHRASE: ${JWT_PASSPHRASE}
+      MAILER_DSN: ${MAILER_DSN}
+      ERROR_ALERT_EMAIL: ${ERROR_ALERT_EMAIL:-}
+      # Valeurs actuelles de la production (identiques aux défauts de config/services.yaml).
+      PUBLIC_FRONTEND_URL: https://www.medclick.be
+      PUBLIC_API_URL: https://api-medclick.easymed.fun
+    volumes:
+      - medclick_prod_jwt:/app/config/jwt
+      - medclick_prod_log:/app/var/log
+    networks:
+      - proxy
+      - medclick-prod-internal
+    depends_on:
+      db:
+        condition: service_healthy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=proxy"
+      # Bascule A : seul api-medclick.easymed.fun est routé ici (anciens fronts, liens d'activation).
+      - "traefik.http.routers.medclick-prod-api.rule=Host(`api-medclick.easymed.fun`)"
+      - "traefik.http.routers.medclick-prod-api.priority=100"
+      - "traefik.http.routers.medclick-prod-api.entrypoints=websecure"
+      - "traefik.http.routers.medclick-prod-api.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.medclick-prod-api.middlewares=secure-headers@file,compress@file"
+      - "traefik.http.routers.medclick-prod-api.service=medclick-prod-backend"
+      - "traefik.http.services.medclick-prod-backend.loadbalancer.server.port=80"
+
+  frontend:
+    build:
+      context: ./src/pwa/frontend
+      dockerfile: ../../backend/deploy/vps/frontend.Dockerfile
+      additional_contexts:
+        deploy: ./src/backend/deploy/vps
+      args:
+        VITE_API_URL: https://www.medclick.be/api/
+    image: medclick-frontend:${FRONTEND_TAG:-prod}
+    container_name: medclick-prod-frontend
+    restart: unless-stopped
+    networks:
+      - proxy
+    depends_on:
+      backend:
+        condition: service_healthy
+    # Bascule B : routes www.medclick.be et medclick.be activées seulement avec WWW_LIVE=true dans
+    # le .env (sinon Traefik demanderait des certificats pour des noms encore chez Hostinger).
+    labels:
+      - "traefik.enable=${WWW_LIVE:-false}"
+      - "traefik.docker.network=proxy"
+      # /api et /activation de www.medclick.be → service du backend (même origine pour le front).
+      - "traefik.http.routers.medclick-prod-www-api.rule=Host(`www.medclick.be`) && (PathPrefix(`/api`) || PathPrefix(`/activation`))"
+      - "traefik.http.routers.medclick-prod-www-api.priority=100"
+      - "traefik.http.routers.medclick-prod-www-api.entrypoints=websecure"
+      - "traefik.http.routers.medclick-prod-www-api.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.medclick-prod-www-api.middlewares=secure-headers@file,compress@file"
+      - "traefik.http.routers.medclick-prod-www-api.service=medclick-prod-backend@docker"
+      - "traefik.http.routers.medclick-prod-web.rule=Host(`www.medclick.be`)"
+      - "traefik.http.routers.medclick-prod-web.priority=10"
+      - "traefik.http.routers.medclick-prod-web.entrypoints=websecure"
+      - "traefik.http.routers.medclick-prod-web.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.medclick-prod-web.middlewares=secure-headers@file,compress@file"
+      - "traefik.http.routers.medclick-prod-web.service=medclick-prod-frontend"
+      - "traefik.http.services.medclick-prod-frontend.loadbalancer.server.port=80"
+      # medclick.be → https://www.medclick.be (même chemin).
+      - "traefik.http.routers.medclick-prod-apex.rule=Host(`medclick.be`)"
+      - "traefik.http.routers.medclick-prod-apex.entrypoints=websecure"
+      - "traefik.http.routers.medclick-prod-apex.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.medclick-prod-apex.middlewares=medclick-prod-to-www"
+      - "traefik.http.routers.medclick-prod-apex.service=noop@internal"
+      - "traefik.http.middlewares.medclick-prod-to-www.redirectregex.regex=^https://medclick\\.be/(.*)"
+      - "traefik.http.middlewares.medclick-prod-to-www.redirectregex.replacement=https://www.medclick.be/$${1}"
+      - "traefik.http.middlewares.medclick-prod-to-www.redirectregex.permanent=true"
+
+networks:
+  proxy:
+    name: proxy
+    external: true
+  medclick-prod-internal:
+    name: medclick-prod-internal
+
+volumes:
+  medclick_prod_db:
+  medclick_prod_jwt:
+  medclick_prod_log:
