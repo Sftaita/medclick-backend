@@ -23,8 +23,22 @@ pour les étapes marquées 🔒. Aucun secret ici : les secrets vivent dans les 
   par l'assistant ; 🔒 nécessite un accord explicite au moment de l'exécution.
 - `H` = Hostinger (`~/domains/easymed.fun/public_html/medclick/backend`, PHP `/opt/alt/php84/usr/bin/php`) ;
   `V` = VPS (`/opt/stack/apps/medclick-prod`, utilisateur `deploy`).
-- SHA à déployer (à figer au préflight) : backend `master` (≥ `cc66e96`), frontend `46912de` ou
+- SHA à déployer (à figer au préflight) : backend = un SHA de `master` contenant `deploy/vps/`
+  (aujourd'hui seulement sur `feature/vps-staging`, qui contient `master` ≥ `cc66e96` : fusion à
+  décider avant A ; `deploy.sh` exige ces fichiers dans le SHA déployé), frontend `46912de` ou
   successeur validé sur le staging.
+
+## Décisions figées (ne pas rediscuter pendant la bascule)
+
+| Sujet | Décision (06/10/2026) |
+|---|---|
+| Fuseau horaire | **UTC** partout (conteneurs, PHP, MariaDB), identique à Hostinger. Aucun réglage `TZ`/`date.timezone` à modifier. |
+| Migration historique `Version20241230061340` | Non fusionnée avant A (branche `feature/migration-historique-20241230061340`, `a721d0f`) ; fichier non suivi laissé en place sur H ; réconciliation **après** A. |
+| Sauvegarde production VPS | cron autorisé, installé à la création de `medclick-prod` : `CRON_TZ=UTC` / `50 3 * * * /opt/stack/apps/medclick-prod/backup.sh /opt/stack/apps/medclick-prod prod` |
+| Phrase de passe des sauvegardes | conservation hors VPS **à confirmer par l'utilisateur avant A** |
+| Protection du staging | liste d'IP conservée ; oauth2-proxy plus tard (non requis pour la bascule) |
+| `var/log/dev.log` Hostinger (30,4 Go, figé depuis le 01/07/2025) | conservé ; **à supprimer avant la fermeture d'Hostinger** ; STOP si l'espace disque devient critique avant |
+| Bascule B | jamais de répétition destructive du front de production ; ≥ 48 h après A ; rollback frontend indépendant du rollback API |
 
 ## Tableau de bord des critères
 
@@ -141,7 +155,10 @@ pour les étapes marquées 🔒. Aucun secret ici : les secrets vivent dans les 
 
 - `docker compose logs backend`, `var/log/prod-*.log`, table `error_log`, `access.log` Traefik
   (codes 5xx), `docker stats`, RAM/swap.
-- Sauvegarde : cron `medclick-prod` installé (🔒) après l'étape 9 ; première exécution vérifiée.
+- Sauvegarde : cron `medclick-prod` (décision figée ci-dessus) installé après l'étape 9, après
+  vérification que `backup.sh`/`backup-retention.sh` déployés sont ceux testés (SHA-256),
+  permissions 700, destination Drive `medclick-prod` ; test contrôlé (fichier local + distant,
+  journal, code de sortie 0).
 - STOP : 5xx récurrente non comprise → rollback A.
 
 ## B. Bascule du frontend (≥ 48 h après A stable)
@@ -168,6 +185,26 @@ pour les étapes marquées 🔒. Aucun secret ici : les secrets vivent dans les 
 - Service worker : comportement validé (pas de prise de contrôle forcée) ; les onglets CRA encore
   ouverts continuent d'appeler `api-medclick.easymed.fun` → **ce nom reste servi par V**.
 - `frontend.easymed.fun` et l'ancien admin restent sur Hostinger (lecture/écriture via l'API V).
+
+## Répétition générale de A sur le staging (06/10/2026, 05:18–05:30 UTC)
+
+Copie de production lue en lecture seule (empreintes avant/après le dump identiques), backend
+`6783a12`, frontend `46912de`. Aucune écriture dans la base Hostinger, aucun DNS modifié.
+
+| Étape | Mesure |
+|---|---|
+| Dump Hostinger (`--single-transaction`) | 1,2 s — 5,26 Mo gzip / 40,6 Mo SQL, 16 tables |
+| Transfert H → V (flux SSH, SHA-256 vérifié) | 4,0 s |
+| Recréation de la base + import | 0,5–1,1 s + 6,3–7,1 s |
+| Empreinte d'intégrité V (16 tables) | 1,3 s — **identique** à H (lignes, MIN/MAX id, SUM/XOR CRC32) |
+| `deploy.sh` (images en cache) | 50 s — 0 migration (`New = 0`, 0,3 s) |
+| Tests API automatisés (75 contrôles) | 18 s — 75/75 |
+| Retour arrière (restauration chiffrée + version précédente) | 5,0 s + 49 s — empreinte = état initial, 14/14 contrôles |
+
+Durée de gel estimée pour A : **≈ 3 min techniques** (gel → V prêt), **10–15 min** d'indisponibilité
+en écriture avec le DNS (TTL 300) et le certificat, **fenêtre annoncée 45 min** (tests et marge de
+retour arrière). Outils : empreinte par table sans donnée affichée,
+`deploy/vps/fingerprint.sql` (versionné) ; contrôles API de fumée : scripts de test du LOT 3/4 (hors dépôt, comptes de test).
 
 ## Rollback
 
@@ -208,8 +245,7 @@ pour les étapes marquées 🔒. Aucun secret ici : les secrets vivent dans les 
 
 ## Points ouverts à trancher avant exécution
 
-1. Fusion de `feature/migration-historique-20241230061340` (fichier identique à celui de H) :
-   avant A, elle impose de déplacer le fichier non suivi sur H avant `git pull` ; recommandé :
-   fusionner **après** A (H n'est plus déployé) ou ne jamais déployer H à nouveau.
+1. Fusion de `feature/vps-staging` dans `master` (fichiers de déploiement VPS, URL publiques
+   configurables `27780a1` — défauts = valeurs de production, sans effet sur H).
 2. Ancien admin (`easymed.fun/medclick/admin-Frontend`) : conservé jusqu'au retrait d'Hostinger.
 3. Changement du mot de passe SMTP (exposé dans une sortie de session le 06/10/2026) avant A.
