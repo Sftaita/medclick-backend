@@ -13,12 +13,13 @@ ENV_NAME=${2:?nom de l environnement requis}
 PASSFILE="$HOME/.medclick-backup-passphrase"
 DEST="$HOME/backups/medclick-$ENV_NAME"
 REMOTE="gdrive:INFORMATIQUE/Base de donnée/medclick-$ENV_NAME"
-KEEP_LOCAL_DAYS=14
-KEEP_REMOTE_DAYS=30
+RETENTION="$(dirname "$(readlink -f "$0")")/backup-retention.sh"
 LOG="$HOME/backups/backup.log"
 log() { echo "[$(date '+%Y-%m-%d %H:%M:%S')] [medclick-$ENV_NAME] $*" | tee -a "$LOG"; }
 
 [ -f "$PASSFILE" ] && [ "$(stat -c %a "$PASSFILE")" = "600" ] || { log "ERREUR : $PASSFILE absent ou pas en 600"; exit 1; }
+[ -x "$RETENTION" ] || { log "ERREUR : $RETENTION absent ou non exécutable"; exit 1; }
+trap 'log "ERREUR : sauvegarde interrompue (ligne $LINENO)"; rm -f "${OUT:-}.part"' ERR
 umask 077
 mkdir -p "$DEST"
 STAMP=$(date -u +%Y%m%dT%H%M%SZ)
@@ -29,11 +30,12 @@ log "dump"
 docker compose --project-directory "$PROJECT" exec -T db sh -c \
   'exec mariadb-dump -uroot -p"$MARIADB_ROOT_PASSWORD" --single-transaction --routines --triggers --no-tablespaces "$MARIADB_DATABASE"' \
   | gzip \
-  | gpg --batch --yes --pinentry-mode loopback --passphrase-file "$PASSFILE" --symmetric --cipher-algo AES256 -o "$OUT"
+  | gpg --batch --yes --pinentry-mode loopback --passphrase-file "$PASSFILE" --symmetric --cipher-algo AES256 -o "$OUT.part"
 
 # Contrôle immédiat : déchiffrable, gzip valide, dump complet.
-gpg --batch --quiet --pinentry-mode loopback --passphrase-file "$PASSFILE" -d "$OUT" | gunzip | tail -1 | grep -q "Dump completed" \
-  || { log "ERREUR : sauvegarde illisible ou incomplète ($OUT)"; rm -f "$OUT"; exit 1; }
+gpg --batch --quiet --pinentry-mode loopback --passphrase-file "$PASSFILE" -d "$OUT.part" | gunzip | tail -1 | grep -q "Dump completed" \
+  || { log "ERREUR : sauvegarde illisible ou incomplète ($OUT)"; rm -f "$OUT.part"; exit 1; }
+mv "$OUT.part" "$OUT"
 (cd "$DEST" && sha256sum "$(basename "$OUT")" > "$(basename "$OUT").sha256")
 log "OK $(basename "$OUT") ($(du -h "$OUT" | cut -f1))"
 
@@ -42,7 +44,14 @@ rclone copy "$DEST" "$REMOTE" --include "*.gpg" --include "*.sha256" --log-file 
 rclone check "$DEST" "$REMOTE" --one-way --include "$(basename "$OUT")" --log-file "$LOG" --log-level NOTICE \
   || { log "ERREUR : copie distante non vérifiée"; exit 1; }
 
-# Rotation : parenthèses explicites (les deux motifs ET l'âge).
-find "$DEST" -type f \( -name "*.gpg" -o -name "*.sha256" \) -mtime +"$KEEP_LOCAL_DAYS" -print -delete | sed "s#^#[rotation locale] #" >> "$LOG"
-rclone delete "$REMOTE" --min-age "${KEEP_REMOTE_DAYS}d" --log-file "$LOG" --log-level NOTICE
+# Rotation (7 quotidiennes, 4 hebdomadaires, 6 mensuelles), seulement après une copie distante
+# vérifiée : la même règle s'applique en local et sur le Drive (backup-retention.sh).
+for f in $(ls "$DEST" | "$RETENTION"); do
+  rm -f "$DEST/$f" "$DEST/$f.sha256" && log "[rotation locale] $f"
+done
+for f in $(rclone lsf "$REMOTE" --files-only | "$RETENTION"); do
+  rclone deletefile "$REMOTE/$f"
+  rclone deletefile "$REMOTE/$f.sha256" 2>/dev/null || true
+  log "[rotation distante] $f"
+done
 log "terminé"

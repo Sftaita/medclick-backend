@@ -96,9 +96,11 @@ depuis le cache) ; en cas de migration, restaurer la sauvegarde prise juste avan
 | Contenu | dump MariaDB (`--single-transaction --routines --triggers`) |
 | Chiffrement | gpg symétrique AES-256, phrase de passe `~/.medclick-backup-passphrase` (600) — **à conserver aussi hors du VPS** (gestionnaire de mots de passe) |
 | Contrôle | déchiffrement + gzip + « Dump completed » immédiatement après ; SHA-256 |
-| Local | `~/backups/medclick-<env>/`, rétention 14 jours |
-| Hors VPS | `gdrive:INFORMATIQUE/Base de donnée/medclick-<env>` (rclone existant), copie vérifiée, rétention 30 jours |
-| Fréquence (production) | quotidienne, après les sauvegardes existantes, ex. cron `50 3 * * * …/backup.sh /opt/stack/apps/medclick-prod prod` |
+| Local | `~/backups/medclick-<env>/` (700, fichiers 600) |
+| Hors VPS | `gdrive:INFORMATIQUE/Base de donnée/medclick-<env>` (rclone existant), copie vérifiée |
+| Rétention (local et Drive) | 7 quotidiennes, 4 hebdomadaires, 6 mensuelles (`backup-retention.sh`), appliquée seulement après une copie distante vérifiée |
+| Échec | code de sortie ≠ 0, ligne `ERREUR` dans `~/backups/backup.log`, aucun fichier partiel (écriture en `.part`) |
+| Fréquence (production) | quotidienne, après les sauvegardes existantes : cron `50 3 * * * /opt/stack/apps/medclick-prod/backup.sh /opt/stack/apps/medclick-prod prod` (CRON_TZ=UTC) |
 
 Restauration :
 - test (base jetable sans réseau, supprimée ensuite) : `restore.sh test <fichier.sql.gz.gpg>` ;
