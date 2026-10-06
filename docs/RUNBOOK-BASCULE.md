@@ -248,4 +248,3 @@ retour arrière). Outils : empreinte par table sans donnée affichée,
 1. Fusion de `feature/vps-staging` dans `master` (fichiers de déploiement VPS, URL publiques
    configurables `27780a1` — défauts = valeurs de production, sans effet sur H).
 2. Ancien admin (`easymed.fun/medclick/admin-Frontend`) : conservé jusqu'au retrait d'Hostinger.
-3. Changement du mot de passe SMTP (exposé dans une sortie de session le 06/10/2026) avant A.
