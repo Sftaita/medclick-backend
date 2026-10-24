@@ -123,6 +123,16 @@ Restauration :
 - Servi sans cache HTTP (`no-cache, no-store`), comme `index.html` ; fichiers `assets/` immuables.
 - Un fichier `assets/` absent répond 404 (jamais `index.html` à la place d'un script).
 - Mise à jour du nouveau front : invite « Nouvelle version disponible » (jamais forcée).
+- **Fichiers de la version précédente conservés** : `deploy.sh` passe l'image du frontend en
+  service (`PREVIOUS_FRONTEND_IMAGE`) au build, qui reprend ses fichiers `assets/` (ceux de sa
+  liste `.release-assets`, ou tout `assets/` pour une image antérieure à ce mécanisme). Un onglet
+  resté ouvert, ou une PWA servie par l'ancien service worker, continue de charger ses pages à la
+  demande au lieu d'afficher « Une erreur est survenue ». Une seule version précédente est gardée.
+- **Filet côté application** (à partir de la v2) : si un chunk reste introuvable (version plus
+  ancienne, retour arrière), la page d'erreur active le service worker publié puis recharge,
+  une seule fois par fenêtre de 30 s (`src/app/versionRecovery.js` du frontend).
+- Build manuel (hors `deploy.sh`) : passer `--build-arg PREVIOUS_IMAGE=<image en service>`, sinon
+  rien n'est repris (image nginx nue par défaut).
 
 ### Transition depuis l'ancien front CRA (mesurée au LOT 3)
 

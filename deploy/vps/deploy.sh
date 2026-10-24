@@ -35,6 +35,11 @@ echo "src/pwa @ $FRONTEND_SHA (archive)"
 cp "src/backend/deploy/vps/docker-compose.$ENV_NAME.yml" docker-compose.yml
 
 export BACKEND_TAG="${BACKEND_SHA:0:7}" FRONTEND_TAG="${FRONTEND_SHA:0:7}"
+# Image du frontend en service : ses fichiers assets/ sont repris dans la nouvelle (onglets ouverts
+# sur la version précédente). Premier déploiement : image nginx nue, rien à reprendre.
+PREVIOUS_FRONTEND_IMAGE=$(docker inspect --format '{{.Config.Image}}' "medclick-$ENV_NAME-frontend" 2>/dev/null || echo nginx:1.29-alpine)
+export PREVIOUS_FRONTEND_IMAGE
+echo "assets précédents repris de : $PREVIOUS_FRONTEND_IMAGE"
 docker compose build
 # Mailpit n'existe qu'en préproduction (capture des e-mails).
 docker compose up -d --wait db $(docker compose config --services | grep -x mailpit || true)

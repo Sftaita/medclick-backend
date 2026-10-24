@@ -91,6 +91,8 @@ services:
         deploy: ./src/backend/deploy/vps
       args:
         VITE_API_URL: https://www.medclick.be/api/
+        # Image en service (deploy.sh) : ses assets/ restent servis pour les onglets ouverts.
+        PREVIOUS_IMAGE: ${PREVIOUS_FRONTEND_IMAGE:-nginx:1.29-alpine}
     image: medclick-prod-frontend:${FRONTEND_TAG:-latest}
     container_name: medclick-prod-frontend
     restart: unless-stopped
