@@ -54,6 +54,11 @@ services:
       JWT_PASSPHRASE: ${JWT_PASSPHRASE}
       MAILER_DSN: ${MAILER_DSN}
       ERROR_ALERT_EMAIL: ${ERROR_ALERT_EMAIL:-}
+      # Traefik (réseau Docker « proxy », 172.18.0.0/16) est le seul pair direct du backend (aucun
+      # port publié) et réécrit X-Forwarded-For/Proto/Port : seuls ces en-têtes font foi. Jamais
+      # « forwarded » (RFC 7239), que Traefik transmet tel quel. Sous-réseau modifié = confiance perdue.
+      SYMFONY_TRUSTED_PROXIES: 172.18.0.0/16
+      SYMFONY_TRUSTED_HEADERS: x-forwarded-for,x-forwarded-proto,x-forwarded-port
       # Valeurs actuelles de la production (identiques aux défauts de config/services.yaml).
       PUBLIC_FRONTEND_URL: https://www.medclick.be
       PUBLIC_API_URL: https://api-medclick.easymed.fun
