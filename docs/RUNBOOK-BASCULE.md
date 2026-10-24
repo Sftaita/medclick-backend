@@ -1,6 +1,6 @@
 # Runbook — bascule de MedClick d'Hostinger vers le VPS (LOT 4)
 
-**Statut : à valider.** Rien de ce document n'est exécuté sans accord explicite, étape par étape
+**Statut : A exécutée le 23/10/2026 (voir « Exécution de A ») ; B préparée, à exécuter.** Rien de ce document n'est exécuté sans accord explicite, étape par étape
 pour les étapes marquées 🔒. Aucun secret ici : les secrets vivent dans les `.env` (600) des serveurs.
 
 ## Principes
@@ -163,28 +163,56 @@ pour les étapes marquées 🔒. Aucun secret ici : les secrets vivent dans les 
 
 ## B. Bascule du frontend (≥ 48 h après A stable)
 
-### 11. Préparation
+Aucune donnée ne bouge : pendant la propagation, l'ancien front CRA (Hostinger) et le nouveau front
+Vite (V) sont valides en même temps et appellent tous deux l'API de V. Pas de gel, pas de relais à
+l'aller. Les sessions sont conservées (même clé `authToken`, même origine `www.medclick.be`).
 
-- TTL `www` (CNAME CDN, 300) et `medclick.be` (vérifier, cible 300) 👤 ; SHA frontend inchangé ou
-  revalidé sur staging ; nouveau front déjà en service sur V (étape 6).
+### 11. Préparation (J-1 à H-1)
+
+- Backend : déployer sur V un SHA de `master` contenant les correctifs de la préparation B
+  (`location /static/` du nginx frontend, proxys de confiance du compose) ; `./deploy.sh <sha_backend> 46912de…`.
+- Frontend : `46912de` (archive déjà dans `src/pwa`, `.commit` vérifié par `deploy.sh`) ; tests
+  Vitest 228/228, lint, build et `check-build` OK.
+- 👤 hPanel : désactiver le CDN Hostinger du site `medclick.be` (sinon la zone est réécrite par
+  le CDN : apex en A/AAAA tournants TTL 60, `www` en CNAME vers `*.cdn.hstgr.net`). Vérifier
+  que le CRA reste servi par l'origine Hostinger, puis noter les valeurs DNS obtenues (retour arrière).
 
 ### 12. DNS du frontend 👤🔒
 
-- `www.medclick.be` : CNAME `www.medclick.be.cdn.hstgr.net` → **A `187.124.55.15`** ;
-  `medclick.be` : A → `187.124.55.15` (redirection vers `www` par Traefik).
-  Attention : désactiver si besoin le CDN Hostinger du site `medclick.be` dans hPanel pour que la
-  zone ne soit pas réécrite ; ne pas toucher MX/TXT (SPF/DKIM) de `medclick.be`.
-- Puis 🤖 : `.env` `WWW_LIVE=true` et `docker compose up -d frontend` (recréation : Traefik active
-  les routes `www`, `www/api` et la redirection de `medclick.be`, puis demande les certificats).
-- Vérification : résolution publique ; certificats LE pour `www.medclick.be` et `medclick.be`.
-- Rollback immédiat côté VPS : `WWW_LIVE=false` + `docker compose up -d frontend`.
+- `www.medclick.be` : supprimer le CNAME, créer **A `187.124.55.15`** et **AAAA `2a02:4780:7:aa8f::1`**, TTL 300.
+- `medclick.be` (apex) : **A `187.124.55.15`** et **AAAA `2a02:4780:7:aa8f::1`**, TTL 300.
+- Ne pas toucher MX, TXT (SPF/DKIM) ni aucun autre nom.
+- Puis 🤖, dès que `ns1` et `ns2.dns-parking.com` répondent les nouvelles valeurs :
+  `.env` `WWW_LIVE=true` et `docker compose up -d frontend` (recréation : Traefik active les routes
+  `www`, `www/api` et la redirection de `medclick.be`, puis demande les certificats HTTP-01).
+- Vérification : certificats Let's Encrypt pour `www.medclick.be` et `medclick.be` en IPv4 et IPv6.
+- Retour arrière immédiat côté V : `WWW_LIVE=false` + `docker compose up -d frontend`.
 
 ### 13. Tests et transition CRA → Vite
 
 - Parcours utilisateur et admin complets sur `https://www.medclick.be` (comme LOT 3).
 - Service worker : comportement validé (pas de prise de contrôle forcée) ; les onglets CRA encore
-  ouverts continuent d'appeler `api-medclick.easymed.fun` → **ce nom reste servi par V**.
+  ouverts continuent d'appeler `api-medclick.easymed.fun` → **ce nom reste servi par V**. Un
+  chunk CRA absent du cache répond 404 (jamais `index.html`).
 - `frontend.easymed.fun` et l'ancien admin restent sur Hostinger (lecture/écriture via l'API V).
+
+## Exécution de A (23/10/2026)
+
+| Étape | Heure (UTC) | Résultat |
+|---|---|---|
+| Préflight | 17:24–18:25 | sauvegarde complète restaurée dans une base jetable, empreinte identique ; images construites ; IPv6 et ACME de V vérifiés |
+| Gel H (503) | 18:25 | aucune écriture sur 2 min (empreinte) |
+| Dump final, transfert, import | 18:27–18:30 | SHA-256 identique ; empreinte V = H gelé (16 tables, 312 561 lignes) ; 34 migrations, 0 en attente |
+| Tests avant DNS | 18:30–18:35 | backend sans route Traefik (fichier override temporaire), parcours fonctionnel complet |
+| DNS 👤 | 19:03 | A **et AAAA** de `api-medclick` → V (le AAAA, absent de la version initiale du runbook, pointait vers H) |
+| Certificat | 19:04 | Let's Encrypt obtenu au premier essai (IPv4 et IPv6) |
+| Relais H → V | 19:09 | relais PHP transitoire sur H pour les caches DNS anciens (la base H n'est jamais atteinte) |
+
+Enseignements :
+- Mesurer les TTL réellement en cache **avant** de fixer l'heure ; les noms DNS ont A **et** AAAA.
+- LiteSpeed relit un `.htaccess` d'après sa date de modification : après `cp -p`, faire `touch`.
+- Les clés JWT d'Hostinger ont été reprises sur V (sessions conservées) ; rotation à planifier.
+- Indisponibilité réelle ≈ 40 min (gel → relais), surtout due à l'attente du changement DNS.
 
 ## Répétition générale de A sur le staging (06/10/2026, 05:18–05:30 UTC)
 
@@ -227,11 +255,13 @@ retour arrière). Outils : empreinte par table sans donnée affichée,
 
 ### R-B. Frontend
 
-- DNS `www` → CNAME CDN Hostinger, `medclick.be` → IP d'origine 👤. Aucune donnée en jeu.
-- Les navigateurs ayant installé le service worker Vite le garderont : il n'est pas bloquant (il
-  sert l'app depuis son cache et appelle `www.medclick.be/api/` → **à router vers l'API V** tant
-  que des clients Vite existent ; prévoir, avant un R-B, une règle Hostinger ou laisser `www`
-  pointé sur V et ne revenir qu'en cas de défaut majeur).
+1. 🤖 Sur H (site `medclick.be`) : déposer le relais `/api` et `/activation` vers l'API de V
+   (même principe que le relais de A, cible fixe, aucune base) et l'insérer en tête du `.htaccess`
+   du CRA (puis `touch`) : les navigateurs qui gardent le front Vite en cache (service worker)
+   appellent `www.medclick.be/api/`.
+2. 👤 DNS `www` et `medclick.be` → valeurs notées à l'étape 11 (origine Hostinger). Aucune donnée en jeu.
+3. 🤖 `WWW_LIVE=false` + `docker compose up -d frontend` sur V une fois la propagation constatée.
+4. Le relais reste en place tant que des requêtes `/api` arrivent sur H.
 
 ## Après la bascule
 
