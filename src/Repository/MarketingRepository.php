@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Marketing;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
 use Doctrine\Persistence\ManagerRegistry;
@@ -60,7 +61,8 @@ class MarketingRepository extends ServiceEntityRepository
             ->andWhere('m.start_date <= :currentDate')
             ->andWhere('m.end_date IS NULL OR m.end_date >= :currentDate')
             ->setParameter('status', 'active')
-            ->setParameter('currentDate', $currentDate)
+            // Comparé comme DATE (AAAA-MM-JJ) : jour de début et jour de fin inclus.
+            ->setParameter('currentDate', $currentDate, Types::DATE_MUTABLE)
             ->getQuery()
             ->getResult();
     }

@@ -22,7 +22,9 @@ class GeneralMarketingController extends AbstractController
     #[Route('/api/marketing/active', name: 'get_active_campaign', methods: ['GET'])]
     public function getActiveCampaign(MarketingRepository $marketingRepository): JsonResponse
     {
-        $currentDate = new DateTime(); // Date actuelle
+        // Jour courant à minuit : colonnes DATE, date de début et date de fin incluses (avec l'heure,
+        // la campagne disparaissait dès minuit le jour de sa date de fin).
+        $currentDate = new DateTime('today');
 
         // Utiliser la méthode du repository pour trouver les campagnes actives
         $campaigns = $marketingRepository->findActiveCampaigns($currentDate);

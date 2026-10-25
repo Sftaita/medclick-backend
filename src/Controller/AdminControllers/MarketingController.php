@@ -84,22 +84,12 @@ class MarketingController extends AbstractController
     public function create(Request $request): Response
     {
         $data = json_decode($request->getContent(), true);
+        if ($error = $this->validationError($data)) {
+            return $error;
+        }
 
         $marketing = new Marketing();
-        $marketing->setCampaignName($data['campaign_name']);
-        $marketing->setStatus($data['status']);
-        $marketing->setStartDate(new \DateTime($data['start_date']));
-        $endDate = $data['end_date'] ?? null;
-        if ($endDate) {
-            $marketing->setEndDate(new \DateTime($endDate));
-        }
-        $marketing->setDuration($data['duration'] ?? 5); // Définit une valeur par défaut si non fourni
-        $marketing->setRedirectUrl($data['redirect_url'] ?? null); // Null si non fourni
-        $marketing->setSmartphoneFormat($data['smartphone_format'] ?? null);
-        $marketing->setTabletPortraitFormat($data['tablet_portrait_format'] ?? null);
-        $marketing->setTabletLandscapeFormat($data['tablet_landscape_format'] ?? null);
-        $marketing->setScreen14InchFormat($data['screen_14_inch_format'] ?? null);
-        $marketing->setLargeScreenFormat($data['large_screen_format'] ?? null);
+        $this->hydrate($marketing, $data);
 
         $this->entityManager->persist($marketing);
         $this->entityManager->flush();
@@ -112,31 +102,132 @@ class MarketingController extends AbstractController
     public function edit(Request $request, Marketing $marketing): Response
     {
         $data = json_decode($request->getContent(), true);
-
-        $marketing->setCampaignName($data['campaign_name']);
-        $marketing->setStatus($data['status']);
-        $marketing->setStartDate(new \DateTime($data['start_date']));
-        $endDate = $data['end_date'] ?? null;
-        if ($endDate) {
-            $marketing->setEndDate(new \DateTime($endDate));
+        if ($error = $this->validationError($data)) {
+            return $error;
         }
-        $marketing->setDuration($data['duration'] ?? 5); // Valeur par défaut si non fourni
-        $marketing->setRedirectUrl($data['redirect_url'] ?? null); // Null si non fourni
-        $marketing->setSmartphoneFormat($data['smartphone_format'] ?? null);
-        $marketing->setTabletPortraitFormat($data['tablet_portrait_format'] ?? null);
-        $marketing->setTabletLandscapeFormat($data['tablet_landscape_format'] ?? null);
-        $marketing->setScreen14InchFormat($data['screen_14_inch_format'] ?? null);
-        $marketing->setLargeScreenFormat($data['large_screen_format'] ?? null);
 
+        $this->hydrate($marketing, $data);
         $this->entityManager->flush();
 
         return $this->json(['status' => 'Marketing campaign updated']);
+    }
+
+    /**
+     * Champs de la campagne (données déjà validées). Une date de fin vide ou absente retire la
+     * date de fin (campagne sans échéance) : auparavant, elle ne pouvait plus être effacée.
+     */
+    private function hydrate(Marketing $marketing, array $data): void
+    {
+        $marketing->setCampaignName(trim($data['campaign_name']));
+        $marketing->setStatus($data['status']);
+        $marketing->setStartDate(new \DateTime($data['start_date']));
+        $marketing->setEndDate(empty($data['end_date']) ? null : new \DateTime($data['end_date']));
+        $marketing->setDuration((int) ($data['duration'] ?? 5));
+        $marketing->setRedirectUrl(empty($data['redirect_url']) ? null : $data['redirect_url']);
+        $marketing->setSmartphoneFormat(empty($data['smartphone_format']) ? null : $data['smartphone_format']);
+        $marketing->setTabletPortraitFormat(empty($data['tablet_portrait_format']) ? null : $data['tablet_portrait_format']);
+        $marketing->setTabletLandscapeFormat(empty($data['tablet_landscape_format']) ? null : $data['tablet_landscape_format']);
+        $marketing->setScreen14InchFormat(empty($data['screen_14_inch_format']) ? null : $data['screen_14_inch_format']);
+        $marketing->setLargeScreenFormat(empty($data['large_screen_format']) ? null : $data['large_screen_format']);
+    }
+
+    private const STATUSES = ['active', 'inactive'];
+
+    private const FORMATS = [
+        'smartphone_format' => 'Visuel smartphone',
+        'tablet_portrait_format' => 'Visuel tablette portrait',
+        'tablet_landscape_format' => 'Visuel tablette paysage',
+        'screen_14_inch_format' => 'Visuel écran 14 pouces',
+        'large_screen_format' => 'Visuel grand écran',
+    ];
+
+    /**
+     * Contrôle des champs : 400 avec un message lisible au lieu d'une erreur 500 (champ manquant,
+     * date invalide, texte trop long pour la colonne en mode SQL strict). Les visuels sont des URL
+     * http(s) d'images hébergées : une image collée en data:… dépasse 500 caractères et était
+     * tronquée, donc illisible.
+     */
+    private function validationError(mixed $data): ?JsonResponse
+    {
+        $fail = static fn (string $message) => new JsonResponse(['message' => $message], Response::HTTP_BAD_REQUEST);
+
+        if (!is_array($data)) {
+            return $fail('Requête invalide.');
+        }
+        $name = $data['campaign_name'] ?? null;
+        if (!is_string($name) || trim($name) === '') {
+            return $fail('Le nom de la campagne est obligatoire.');
+        }
+        if (mb_strlen(trim($name)) > 400) {
+            return $fail('Le nom de la campagne ne doit pas dépasser 400 caractères.');
+        }
+        if (!in_array($data['status'] ?? null, self::STATUSES, true)) {
+            return $fail('Le statut doit être « active » ou « inactive ».');
+        }
+        $start = self::date($data['start_date'] ?? null);
+        if (!$start) {
+            return $fail('La date de début est obligatoire (AAAA-MM-JJ).');
+        }
+        if (!empty($data['end_date'])) {
+            $end = self::date($data['end_date']);
+            if (!$end) {
+                return $fail('La date de fin est invalide (AAAA-MM-JJ).');
+            }
+            if ($end < $start) {
+                return $fail('La date de fin doit suivre la date de début.');
+            }
+        }
+        $duration = $data['duration'] ?? 5;
+        if (filter_var($duration, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1, 'max_range' => 15]]) === false) {
+            return $fail("La durée d'affichage doit être un nombre entier de 1 à 15 secondes.");
+        }
+        if (!empty($data['redirect_url']) && !self::isHttpUrl($data['redirect_url'])) {
+            return $fail("L'URL de redirection doit commencer par https:// ou http:// (500 caractères maximum).");
+        }
+        $hasVisual = false;
+        foreach (self::FORMATS as $key => $label) {
+            if (empty($data[$key])) {
+                continue;
+            }
+            if (!self::isHttpUrl($data[$key])) {
+                return $fail(sprintf("%s : indiquez l'URL https:// d'une image hébergée (500 caractères maximum, pas d'image collée).", $label));
+            }
+            $hasVisual = true;
+        }
+        if (!$hasVisual) {
+            return $fail("Indiquez au moins un visuel (URL d'image).");
+        }
+
+        return null;
+    }
+
+    private static function date(mixed $value): ?\DateTimeImmutable
+    {
+        if (!is_string($value)) {
+            return null;
+        }
+        $date = \DateTimeImmutable::createFromFormat('!Y-m-d', $value);
+
+        return $date && $date->format('Y-m-d') === $value ? $date : null;
+    }
+
+    private static function isHttpUrl(mixed $value): bool
+    {
+        return is_string($value)
+            && strlen($value) <= 500
+            && filter_var($value, FILTER_VALIDATE_URL) !== false
+            && in_array(strtolower((string) parse_url($value, PHP_URL_SCHEME)), ['http', 'https'], true);
     }
 
 
     #[Route('/marketing/{id}', name: 'delete_marketing_campaign', methods: ['DELETE'])]
     public function delete(Marketing $marketing, EntityManagerInterface $entityManager): JsonResponse
     {
+        // Historique des affichages (marketing_view, clé étrangère sans cascade) : supprimé avec la
+        // campagne, sinon une campagne déjà affichée ne pouvait pas être supprimée (erreur 500).
+        $entityManager->createQuery('DELETE FROM App\Entity\MarketingView v WHERE v.marketing = :marketing')
+            ->setParameter('marketing', $marketing)
+            ->execute();
         $entityManager->remove($marketing);
         $entityManager->flush();
 
@@ -151,6 +242,9 @@ class MarketingController extends AbstractController
         // On s'assure que le champ 'status' est présent dans la requête
         if (!isset($data['status'])) {
             return new JsonResponse(['error' => 'Status field is required'], Response::HTTP_BAD_REQUEST);
+        }
+        if (!in_array($data['status'], self::STATUSES, true)) {
+            return new JsonResponse(['message' => 'Le statut doit être « active » ou « inactive ».'], Response::HTTP_BAD_REQUEST);
         }
 
         // Met à jour le statut de la campagne
