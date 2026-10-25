@@ -61,6 +61,7 @@ User 1──* Years 1──* Surgeries *──1 Nomenclature
 
 TermsConditions (versions des CGU, la plus récente fait foi)
 Marketing 1──* MarketingView
+Partner *──1 PartnerLogo (logo PNG/SVG en base, adressé par SHA-256)
 ```
 
 Points notables :
@@ -108,6 +109,8 @@ Points notables :
 | GET | `/api/terms-conditions` | public | Dernières CGU |
 | PUT | `/api/acceptTerms` | user | Acceptation des CGU |
 | GET | `/api/marketing/active` | public | Campagne active aléatoire (+1 vue) |
+| GET | `/api/partner/active` | public | Partenaire affiché aujourd'hui (204 sinon) |
+| GET | `/api/partner/logo/{sha256}.{png\|svg}` | public | Logo du partenaire (CSP sans script, cache immuable) |
 | GET | `/api/nomenclature/{speciality}` | user | Nomenclature d'une spécialité |
 | GET | `/api/list/{id}` | propriétaire | Chirurgiens d'une année |
 | POST | `/api/years/create` | user | Création d'année (unicité année/user) |
@@ -127,6 +130,14 @@ Points notables :
 | GET | `/api/admin/history/quick` | admin | Tableau de bord des connexions |
 | GET/POST/PUT | `/api/admin/nomenclature…` | admin | CRUD nomenclature, type, sous-type |
 | GET/POST/PUT/DELETE | `/api/admin/marketing…` | admin | CRUD campagnes, statut |
+| GET/POST/PUT/DELETE | `/api/admin/partners…` | admin | Partenaire : brouillon, publication, `withdraw`, `reschedule`, historique |
+| POST | `/api/admin/partner-logos` | admin | Envoi d'un logo (multipart `file`, PNG ≥ 512 px ou SVG sûr, 1 Mo) |
+
+Partenaire (`src/Service/PartnerManager.php`) : un seul affiché à la fois (chevauchement de
+périodes refusé à la publication) ; affiché = publié, date de début atteinte, date de fin non
+dépassée, calculé à chaque requête (Europe/Brussels, comparaison de jours) : passage automatique
+d'un partenaire au suivant, sans tâche planifiée. Les logos sont stockés en base
+(`partner_logo`) : inclus dans les sauvegardes, indépendants des conteneurs.
 
 Tout `/api` non listé comme public exige un JWT (dernière règle de `access_control`).
 « propriétaire » = contrôle `isGranted('OWNER', ...)` via `OwnershipVoter`.
