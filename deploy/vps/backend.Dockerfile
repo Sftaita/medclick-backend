@@ -28,6 +28,8 @@ COPY --from=vendor /app/vendor ./vendor
 RUN php -r 'exit(extension_loaded("sodium") ? 0 : 1);' \
     # .env minimal : les vraies valeurs viennent des variables d'environnement du conteneur.
     && printf 'APP_ENV=prod\n' > .env \
+    # Visuels de campagne importés : 5 Mo par fichier (contrôlé par l'application). Défaut PHP : 2 Mo.
+    && printf 'upload_max_filesize = 6M\npost_max_size = 8M\n' > "$PHP_INI_DIR/conf.d/zz-medclick-uploads.ini" \
     && mkdir -p var config/jwt \
     && chown -R www-data:www-data var config/jwt
 

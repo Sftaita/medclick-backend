@@ -111,6 +111,7 @@ Points notables :
 | GET | `/api/marketing/active` | public | Campagne active aléatoire (+1 vue) |
 | GET | `/api/partner/active` | public | Partenaire affiché aujourd'hui (204 sinon) |
 | GET | `/api/partner/logo/{sha256}.{png\|svg}` | public | Logo du partenaire (CSP sans script, cache immuable) |
+| GET | `/api/marketing/image/{sha256}.webp` | public | Visuel importé d'une campagne (CSP sans script, cache immuable) |
 | GET | `/api/nomenclature/{speciality}` | user | Nomenclature d'une spécialité |
 | GET | `/api/list/{id}` | propriétaire | Chirurgiens d'une année |
 | POST | `/api/years/create` | user | Création d'année (unicité année/user) |
@@ -130,6 +131,7 @@ Points notables :
 | GET | `/api/admin/history/quick` | admin | Tableau de bord des connexions |
 | GET/POST/PUT | `/api/admin/nomenclature…` | admin | CRUD nomenclature, type, sous-type |
 | GET/POST/PUT/DELETE | `/api/admin/marketing…` | admin | CRUD campagnes, statut |
+| POST/DELETE | `/api/admin/marketing-images…` | admin | Import d'un visuel (multipart `file`, PNG/JPEG/WebP 5 Mo) ; suppression d'un import abandonné (409 s'il est utilisé) |
 | GET/POST/PUT/DELETE | `/api/admin/partners…` | admin | Partenaire : brouillon, publication, `withdraw`, `reschedule`, historique |
 | POST | `/api/admin/partner-logos` | admin | Envoi d'un logo (multipart `file`, PNG ≥ 512 px ou SVG sûr, 1 Mo) |
 
@@ -138,6 +140,18 @@ périodes refusé à la publication) ; affiché = publié, date de début attein
 dépassée, calculé à chaque requête (Europe/Brussels, comparaison de jours) : passage automatique
 d'un partenaire au suivant, sans tâche planifiée. Les logos sont stockés en base
 (`partner_logo`) : inclus dans les sauvegardes, indépendants des conteneurs.
+
+Visuels des campagnes (`src/Service/MarketingImageProcessor.php`, `MarketingImageStore.php`) :
+une image principale (`large_screen_format`) et quatre variantes (smartphone, tablette portrait,
+tablette paysage, ordinateur = `screen_14_inch_format`). Chaque champ contient soit l'URL
+relative d'un visuel importé (`/api/marketing/image/<sha256>.webp`), soit une URL externe
+(anciennes campagnes, conservées et toujours affichées). Import : type vérifié sur le contenu,
+480 à 8000 px par côté, 25 Mpx et 5 Mo au plus, images animées refusées ; réencodé en WebP
+(métadonnées supprimées, orientation EXIF appliquée, 2560 px et 1,5 Mo au plus) et stocké en
+base (`marketing_image`, sauvegardes comprises). Un visuel remplacé, retiré ou dont la campagne
+est supprimée est effacé s'il ne sert à aucune autre campagne ; un import jamais enregistré est
+supprimé par le front à l'annulation, sinon purgé après 24 h. Une valeur déjà enregistrée
+renvoyée inchangée est acceptée telle quelle (ex. images collées tronquées de « Test Arthrex »).
 
 Tout `/api` non listé comme public exige un JWT (dernière règle de `access_control`).
 « propriétaire » = contrôle `isGranted('OWNER', ...)` via `OwnershipVoter`.

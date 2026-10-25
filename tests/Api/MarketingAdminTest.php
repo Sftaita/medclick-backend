@@ -58,9 +58,9 @@ class MarketingAdminTest extends ApiTestBase
         yield 'redirection non http' => [['redirect_url' => 'javascript:alert(1)'], "L'URL de redirection doit commencer par https:// ou http:// (500 caractères maximum)."];
         yield 'image collée (data:)' => [
             ['smartphone_format' => 'data:image/jpeg;base64,' . str_repeat('A', 600)],
-            "Visuel smartphone : indiquez l'URL https:// d'une image hébergée (500 caractères maximum, pas d'image collée).",
+            "Visuel smartphone : importez une image PNG, JPEG ou WebP (ou indiquez l'URL https:// d'une image hébergée ; pas d'image collée).",
         ];
-        yield 'aucun visuel' => [['smartphone_format' => '', 'large_screen_format' => null], "Indiquez au moins un visuel (URL d'image)."];
+        yield 'aucun visuel' => [['smartphone_format' => '', 'large_screen_format' => null], 'Importez au moins un visuel (image principale).'];
     }
 
     /** Durées proposées (3, 5, 10, 15, 30 s) et durée personnalisée : enregistrées et servies telles quelles. */

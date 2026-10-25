@@ -53,6 +53,8 @@ security:
     - { path: ^/api/marketing/active, roles: PUBLIC_ACCESS }
     # Clic sur la publicité depuis la page de connexion (limité en débit).
     - { path: ^/api/marketing/incrementCampaign/\d+$, roles: PUBLIC_ACCESS, methods: [PUT] }
+    # Visuels importés des campagnes (publicité de la page de connexion).
+    - { path: '^/api/marketing/image/[a-f0-9]{64}\.webp$', roles: PUBLIC_ACCESS, methods: [GET] }
     # Partenaire affiché et son logo (écran de connexion, avant toute session).
     - { path: ^/api/partner/active$, roles: PUBLIC_ACCESS, methods: [GET] }
     - { path: '^/api/partner/logo/[a-f0-9]{64}\.(png|svg)$', roles: PUBLIC_ACCESS, methods: [GET] }

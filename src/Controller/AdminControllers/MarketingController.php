@@ -3,7 +3,10 @@
 namespace App\Controller\AdminControllers;
 
 use App\Entity\Marketing;
+use App\Entity\MarketingImage;
+use App\Repository\MarketingImageRepository;
 use App\Repository\MarketingRepository;
+use App\Service\MarketingImageStore;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -16,8 +19,11 @@ class MarketingController extends AbstractController
 {
     private $entityManager;
 
-    public function __construct(EntityManagerInterface $entityManager)
-    {
+    public function __construct(
+        EntityManagerInterface $entityManager,
+        private readonly MarketingImageRepository $images,
+        private readonly MarketingImageStore $imageStore,
+    ) {
         $this->entityManager = $entityManager;
     }
 
@@ -93,6 +99,7 @@ class MarketingController extends AbstractController
 
         $this->entityManager->persist($marketing);
         $this->entityManager->flush();
+        $this->imageStore->purgeOrphans();
 
         return $this->json(['status' => 'Marketing campaign created'], Response::HTTP_CREATED);
     }
@@ -102,12 +109,15 @@ class MarketingController extends AbstractController
     public function edit(Request $request, Marketing $marketing): Response
     {
         $data = json_decode($request->getContent(), true);
-        if ($error = $this->validationError($data)) {
+        if ($error = $this->validationError($data, $marketing)) {
             return $error;
         }
 
+        // Visuels remplacés ou retirés : supprimés après l'enregistrement s'ils ne servent plus.
+        $previous = $this->imageStore->pathsOf($marketing);
         $this->hydrate($marketing, $data);
         $this->entityManager->flush();
+        $this->imageStore->release($previous);
 
         return $this->json(['status' => 'Marketing campaign updated']);
     }
@@ -137,17 +147,21 @@ class MarketingController extends AbstractController
         'smartphone_format' => 'Visuel smartphone',
         'tablet_portrait_format' => 'Visuel tablette portrait',
         'tablet_landscape_format' => 'Visuel tablette paysage',
-        'screen_14_inch_format' => 'Visuel écran 14 pouces',
-        'large_screen_format' => 'Visuel grand écran',
+        'screen_14_inch_format' => 'Visuel ordinateur',
+        'large_screen_format' => 'Image principale',
     ];
 
     /**
      * Contrôle des champs : 400 avec un message lisible au lieu d'une erreur 500 (champ manquant,
-     * date invalide, texte trop long pour la colonne en mode SQL strict). Les visuels sont des URL
-     * http(s) d'images hébergées : une image collée en data:… dépasse 500 caractères et était
-     * tronquée, donc illisible.
+     * date invalide, texte trop long pour la colonne en mode SQL strict).
+     *
+     * Visuel accepté : visuel importé (/api/marketing/image/<sha256>.webp, existant), URL http(s)
+     * d'une image hébergée (anciennes campagnes, ancienne interface), ou valeur déjà enregistrée
+     * renvoyée inchangée (une ancienne campagne reste modifiable sans perte de ses visuels, même
+     * « Test Arthrex » et ses images collées tronquées). Une nouvelle image collée en data:… est
+     * refusée : elle dépasse 500 caractères et serait tronquée, donc illisible.
      */
-    private function validationError(mixed $data): ?JsonResponse
+    private function validationError(mixed $data, ?Marketing $current = null): ?JsonResponse
     {
         $fail = static fn (string $message) => new JsonResponse(['message' => $message], Response::HTTP_BAD_REQUEST);
 
@@ -185,18 +199,29 @@ class MarketingController extends AbstractController
         if (!empty($data['redirect_url']) && !self::isHttpUrl($data['redirect_url'])) {
             return $fail("L'URL de redirection doit commencer par https:// ou http:// (500 caractères maximum).");
         }
+        $stored = $current !== null ? MarketingImageStore::formatValues($current) : [];
         $hasVisual = false;
         foreach (self::FORMATS as $key => $label) {
             if (empty($data[$key])) {
                 continue;
             }
-            if (!self::isHttpUrl($data[$key])) {
-                return $fail(sprintf("%s : indiquez l'URL https:// d'une image hébergée (500 caractères maximum, pas d'image collée).", $label));
-            }
+            $value = $data[$key];
             $hasVisual = true;
+            if (isset($stored[$key]) && $value === $stored[$key]) {
+                continue;
+            }
+            if (is_string($value) && str_starts_with($value, MarketingImage::PATH_PREFIX)) {
+                if ($this->images->findByPath($value) === null) {
+                    return $fail(sprintf('%s : visuel introuvable, importez-le de nouveau.', $label));
+                }
+                continue;
+            }
+            if (!self::isHttpUrl($value)) {
+                return $fail(sprintf("%s : importez une image PNG, JPEG ou WebP (ou indiquez l'URL https:// d'une image hébergée ; pas d'image collée).", $label));
+            }
         }
         if (!$hasVisual) {
-            return $fail("Indiquez au moins un visuel (URL d'image).");
+            return $fail('Importez au moins un visuel (image principale).');
         }
 
         return null;
@@ -229,8 +254,11 @@ class MarketingController extends AbstractController
         $entityManager->createQuery('DELETE FROM App\Entity\MarketingView v WHERE v.marketing = :marketing')
             ->setParameter('marketing', $marketing)
             ->execute();
+        $images = $this->imageStore->pathsOf($marketing);
         $entityManager->remove($marketing);
         $entityManager->flush();
+        // Visuels importés de la campagne : supprimés avec elle s'ils ne servent à aucune autre.
+        $this->imageStore->release($images);
 
         return new JsonResponse(['status' => 'Marketing campaign deleted']);
     }

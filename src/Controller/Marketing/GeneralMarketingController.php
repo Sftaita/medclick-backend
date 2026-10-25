@@ -3,8 +3,11 @@
 namespace App\Controller\Marketing;
 
 use DateTime;
+use App\Entity\MarketingImage;
 use App\Entity\MarketingView;
+use App\Repository\MarketingImageRepository;
 use App\Repository\MarketingRepository;
+use Symfony\Component\HttpFoundation\Response;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -75,6 +78,27 @@ class GeneralMarketingController extends AbstractController
         ];
 
         return new JsonResponse($campaignData, JsonResponse::HTTP_OK);
+    }
+
+    /**
+     * Visuel importé (page de connexion, sans JWT). Nom = empreinte du contenu : mis en cache
+     * sans limite. Servi comme une image inerte (nosniff, CSP sans script).
+     */
+    #[Route('/api/marketing/image/{file}', name: 'marketing_image', methods: ['GET'], requirements: ['file' => '[a-f0-9]{64}\.webp'])]
+    public function image(string $file, MarketingImageRepository $images): Response
+    {
+        $image = $images->findByFileName($file);
+        if ($image === null) {
+            return new JsonResponse(['message' => 'Visuel introuvable.'], Response::HTTP_NOT_FOUND);
+        }
+
+        return new Response($image->getData(), Response::HTTP_OK, [
+            'Content-Type' => MarketingImage::MIME_TYPE,
+            'Content-Disposition' => 'inline; filename="' . $image->getFileName() . '"',
+            'Cache-Control' => 'public, max-age=31536000, immutable',
+            'X-Content-Type-Options' => 'nosniff',
+            'Content-Security-Policy' => "default-src 'none'; sandbox",
+        ]);
     }
 
     /**
