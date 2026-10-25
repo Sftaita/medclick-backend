@@ -282,6 +282,18 @@ Procédure (aucune fenêtre sans certificat valide) :
 Retour arrière des certificats : remettre `medclick-tls.yml` (le certificat manuel est valable
 jusqu'au 22/01/2027) ; il est servi à nouveau dès le rechargement à chaud.
 
+Exécution (25/10/2026, UTC) : routeur activé à 05:15:33, certificat dans `acme.json` à 05:15:56
+(un seul essai, aucune erreur), certificat manuel retiré à 05:21:38. Série servie en IPv4 et IPv6
+pour les trois noms : `…3D43FE` (Let's Encrypt, valable jusqu'au 23/01/2027, chaîne vérifiée).
+MedVue, SurgicalHub et le staging inchangés. Aucun visiteur n'a reçu d'erreur.
+
+À savoir pour les contrôles : Traefik range le certificat dans `acme.json` sous le seul nom qui
+manquait (`domain.main = cert.medclick.be`, sans SAN), alors que le certificat couvre bien les trois
+noms. Vérifier les SAN du certificat lui-même (`openssl x509 -ext subjectAltName`), pas l'étiquette.
+Sans effet sur le renouvellement : lego reprend les noms du certificat (`ExtractDomains`). Premier
+renouvellement attendu vers le 24/12/2026 ; à surveiller : nouvelle série servie sur `www`.
+Archive et retour arrière : `~/bascule-b/medclick-tls.yml.retire-*`, `~/bascule-b/retour-cert-manuel.sh`.
+
 ## Répétition générale de A sur le staging (06/10/2026, 05:18–05:30 UTC)
 
 Copie de production lue en lecture seule (empreintes avant/après le dump identiques), backend
