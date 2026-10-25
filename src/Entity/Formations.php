@@ -51,6 +51,8 @@ class Formations
     #[ORM\Column(type: 'datetime')]
     #[Groups(['formations_read'])]
     #[Assert\NotBlank(message: 'Veuillez indiquer la date de fin.')]
+    // Période cohérente : la fin ne précède pas le début (constaté : formation de 14:00 à 12:00 acceptée).
+    #[Assert\GreaterThanOrEqual(propertyPath: 'dateOfStart', message: 'La fin doit être postérieure au début.')]
     private $dateOfEnd;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]

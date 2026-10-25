@@ -44,6 +44,8 @@ class Gardes
     #[ORM\Column(type: 'datetime')]
     #[Groups(['gardes_read'])]
     #[Assert\NotBlank(message: 'Veuillez indiquer la date de fin.')]
+    // Période cohérente : la fin ne précède pas le début.
+    #[Assert\GreaterThanOrEqual(propertyPath: 'dateOfStart', message: 'La fin doit être postérieure au début.')]
     private $dateOfEnd;
 
     #[ORM\Column(type: 'string', length: 10)]
