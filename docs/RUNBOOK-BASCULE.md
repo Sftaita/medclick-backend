@@ -179,14 +179,22 @@ l'aller. Les sessions sont conservées (même clé `authToken`, même origine `w
 
 ### 12. DNS du frontend 👤🔒
 
-- `www.medclick.be` : supprimer le CNAME, créer **A `187.124.55.15`** et **AAAA `2a02:4780:7:aa8f::1`**, TTL 300.
+> Procédure corrigée après l'incident du 24/10 (voir « Exécution de B ») : **le certificat des deux
+> noms doit être servi par V AVANT tout changement DNS**, et les routes `www` doivent déjà exister.
+
+- Prérequis 🤖 : routes `www`, `www/api` et redirection de l'apex actives sur V (`WWW_LIVE=true`) ;
+  certificat valide pour `www.medclick.be` **et** `medclick.be` servi par V en IPv4 et IPv6 (vérifié
+  en forçant la résolution : `curl --resolve`, puis test navigateur via le fichier `hosts`).
+  L'HTTP-01 est impossible avant le DNS (Hostinger intercepte `/.well-known/acme-challenge/`, voir
+  plus bas) : certificat obtenu par **DNS-01 manuel** (section « Certificats de www et de l'apex »).
 - `medclick.be` (apex) : **A `187.124.55.15`** et **AAAA `2a02:4780:7:aa8f::1`**, TTL 300.
-- Ne pas toucher MX, TXT (SPF/DKIM) ni aucun autre nom.
-- Puis 🤖, dès que `ns1` et `ns2.dns-parking.com` répondent les nouvelles valeurs :
-  `.env` `WWW_LIVE=true` et `docker compose up -d frontend` (recréation : Traefik active les routes
-  `www`, `www/api` et la redirection de `medclick.be`, puis demande les certificats HTTP-01).
-- Vérification : certificats Let's Encrypt pour `www.medclick.be` et `medclick.be` en IPv4 et IPv6.
-- Retour arrière immédiat côté V : `WWW_LIVE=false` + `docker compose up -d frontend`.
+- `www.medclick.be` : **CNAME vers `medclick.be` conservé** (il suit l'apex, rien à modifier).
+- Ne pas toucher MX, TXT (SPF/DKIM/DMARC) ni aucun autre nom.
+- Vérification : `ns1` et `ns2.dns-parking.com` interrogés en boucle (la zone Hostinger peut
+  alterner entre ancienne et nouvelle valeur pendant plusieurs dizaines de minutes, sans changer le
+  numéro de série), puis résolveurs publics ; certificats et réponses du site en IPv4 et IPv6.
+- Retour arrière : remettre l'ancien A/AAAA de l'apex (valeurs notées à l'étape 11) ; le CRA
+  d'Hostinger reprend et son relais `/api` reste actif.
 
 ### 13. Tests et transition CRA → Vite
 
@@ -213,6 +221,78 @@ Enseignements :
 - LiteSpeed relit un `.htaccess` d'après sa date de modification : après `cp -p`, faire `touch`.
 - Les clés JWT d'Hostinger ont été reprises sur V (sessions conservées) ; rotation à planifier.
 - Indisponibilité réelle ≈ 40 min (gel → relais), surtout due à l'attente du changement DNS.
+
+## Exécution de B (24/10/2026)
+
+Versions : backend `a533cf6` (proxys de confiance, `location /static/`), frontend `46912de`.
+
+| Étape | Résultat |
+|---|---|
+| Préflight, CDN Hostinger désactivé 👤 | valeurs DNS de retour arrière notées ; CRA servi par l'origine Hostinger |
+| 1er changement DNS 👤 (matin) | **incident** : V n'avait encore ni route `www` active ni certificat pour ces noms, et la zone Hostinger a alterné ancienne/nouvelle valeur ; une partie des visiteurs a reçu une erreur de certificat pendant ≈ 45 min (09:44 → ≈ 10:28, heure de Bruxelles) ; retour arrière DNS 👤, aucune donnée en jeu |
+| Analyse | HTTP-01 impossible avant le DNS : l'openresty d'Hostinger intercepte `/.well-known/acme-challenge/` (relais PHP inopérant) |
+| Relais Hostinger | relais `/api` et `/activation` du CRA vers l'API de V déposé **avant** le DNS (R-B prêt) |
+| Certificat DNS-01 manuel | obtenu au premier essai (deux TXT `_acme-challenge`), servi par V via le fournisseur de fichiers Traefik ; tests complets via le fichier `hosts` |
+| 2e changement DNS 👤 (après-midi) | A/AAAA de l'apex vers V ; stable sur `ns1`/`ns2` dès le premier échantillon ; **aucune erreur de certificat** ; 0 réponse 5xx |
+| Certificats Traefik | voir ci-dessous (pré-émission sans interruption) |
+
+Enseignements :
+- Ne jamais changer un DNS vers V tant que V ne sert pas déjà, pour ce nom, la route **et** un
+  certificat valide (vérifié en forçant la résolution).
+- La zone Hostinger (`dns-parking.com`) peut répondre alternativement l'ancienne et la nouvelle
+  valeur après une modification : surveiller les deux serveurs faisant autorité, pas un seul résolveur.
+- Hostinger intercepte les défis HTTP-01 : pour un nom encore hébergé chez Hostinger, utiliser DNS-01.
+- Traefik ne demande **aucun** certificat ACME pour un nom déjà couvert par un certificat de son
+  magasin (fichier compris) : un certificat manuel « bloque » le renouvellement automatique.
+
+## Certificats de www et de l'apex
+
+### Avant le DNS : DNS-01 manuel
+
+- acme.sh (image officielle, état dans un dossier en 700 sur V, clés en 600), mode `--dns` manuel :
+  deux TXT `_acme-challenge.medclick.be` et `_acme-challenge.www.medclick.be` ajoutés 👤 dans hPanel,
+  vérifiés sur `ns1`/`ns2`, puis validation. Un seul essai, aucune autre entrée DNS modifiée.
+- Certificat chargé par Traefik via un fichier du fournisseur `file` (`medclick-tls.yml`, rechargé à
+  chaud, sans redémarrage de Traefik ni effet sur les autres applications).
+
+### Après le DNS : passage aux certificats Traefik sans interruption
+
+Contraintes vérifiées dans le code de Traefik 3.6 :
+- l'ACME n'émet que si **au moins un** nom demandé n'est couvert par aucun certificat du magasin,
+  et commande alors **tous** les noms de la liste (`tls.domains`) ;
+- un routeur HTTPS visant un nom précis passe **avant** tout routeur TCP sur le même nom : un relais
+  TLS en passthrough ne peut pas masquer temporairement `www` (essayé le 24/10, sans effet ni impact) ;
+- le renouvellement porte sur tous les certificats d'`acme.json` (30 jours avant l'échéance,
+  contrôle quotidien), indépendamment des routeurs.
+
+Procédure (aucune fenêtre sans certificat valide) :
+1. 👤 Créer `cert.medclick.be` **A `187.124.55.15`** (TTL 300), vérifié sur `ns1`/`ns2`.
+2. 🤖 Ajouter le routeur de fichier `medclick-acme.yml` (`Host(cert.medclick.be)`, service
+   `noop@internal`, `tls.domains` = `www.medclick.be` + `medclick.be` + `cert.medclick.be`) :
+   Traefik commande par HTTP-01 un certificat couvrant les trois noms, pendant que le certificat
+   manuel continue d'être servi.
+3. 🤖 Vérifier `acme.json` (noms, échéance) ; échec → retirer le routeur, analyser, ne pas réessayer
+   en boucle (limites Let's Encrypt). Les visiteurs ne sont pas concernés.
+4. 🤖 Retirer `medclick-tls.yml` (archivé, pas supprimé) : le certificat Traefik, déjà dans le
+   magasin, prend le relais. Vérifier le numéro de série servi en IPv4 et IPv6.
+5. `cert.medclick.be` doit **rester** en DNS vers V : il fait partie du certificat renouvelé.
+6. Les TXT `_acme-challenge` ne servent plus au renouvellement (HTTP-01) : suppression 👤 possible
+   après l'étape 4, ou conservation sans effet si un nouveau DNS-01 manuel est envisagé.
+
+Retour arrière des certificats : remettre `medclick-tls.yml` (le certificat manuel est valable
+jusqu'au 22/01/2027) ; il est servi à nouveau dès le rechargement à chaud.
+
+Exécution (25/10/2026, UTC) : routeur activé à 05:15:33, certificat dans `acme.json` à 05:15:56
+(un seul essai, aucune erreur), certificat manuel retiré à 05:21:38. Série servie en IPv4 et IPv6
+pour les trois noms : `…3D43FE` (Let's Encrypt, valable jusqu'au 23/01/2027, chaîne vérifiée).
+MedVue, SurgicalHub et le staging inchangés. Aucun visiteur n'a reçu d'erreur.
+
+À savoir pour les contrôles : Traefik range le certificat dans `acme.json` sous le seul nom qui
+manquait (`domain.main = cert.medclick.be`, sans SAN), alors que le certificat couvre bien les trois
+noms. Vérifier les SAN du certificat lui-même (`openssl x509 -ext subjectAltName`), pas l'étiquette.
+Sans effet sur le renouvellement : lego reprend les noms du certificat (`ExtractDomains`). Premier
+renouvellement attendu vers le 24/12/2026 ; à surveiller : nouvelle série servie sur `www`.
+Archive et retour arrière : `~/bascule-b/medclick-tls.yml.retire-*`, `~/bascule-b/retour-cert-manuel.sh`.
 
 ## Répétition générale de A sur le staging (06/10/2026, 05:18–05:30 UTC)
 
