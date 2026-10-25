@@ -52,13 +52,53 @@ class MarketingAdminTest extends ApiTestBase
         yield 'statut inconnu' => [['status' => 'paused'], 'Le statut doit être « active » ou « inactive ».'];
         yield 'date de début absente' => [['start_date' => ''], 'La date de début est obligatoire (AAAA-MM-JJ).'];
         yield 'fin avant début' => [['end_date' => '2026-09-01'], 'La date de fin doit suivre la date de début.'];
-        yield 'durée hors limites' => [['duration' => 60], "La durée d'affichage doit être un nombre entier de 1 à 15 secondes."];
+        yield 'durée nulle' => [['duration' => 0], "La durée d'affichage doit être un nombre entier de 1 à 60 secondes."];
+        yield 'durée trop longue' => [['duration' => 61], "La durée d'affichage doit être un nombre entier de 1 à 60 secondes."];
+        yield 'durée décimale' => [['duration' => 4.5], "La durée d'affichage doit être un nombre entier de 1 à 60 secondes."];
         yield 'redirection non http' => [['redirect_url' => 'javascript:alert(1)'], "L'URL de redirection doit commencer par https:// ou http:// (500 caractères maximum)."];
         yield 'image collée (data:)' => [
             ['smartphone_format' => 'data:image/jpeg;base64,' . str_repeat('A', 600)],
             "Visuel smartphone : indiquez l'URL https:// d'une image hébergée (500 caractères maximum, pas d'image collée).",
         ];
         yield 'aucun visuel' => [['smartphone_format' => '', 'large_screen_format' => null], "Indiquez au moins un visuel (URL d'image)."];
+    }
+
+    /** Durées proposées (3, 5, 10, 15, 30 s) et durée personnalisée : enregistrées et servies telles quelles. */
+    #[DataProvider('displayDurations')]
+    public function testDisplayDurationIsStoredAndServed(int $duration): void
+    {
+        $this->admin()->request('POST', '/api/admin/marketing', ['json' => array_merge(self::VALID, ['duration' => $duration, 'start_date' => (new \DateTime('-1 day'))->format('Y-m-d'), 'end_date' => null])]);
+
+        $this->assertResponseStatusCodeSame(201);
+        $this->assertSame($duration, static::createClient()->request('GET', '/api/marketing/active')->toArray()['duration']);
+    }
+
+    public static function displayDurations(): iterable
+    {
+        foreach ([3, 5, 10, 15, 30, 45, 1, 60] as $duration) {
+            yield "$duration s" => [$duration];
+        }
+    }
+
+    public function testDurationDefaultsToFiveSeconds(): void
+    {
+        $data = self::VALID;
+        unset($data['duration']);
+        $this->admin()->request('POST', '/api/admin/marketing', ['json' => $data]);
+
+        $this->assertResponseStatusCodeSame(201);
+        $this->assertSame(5, $this->freshEm()->getRepository(Marketing::class)->findOneBy([])->getDuration());
+    }
+
+    public function testDurationCanBeChanged(): void
+    {
+        $campaign = $this->createCampaign();
+
+        $this->admin()->request('PUT', '/api/admin/marketing/' . $campaign->getId(), ['json' => array_merge(self::VALID, ['duration' => 30])]);
+
+        $this->assertResponseIsSuccessful();
+        $this->assertSame(30, $this->freshEm()->find(Marketing::class, $campaign->getId())->getDuration());
+        $this->assertSame(30, static::createClient()->request('GET', '/api/admin/marketing/' . $campaign->getId(), ['headers' => ['Authorization' => $this->adminAuthorization()]])->toArray()['duration']);
     }
 
     public function testEndDateCanBeCleared(): void
@@ -141,6 +181,13 @@ class MarketingAdminTest extends ApiTestBase
     private function admin()
     {
         return $this->clientFor($this->createUser('admin@test.be', ['ROLE_ADMIN']));
+    }
+
+    private function adminAuthorization(): string
+    {
+        $response = static::createClient()->request('POST', '/api/login_check', ['json' => ['username' => 'admin@test.be', 'password' => self::PASSWORD]]);
+
+        return 'Bearer ' . $response->toArray()['token'];
     }
 
     private function createCampaign(): Marketing

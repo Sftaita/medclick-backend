@@ -52,7 +52,7 @@ class GeneralMarketingController extends AbstractController
         $entityManager->flush();
 
         // Déterminer la durée avec une valeur par défaut de 5
-        $duration = $randomCampaign->getDuration() ?? 5;
+        $duration = $randomCampaign->getDuration();
 
         // Renvoyer les informations de la campagne en JSON
         $campaignData = [

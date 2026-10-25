@@ -122,7 +122,7 @@ class MarketingController extends AbstractController
         $marketing->setStatus($data['status']);
         $marketing->setStartDate(new \DateTime($data['start_date']));
         $marketing->setEndDate(empty($data['end_date']) ? null : new \DateTime($data['end_date']));
-        $marketing->setDuration((int) ($data['duration'] ?? 5));
+        $marketing->setDuration((int) ($data['duration'] ?? Marketing::DEFAULT_DURATION));
         $marketing->setRedirectUrl(empty($data['redirect_url']) ? null : $data['redirect_url']);
         $marketing->setSmartphoneFormat(empty($data['smartphone_format']) ? null : $data['smartphone_format']);
         $marketing->setTabletPortraitFormat(empty($data['tablet_portrait_format']) ? null : $data['tablet_portrait_format']);
@@ -177,9 +177,10 @@ class MarketingController extends AbstractController
                 return $fail('La date de fin doit suivre la date de début.');
             }
         }
-        $duration = $data['duration'] ?? 5;
-        if (filter_var($duration, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1, 'max_range' => 15]]) === false) {
-            return $fail("La durée d'affichage doit être un nombre entier de 1 à 15 secondes.");
+        // Durée d'affichage à la connexion : 3, 5, 10, 15 ou 30 s proposées, ou valeur personnalisée.
+        $duration = $data['duration'] ?? Marketing::DEFAULT_DURATION;
+        if (filter_var($duration, FILTER_VALIDATE_INT, ['options' => ['min_range' => Marketing::MIN_DURATION, 'max_range' => Marketing::MAX_DURATION]]) === false) {
+            return $fail(sprintf("La durée d'affichage doit être un nombre entier de %d à %d secondes.", Marketing::MIN_DURATION, Marketing::MAX_DURATION));
         }
         if (!empty($data['redirect_url']) && !self::isHttpUrl($data['redirect_url'])) {
             return $fail("L'URL de redirection doit commencer par https:// ou http:// (500 caractères maximum).");

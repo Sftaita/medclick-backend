@@ -10,6 +10,10 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: MarketingRepository::class)]
 class Marketing
 {
+    public const DEFAULT_DURATION = 5;
+    public const MIN_DURATION = 1;
+    public const MAX_DURATION = 60;
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
@@ -51,8 +55,9 @@ class Marketing
     #[ORM\OneToMany(targetEntity: MarketingView::class, mappedBy: 'marketing')]
     private $viewedAt;
 
-    #[ORM\Column(type: 'integer', nullable: true, options: ['default' => 5])]
-    private $duration;
+    /** Durée d'affichage à la connexion, en secondes (MIN_DURATION à MAX_DURATION). */
+    #[ORM\Column(type: 'integer', options: ['default' => 5])]
+    private int $duration = self::DEFAULT_DURATION;
 
     #[ORM\Column(type: 'string', length: 500, nullable: true)]
     private $redirectUrl;
@@ -229,12 +234,12 @@ class Marketing
         return $this;
     }
 
-    public function getDuration(): ?int
+    public function getDuration(): int
     {
         return $this->duration;
     }
 
-    public function setDuration(?int $duration): self
+    public function setDuration(int $duration): self
     {
         $this->duration = $duration;
 
