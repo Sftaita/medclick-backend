@@ -96,7 +96,7 @@ class PartnerManager
 
         $startsOn = self::date($data['startsOn'] ?? null, 'Date de début');
         $endsOn = self::date($data['endsOn'] ?? null, 'Date de fin');
-        if ($startsOn !== null && $endsOn !== null && $endsOn < $startsOn) {
+        if ($startsOn !== null && $endsOn !== null && $endsOn->format('Y-m-d') < $startsOn->format('Y-m-d')) {
             throw new \InvalidArgumentException('La date de fin doit suivre la date de début.');
         }
 
@@ -125,7 +125,8 @@ class PartnerManager
         if ($partner->getStartsOn() === null) {
             throw new \InvalidArgumentException('Indiquez la date de début d\'affichage.');
         }
-        if ($partner->getEndsOn() !== null && $partner->getEndsOn() < $this->today()) {
+        // Jours comparés en AAAA-MM-JJ (voir Partner::stateOn).
+        if ($partner->getEndsOn() !== null && $partner->getEndsOn()->format('Y-m-d') < $this->today()->format('Y-m-d')) {
             throw new \InvalidArgumentException('La date de fin est déjà passée : choisissez une période à venir.');
         }
         $other = $this->partners->findOverlapping($partner->getStartsOn(), $partner->getEndsOn(), $partner);

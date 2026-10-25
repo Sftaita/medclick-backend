@@ -87,11 +87,15 @@ class Partner
      */
     public function stateOn(\DateTimeImmutable $today): string
     {
+        // Comparaison de jours (AAAA-MM-JJ), jamais d'instants : Doctrine relit une colonne DATE
+        // dans le fuseau de PHP (UTC dans le conteneur), « aujourd'hui » est calculé à Bruxelles.
+        $day = $today->format('Y-m-d');
+
         return match (true) {
             $this->status === self::STATUS_DRAFT => 'draft',
             $this->status === self::STATUS_WITHDRAWN => 'withdrawn',
-            $this->startsOn !== null && $this->startsOn > $today => 'scheduled',
-            $this->endsOn !== null && $this->endsOn < $today => 'ended',
+            $this->startsOn !== null && $this->startsOn->format('Y-m-d') > $day => 'scheduled',
+            $this->endsOn !== null && $this->endsOn->format('Y-m-d') < $day => 'ended',
             default => 'live',
         };
     }

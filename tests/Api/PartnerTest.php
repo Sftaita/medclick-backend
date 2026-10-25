@@ -122,6 +122,26 @@ class PartnerTest extends ApiTestBase
         ], $active);
     }
 
+    /**
+     * Régression (staging) : PHP en UTC (conteneur), « aujourd'hui » calculé à Bruxelles. Un
+     * partenaire commençant aujourd'hui, relu depuis la base, doit être « live », pas « scheduled ».
+     */
+    public function testStateIsComputedOnDaysWhateverThePhpTimezone(): void
+    {
+        $previous = date_default_timezone_get();
+        date_default_timezone_set('UTC');
+        try {
+            $partner = $this->post($this->valid(['startsOn' => $this->day(0), 'endsOn' => $this->day(0), 'publish' => true]));
+            $this->em->clear();
+
+            $this->assertSame('live', $partner['state']);
+            $states = array_column($this->admin->request('GET', '/api/admin/partners')->toArray()['partners'], 'state');
+            $this->assertSame(['live'], $states);
+        } finally {
+            date_default_timezone_set($previous);
+        }
+    }
+
     public function testFuturePartnerIsScheduledNotShown(): void
     {
         $partner = $this->post($this->valid(['startsOn' => $this->day(3), 'publish' => true]));
