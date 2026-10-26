@@ -90,7 +90,7 @@ export default function LandingPage({ config, partner, screenshots = {}, LinkCom
               <PhoneMockup className="lp-phone--front" variant="home" src={screenshots.front} />
               <div className="lp-float lp-float--a">
                 <span className="lp-float-chip lp-tone-green"><Icon name="check" size={20} strokeWidth={2.8} /></span>
-                <span><strong>Intervention enregistrée</strong><small>Prothèse totale de genou · 1re main</small></span>
+                <span><strong>Intervention enregistrée</strong><small>Prothèse totale du genou · 1re main</small></span>
               </div>
             </div>
           </div>
@@ -115,21 +115,22 @@ export default function LandingPage({ config, partner, screenshots = {}, LinkCom
               <article className="lp-card lp-span-4">
                 <span className="lp-kicker lp-kicker--sm">Encodage</span>
                 <h3>Une intervention encodée avant d'avoir quitté le vestiaire.</h3>
-                <p>Recherchez l'acte dans la nomenclature INAMI, retrouvez vos favoris et vos chirurgiens, indiquez votre rôle. C'est tout.</p>
+                <p>Recherchez l'acte dans la nomenclature INAMI, retrouvez vos favoris et vos chirurgiens, indiquez votre rôle. Une journée opératoire chargée ? Encodez tous les actes d'un coup.</p>
                 <div className="lp-demo lp-demo--encode" aria-hidden="true">
                   <div>
-                    <div className="lp-search"><Icon name="search" size={18} strokeWidth={2.2} />prothèse genou</div>
-                    <div className="lp-result"><span>Arthroplastie totale du genou</span><span className="lp-fav"><Icon name="star" size={18} /></span></div>
-                    <div className="lp-result"><span>Prothèse unicompartimentale</span></div>
-                    <div className="lp-result"><span>Reprise de prothèse du genou</span></div>
+                    <div className="lp-search"><Icon name="search" size={18} strokeWidth={2.2} />genou</div>
+                    <div className="lp-result"><span>Prothèse totale du genou</span><span className="lp-fav"><Icon name="star" size={18} /></span></div>
+                    <div className="lp-result"><span>Plastie du ligament croisé antérieur</span></div>
+                    <div className="lp-result"><span>Méniscectomie sous arthroscopie</span></div>
                   </div>
                   <div>
                     <span className="lp-label">Votre rôle</span>
                     <div className="lp-roles">
-                      <span className="lp-role lp-role--on"><i className="lp-role-1" />1re main</span>
-                      <span className="lp-role"><i className="lp-role-3" />1re main aidée</span>
+                      <span className="lp-role"><i className="lp-role-1" />1re main</span>
+                      <span className="lp-role lp-role--on"><i className="lp-role-3" />1re main aidée</span>
                       <span className="lp-role"><i className="lp-role-2" />2e main</span>
                     </div>
+                    <span className="lp-label lp-label--block">Aidé par</span>
                     <div className="lp-surgeon"><span className="lp-avatar">JD</span>Chirurgien enregistré</div>
                   </div>
                 </div>
@@ -138,7 +139,7 @@ export default function LandingPage({ config, partner, screenshots = {}, LinkCom
               <article className="lp-card lp-span-2">
                 <span className="lp-kicker lp-kicker--sm">Ma semaine</span>
                 <h3>Vous voyez tout de suite le jour qui manque.</h3>
-                <p>Chaque jour de stage non complété est signalé, et votre série de semaines à jour vous aide à rester régulier.</p>
+                <p>Chaque jour de stage sans activité est signalé, et votre série de semaines à jour vous aide à rester régulier.</p>
                 <div className="lp-demo" aria-hidden="true">
                   <div className="lp-week">
                     {[['L', 'ok'], ['M', 'ok'], ['M', 'miss'], ['J', 'ok'], ['V', 'ok'], ['S', 'off'], ['D', 'off']].map(([d, s], i) => (
@@ -154,7 +155,7 @@ export default function LandingPage({ config, partner, screenshots = {}, LinkCom
               <article className="lp-card lp-span-3">
                 <span className="lp-kicker lp-kicker--sm">Progression</span>
                 <h3>Votre année, en chiffres et en milestones.</h3>
-                <p>Interventions, première main, consultations : suivez où vous en êtes et franchissez les étapes de votre formation.</p>
+                <p>Interventions, première main, consultations : suivez vos statistiques et débloquez les milestones de votre formation.</p>
                 <div className="lp-demo lp-progress" aria-hidden="true">
                   <span className="lp-ring">
                     <svg width="96" height="96" viewBox="0 0 44 44">
@@ -170,7 +171,7 @@ export default function LandingPage({ config, partner, screenshots = {}, LinkCom
               <article className="lp-card lp-span-3">
                 <span className="lp-kicker lp-kicker--sm">Export</span>
                 <h3>Le carnet officiel, prêt en un clic.</h3>
-                <p>Un fichier Excel avec toutes vos activités, année par année, à remettre à votre maître de stage.</p>
+                <p>Un fichier Excel par année de formation, au format du carnet officiel, à remettre à votre maître de stage.</p>
                 <div className="lp-demo" aria-hidden="true">
                   <div className="lp-file">
                     <span className="lp-chip lp-chip--white"><Icon name="excel" size={24} /></span>
@@ -283,6 +284,7 @@ export default function LandingPage({ config, partner, screenshots = {}, LinkCom
           <nav className="lp-foot-links" aria-label="Pied de page">
             {mailto && <a href={mailto}>Nous contacter</a>}
             <AppLink to={cfg.termsHref}>Conditions d'utilisation</AppLink>
+            <AppLink to={cfg.privacyHref}>Confidentialité</AppLink>
             <AppLink to={cfg.partnersHref}>Partenaires</AppLink>
           </nav>
           <span className="lp-version">Version {cfg.version}</span>

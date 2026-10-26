@@ -5,9 +5,10 @@
 
 export const landingConfig = {
   // Routes de l'application (à adapter à votre routeur)
-  loginHref: '/login',
-  registerHref: '/register',
-  termsHref: '/conditions-utilisation',
+  loginHref: '/connexion',
+  registerHref: '/inscription',
+  termsHref: '/cgu',
+  privacyHref: '/confidentialite',
   partnersHref: '/partenaires',
 
   // Laisser vide pour masquer les liens « Nous contacter » / « Écrivez-nous »
@@ -33,15 +34,15 @@ export const hero = {
 
 export const activityTypes = [
   { key: 'interventions', title: 'Interventions', sub: 'Nomenclature INAMI', tone: 'blue', icon: 'scalpel' },
-  { key: 'consultations', title: 'Consultations', sub: 'Par journée', tone: 'green', icon: 'stethoscope' },
-  { key: 'gardes', title: 'Gardes', sub: 'Jour, nuit, week-end', tone: 'purple', icon: 'moon' },
-  { key: 'formations', title: 'Formations', sub: 'Cours, congrès, ateliers', tone: 'orange', icon: 'cap' },
+  { key: 'consultations', title: 'Consultations', sub: 'Patients vus par demi-journée', tone: 'purple', icon: 'stethoscope' },
+  { key: 'gardes', title: 'Gardes', sub: 'Début, fin et patients vus', tone: 'orange', icon: 'moon' },
+  { key: 'formations', title: 'Formations', sub: 'Staff, journal club, cours, congrès', tone: 'green', icon: 'cap' },
 ];
 
 export const steps = [
   {
     title: 'Créez votre compte',
-    text: "Votre nom, votre e-mail et votre spécialité. Vous activez le compte depuis l'e-mail reçu.",
+    text: "Votre nom, votre e-mail et votre spécialité. Activez le compte depuis l'e-mail reçu, puis créez votre année de formation : hôpital et maître de stage.",
   },
   {
     title: 'Encodez au fil des jours',

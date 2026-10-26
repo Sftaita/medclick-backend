@@ -1,4 +1,5 @@
 import { Icon } from './Icons';
+import Logo from './Logo';
 
 /**
  * Cadre de téléphone pour le hero.
@@ -15,63 +16,83 @@ export default function PhoneMockup({ src, alt = '', variant = 'home', className
   );
 }
 
-/* Écrans d'exemple : données fictives d'illustration, comme dans les maquettes. */
+/* Écrans d'exemple : reprennent l'Accueil et « Mes activités » de l'application, avec des données fictives. */
 
 function HomeScreen() {
   return (
     <div className="ps">
       <div className="ps-head">
-        <div>
-          <div className="ps-h1">Bonjour Léa</div>
-          <div className="ps-muted">Belle progression cette année !</div>
-        </div>
-        <span className="ps-bell"><Icon name="bell" size={16} /></span>
+        <Logo size={22} showWordmark={false} />
+        <span className="ps-wm">Med<span>Click</span></span>
+        <span className="ps-bell"><Icon name="bell" size={16} /><i /></span>
         <span className="ps-avatar">L</span>
       </div>
+      <div>
+        <div className="ps-h1">Bonjour Léa</div>
+        <div className="ps-muted">Belle progression cette année !</div>
+      </div>
       <div className="ps-card">
-        <div className="ps-title">Mon année</div>
+        <div className="ps-title"><Icon name="chart" size={13} strokeWidth={2.6} />Mon année (3e année)</div>
         <div className="ps-kpis">
           <Kpi tone="blue" icon="scalpel" value="124" label="interventions" />
-          <Kpi tone="green" icon="hand" value="47" label="en 1re main" />
-          <Kpi tone="green" icon="stethoscope" value="18" label="consultations" />
-          <Kpi tone="ring" value="72 %" label="du carnet" />
+          <Kpi tone="green" icon="hand" value="47" label="en première main" />
+          <Kpi tone="purple" icon="stethoscope" value="18" label="consultations" />
+          <Kpi tone="ring" value="72 %" label="du carnet complété" />
         </div>
-        <div className="ps-streak"><span className="ps-flame"><Icon name="flame" size={14} /></span>6 semaines à jour</div>
+        <div className="ps-streak">
+          <span className="ps-flame"><Icon name="flame" size={14} /></span>6 semaines à jour
+          <span className="ps-streak-chev"><Icon name="chevron-right" size={12} strokeWidth={2.2} /></span>
+        </div>
       </div>
-      <div className="ps-title" style={{ marginTop: 4 }}>Cette semaine</div>
+      <div className="ps-title-row">
+        <span className="ps-title"><Icon name="calendar" size={13} />Cette semaine</span>
+        <span className="ps-link">Voir tout ›</span>
+      </div>
       <div className="ps-tiles">
-        <Tile tone="blue" value="12" label="encodées" />
-        <Tile tone="green" value="6" label="1re main" />
-        <Tile tone="red" value="1" label="jour manquant" />
+        <Tile tone="blue" icon="scalpel" value="12" label="interventions encodées" />
+        <Tile tone="green" icon="hand" value="6" label="première main" />
+        <Tile tone="red" icon="calendar" value="1" label="jour sans activité" />
       </div>
       <div className="ps-btn">Compléter ma semaine <Icon name="arrow" size={14} strokeWidth={2.4} /></div>
-      <TabBar />
+      <span className="ps-fab"><Icon name="plus" size={18} strokeWidth={2.6} /></span>
+      <TabBar active="Accueil" />
     </div>
   );
 }
 
 function ListScreen() {
+  // [acte, moment, rôle, lieu, couleur du rôle, icône]
   const rows = [
-    ['Arthroplastie totale du genou', '1re main', 'g'],
-    ['Ostéosynthèse de cheville', '1re main aidée', 'b'],
-    ['Arthroscopie du genou', '1re main', 'g'],
-    ['Prothèse totale de hanche', '2e main', 'p'],
-    ['Suture tendineuse', '1re main aidée', 'b'],
-    ['Ablation de matériel', '1re main', 'g'],
+    ['Prothèse totale du genou', "Aujourd'hui", '1re main', 'Genou', 'g', 'knee'],
+    ['Ostéosynthèse de la cheville', "Aujourd'hui", '1re main aidée', 'Cheville', 'b', 'ankle'],
+    ['Plastie du ligament croisé antérieur', 'Hier', '1re main', 'Genou', 'g', 'knee'],
+    ['Prothèse totale de hanche', 'Hier', '2e main', 'Hanche', 'p', 'hip'],
+    ['Hallux valgus', 'Lundi', '1re main aidée', 'Pied', 'b', 'foot'],
+    ['Appendicectomie', 'Lundi', '1re main', 'Digestif', 'g', 'dig'],
   ];
   return (
     <div className="ps">
-      <div className="ps-h1" style={{ marginTop: 6 }}>Mes activités</div>
-      <div className="ps-seg"><span className="on">Interventions</span><span>Consult.</span><span>Gardes</span></div>
-      <div className="ps-card" style={{ gap: 0, padding: '4px 12px' }}>
-        {rows.map(([t, r, c]) => (
+      <div className="ps-top">
+        <Icon name="chevron-left" size={16} strokeWidth={2.2} />
+        <div className="ps-h1">Mes activités</div>
+        <span />
+      </div>
+      <div className="ps-seg ps-seg--4"><span className="on">Interventions</span><span>Consult.</span><span>Gardes</span><span>Formations</span></div>
+      <div className="ps-search"><Icon name="search" size={12} />Rechercher une intervention ou un code…</div>
+      <div className="ps-title">Récemment ajoutées</div>
+      <div className="ps-card ps-card--list">
+        {rows.map(([t, when, role, where, c, icon]) => (
           <div className="ps-row" key={t}>
-            <span className={`ps-dot ps-dot--${c}`} />
-            <span className="ps-row-t"><b>{t}</b><small>{r}</small></span>
+            <span className={`ps-sq lp-tone-${icon === 'dig' ? 'purple' : 'blue'}`}><Icon name={icon} size={15} /></span>
+            <span className="ps-row-t">
+              <b><span className={`ps-dot ps-dot--${c}`} />{t}</b>
+              <small>{when} · {role} · {where}</small>
+            </span>
           </div>
         ))}
       </div>
-      <TabBar />
+      <span className="ps-fab"><Icon name="plus" size={18} strokeWidth={2.6} /></span>
+      <TabBar active="Activités" />
     </div>
   );
 }
@@ -92,21 +113,25 @@ function Kpi({ tone, icon, value, label }) {
   );
 }
 
-function Tile({ tone, value, label }) {
+function Tile({ tone, icon, value, label }) {
   return (
     <div className={`ps-tile lp-tone-${tone}`}>
+      <Icon name={icon} size={15} />
       <b>{value}</b>
       <small>{label}</small>
     </div>
   );
 }
 
-function TabBar() {
+/** Barre d'onglets de l'application : Accueil, Activités, Ma semaine, Progression, Plus. */
+const TABS = [['Accueil', 'home'], ['Activités', 'scalpel'], ['Ma semaine', 'calendar'], ['Progression', 'chart'], ['Plus', 'dots']];
+
+function TabBar({ active }) {
   return (
     <div className="ps-tabbar">
-      {['Accueil', 'Activités', '', 'Semaine', 'Profil'].map((l, i) =>
-        i === 2 ? <span key="fab" className="ps-fab">+</span> : <span key={l} className={i === 0 ? 'on' : ''}>{l}</span>
-      )}
+      {TABS.map(([label, icon]) => (
+        <span key={label} className={label === active ? 'on' : ''}><Icon name={icon} size={16} />{label}</span>
+      ))}
     </div>
   );
 }

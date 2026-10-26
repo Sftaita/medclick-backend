@@ -45,7 +45,7 @@ Sans `LinkComponent`, la page utilise de simples balises `<a href>`.
 | Prop | Type | Défaut | Rôle |
 |---|---|---|---|
 | `LinkComponent` | composant | `null` (→ `<a>`) | Composant de lien du routeur. Reçoit `to`, `className`, `children`. |
-| `config` | objet | `landingConfig` | Surcharge partielle : `loginHref`, `registerHref`, `termsHref`, `partnersHref`, `contactEmail`, `version`. |
+| `config` | objet | `landingConfig` | Surcharge partielle : `loginHref`, `registerHref`, `termsHref`, `privacyHref`, `partnersHref`, `contactEmail`, `version`. |
 | `partner` | `{ name, logoSrc?, href?, tagline? }` | — | Bloc « Application sponsorisée par ». **Omis → le bloc est masqué** et le texte « Qu'est-ce que MedClick ? » prend toute la largeur (période sans partenaire). |
 | `screenshots` | `{ front?, back? }` | — | Captures pour les deux téléphones du hero (390 × 844) : `front` = Accueil, `back` = Mes activités. Omis → écrans d'exemple dessinés en JSX. |
 
@@ -55,8 +55,8 @@ Sans `LinkComponent`, la page utilise de simples balises `<a href>`.
 <LandingPage
   LinkComponent={Link}
   config={{
-    loginHref: '/login',
-    registerHref: '/register',
+    loginHref: '/connexion',
+    registerHref: '/inscription',
     contactEmail: 'contact@medclick.be',
     version: import.meta.env.VITE_APP_VERSION ?? '3.1',
   }}
@@ -94,7 +94,7 @@ Pour remplacer les écrans d'exemple par de vraies captures :
 2. Placez-les dans `public/landing/`.
 3. Passez-les via `screenshots={{ front, back }}`. Les images sont cadrées en haut (`object-position: top`).
 
-Les écrans d'exemple contiennent des données fictives d'illustration (124 interventions, 72 %, etc.), comme les maquettes.
+Les écrans d'exemple reprennent l'Accueil et « Mes activités » de la nouvelle application (`docs/Design/medclick-react`), avec des données fictives d'illustration (124 interventions, 72 %, etc.).
 
 ## Responsive
 
@@ -119,4 +119,4 @@ Toutes les classes commencent par `.lp-` (ou `.ps-` pour les écrans d'exemple),
 
 - **Adresse de contact** : à renseigner (`contactEmail`).
 - **Réponse « données »** : la mention « à des fins marketing » mérite d'être précisée (destinataires, finalité) pour être conforme au RGPD et rassurer les utilisateurs.
-- **Routes** : vérifiez `loginHref`, `registerHref`, `termsHref`, `partnersHref` par rapport à votre routeur.
+- **Routes** : vérifiez `loginHref`, `registerHref`, `termsHref`, `privacyHref`, `partnersHref` par rapport à votre routeur.
