@@ -266,6 +266,13 @@ final class CarnetDeStageSpreadsheetBuilder
             $progress->advance($total);
         }
 
+        // Décompte final par superviseur : chaque ligne insérée réécrit toute la feuille, désormais
+        // longue (étape à part, avec son propre compteur réel de lignes écrites).
+        $tallyRows = count(array_filter($supervisors, fn ($s) => !$s['isManager']))
+            + (count(array_filter($supervisors, fn ($s) => $s['isManager'])) > 0 ? 1 : 0);
+        $progress->step(ExportStep::Supervisors, $tallyRows);
+        $written = 0;
+
         $sheet->removeRow($currentRow, 1);
 
         // Décompte final par superviseur.
@@ -281,6 +288,7 @@ final class CarnetDeStageSpreadsheetBuilder
                 $hasManager = true;
                 $currentRow++;
                 $this->fillSupervisorRow($sheet, $currentRow, $supervisor);
+                $progress->advance(++$written);
                 break;
             }
         }
@@ -291,6 +299,7 @@ final class CarnetDeStageSpreadsheetBuilder
             if (!$supervisor['isManager']) {
                 $currentRow++;
                 $this->fillSupervisorRow($sheet, $currentRow, $supervisor);
+                $progress->advance(++$written);
             }
         }
 

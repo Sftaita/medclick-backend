@@ -47,7 +47,9 @@ final class GenerateExportHandler
         $started = hrtime(true);
         $progress = new JobProgress($this->manager, $job, $started, $this->settings->timeoutSeconds);
         $previousMemoryLimit = ini_get('memory_limit');
-        ini_set('memory_limit', $this->settings->memoryLimit);
+        // Sans effet (et sans avertissement) si le processus utilise déjà davantage : la génération
+        // se poursuit alors avec la limite en place.
+        @ini_set('memory_limit', $this->settings->memoryLimit);
         $this->arm($job, $progress);
 
         try {

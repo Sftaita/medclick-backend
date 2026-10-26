@@ -13,6 +13,7 @@ enum ExportStep: string
     case Loading = 'loading';
     case Template = 'template';
     case Surgeries = 'surgeries';
+    case Supervisors = 'supervisors';
     case Summary = 'summary';
     case Sheets = 'sheets';
     case Writing = 'writing';
@@ -26,6 +27,7 @@ enum ExportStep: string
             self::Loading => 'Récupération des interventions…',
             self::Template => 'Chargement du modèle Excel…',
             self::Surgeries => 'Traitement des interventions',
+            self::Supervisors => 'Décompte par superviseur',
             self::Summary => 'Calcul de la liste récapitulative',
             self::Sheets => 'Génération des feuilles Excel…',
             self::Writing => 'Finalisation du fichier…',

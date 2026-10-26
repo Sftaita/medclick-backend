@@ -16,7 +16,7 @@ use App\Export\ExportStep;
 final class ExportJobPresenter
 {
     /** Étapes présentées à l'utilisateur, dans l'ordre d'exécution. */
-    private const STEPS = [ExportStep::Preparing, ExportStep::Loading, ExportStep::Template, ExportStep::Surgeries,
+    private const STEPS = [ExportStep::Preparing, ExportStep::Loading, ExportStep::Template, ExportStep::Surgeries, ExportStep::Supervisors,
         ExportStep::Summary, ExportStep::Sheets, ExportStep::Writing];
 
     public function __construct(private ExportStorage $storage)

@@ -112,7 +112,7 @@ final class ExportAccessTest extends ExportTestCase
         self::assertArrayNotHasKey('downloadUrl', $detail);
 
         $readyDetail = $admin->request('GET', "/api/admin/exports/{$ok['id']}")->toArray();
-        self::assertSame(['preparing', 'loading', 'template', 'surgeries', 'summary', 'sheets', 'writing'], array_column($readyDetail['steps'], 'step'));
+        self::assertSame(['preparing', 'loading', 'template', 'surgeries', 'supervisors', 'summary', 'sheets', 'writing'], array_column($readyDetail['steps'], 'step'));
         self::assertNotNull($readyDetail['download']['notDownloadedAt']);
         // Aucune donnée médicale dans ce que voit l'administrateur.
         $json = json_encode($readyDetail, JSON_UNESCAPED_UNICODE);
