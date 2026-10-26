@@ -59,7 +59,8 @@ final class JobProgress implements ExportProgress
     public function advance(int $done): void
     {
         $this->job->setProcessed($done);
-        if (self::now() - $this->lastWrite >= self::WRITE_EVERY) {
+        // Écrit au plus toutes les 0,5 s, et toujours le dernier avancement de l'étape.
+        if (self::now() - $this->lastWrite >= self::WRITE_EVERY || $done === $this->job->getTotal()) {
             $this->checkDeadline();
             $this->write(false);
         }

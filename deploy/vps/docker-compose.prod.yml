@@ -43,7 +43,7 @@ services:
     image: medclick-prod-backend:${BACKEND_TAG:-latest}
     container_name: medclick-prod-backend
     restart: unless-stopped
-    environment:
+    environment: &backend-environment
       APP_ENV: prod
       APP_DEBUG: "0"
       APP_SECRET: ${APP_SECRET}
@@ -62,9 +62,13 @@ services:
       # Valeurs actuelles de la production (identiques aux défauts de config/services.yaml).
       PUBLIC_FRONTEND_URL: https://www.medclick.be
       PUBLIC_API_URL: https://api-medclick.easymed.fun
+      # Exports Excel asynchrones (docs/EXPORTS.md) ; alertes : EXPORT_ALERT_EMAIL, sinon ERROR_ALERT_EMAIL.
+      EXPORT_ALERT_EMAIL: ${EXPORT_ALERT_EMAIL:-}
+      EXPORT_STORAGE_DIR: /app/var/exports
     volumes:
       - medclick_prod_jwt:/app/config/jwt
       - medclick_prod_log:/app/var/log
+      - medclick_prod_exports:/app/var/exports
     networks:
       - proxy
       - medclick-prod-internal
@@ -82,6 +86,28 @@ services:
       - "traefik.http.routers.medclick-prod-api.middlewares=secure-headers@file,compress@file"
       - "traefik.http.routers.medclick-prod-api.service=medclick-prod-backend"
       - "traefik.http.services.medclick-prod-backend.loadbalancer.server.port=80"
+
+  # Worker des exports Excel (voir docker-compose.staging.yml) : aucune entrée réseau, ressources plafonnées.
+  worker:
+    image: medclick-prod-backend:${BACKEND_TAG:-latest}
+    container_name: medclick-prod-worker
+    restart: unless-stopped
+    # Cache préchauffé (dont le gabarit Excel analysé) avant de consommer la file.
+    command: ["sh", "-c", "php bin/console cache:warmup && exec php bin/console messenger:consume exports scheduler_exports_monitor --time-limit=3600 --memory-limit=400M --sleep=1 -v"]
+    environment: *backend-environment
+    volumes:
+      - medclick_prod_log:/app/var/log
+      - medclick_prod_exports:/app/var/exports
+    networks:
+      - medclick-prod-internal
+    depends_on:
+      db:
+        condition: service_healthy
+      backend:
+        condition: service_healthy
+    mem_limit: 768m
+    cpus: 1.0
+    stop_grace_period: 120s
 
   frontend:
     build:
@@ -141,3 +167,4 @@ volumes:
   medclick_prod_db:
   medclick_prod_jwt:
   medclick_prod_log:
+  medclick_prod_exports:

@@ -38,7 +38,12 @@ final class ExportLifecycleTest extends ExportTestCase
         // Toutes les étapes réellement exécutées, dans l'ordre, avec une durée mesurée.
         self::assertSame(['preparing', 'loading', 'template', 'surgeries', 'summary', 'sheets', 'writing'], array_column($ready['steps'], 'step'));
         self::assertSame(array_fill(0, 7, 'done'), array_column($ready['steps'], 'state'));
-        self::assertSame([null, null, null, 25, 25, null, null], array_column($ready['steps'], 'total'));
+        // Totaux réels : interventions de l'année, puis lignes de la liste récapitulative (codes distincts).
+        $totals = array_column($ready['steps'], 'total');
+        self::assertSame([null, null, null, 25], array_slice($totals, 0, 4));
+        self::assertGreaterThan(0, $totals[4]);
+        self::assertLessThanOrEqual(25, $totals[4]);
+        self::assertSame([null, null], array_slice($totals, 5));
         foreach ($ready['steps'] as $step) {
             self::assertIsInt($step['durationMs']);
         }
@@ -252,7 +257,9 @@ final class ExportLifecycleTest extends ExportTestCase
             self::assertLessThanOrEqual($step['total'], max($advances));
         }
         self::assertSame(100, $progress->steps[2]['total'], 'Interventions de l\'année exportée');
-        self::assertSame(160, $progress->steps[3]['total'], 'Interventions de toutes les années');
+        // Liste récapitulative : une ligne par code distinct retenu (au plus une par intervention).
+        self::assertGreaterThan(0, $progress->steps[3]['total']);
+        self::assertLessThanOrEqual(160, $progress->steps[3]['total']);
     }
 
     public function testLargeExportThroughTheWorker(): void
@@ -265,7 +272,8 @@ final class ExportLifecycleTest extends ExportTestCase
         $ready = $client->request('GET', "/api/exports/{$job['id']}")->toArray();
         self::assertSame('ready', $ready['status']);
         self::assertSame(1000, $ready['rowCount']);
-        self::assertSame(2700, $ready['steps'][4]['total']);
+        self::assertSame('done', $ready['steps'][4]['state']);
+        self::assertLessThanOrEqual(2700, $ready['steps'][4]['total']);
         // Contenu identique à celui du moteur appelé directement.
         $direct = $this->runNew($user, $yearId, clock: \Symfony\Component\Clock\Clock::get());
         $download = $this->body($client, '/api/' . $ready['downloadUrl']);

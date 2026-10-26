@@ -59,5 +59,11 @@ if [ "${PENDING:-0}" != "0" ]; then
   exit 2
 fi
 
+# Worker des exports Excel, après les migrations (il lit la file messenger_messages) ; recréé à
+# chaque déploiement pour exécuter le nouveau code. Arrêt propre : génération en cours terminée.
+if docker compose config --services | grep -qx worker; then
+  docker compose up -d worker
+fi
+
 docker compose up -d --wait frontend
 docker compose ps

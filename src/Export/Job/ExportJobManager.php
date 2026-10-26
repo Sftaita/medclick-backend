@@ -274,9 +274,13 @@ final class ExportJobManager
     {
         // Conditionnel : si le worker vient d'envoyer un signe de vie, l'export n'est pas touché.
         $unchanged = $job->getHeartbeatAt() ? ['heartbeat_at' => $job->getHeartbeatAt()] : [];
+        // Worker interrompu : la génération s'est arrêtée au dernier signe de vie, pas à la détection.
+        $durationMs = $category === ExportFailure::WORKER_INTERRUPTED && $job->getStartedAt() && $job->getHeartbeatAt()
+            ? 1000 * ($job->getHeartbeatAt()->getTimestamp() - $job->getStartedAt()->getTimestamp())
+            : null;
 
         return $this->fail($job, new ExportFailure($category, $detail, ExportStep::tryFrom($job->getStep())),
-            ExportJobEvent::STALLED, [$job->getStatus()], $unchanged);
+            ExportJobEvent::STALLED, [$job->getStatus()], $unchanged, $durationMs);
     }
 
     /**

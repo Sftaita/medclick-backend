@@ -381,49 +381,13 @@ final class CarnetDeStageSpreadsheetBuilder
         }
         $extraYears = $maxYearOfFormation - 7;
 
-        if ($extraYears > 0) {
-            $sheet->insertNewColumnBefore('S', $extraYears);
-            $sheet->insertNewColumnBefore('K', $extraYears);
-        }
-
-        $formationYearColumns = [];
-        $firstHandColumns = [];
-        for ($i = 1; $i <= $maxYearOfFormation; $i++) {
-            $formationYearColumns[$i] = Coordinate::stringFromColumnIndex(4 + $i);
-            $firstHandColumns[$i] = Coordinate::stringFromColumnIndex(5 + $maxYearOfFormation + $i);
-        }
-        $columns = [
-            'secondHandYears' => $formationYearColumns,
-            'firstHandYears' => $firstHandColumns,
-            'secondHandTotal' => Coordinate::stringFromColumnIndex(5 + $maxYearOfFormation),
-            'firstHandTotal' => Coordinate::stringFromColumnIndex(6 + 2 * $maxYearOfFormation),
-            'total' => Coordinate::stringFromColumnIndex(7 + 2 * $maxYearOfFormation),
-            'percentage' => Coordinate::stringFromColumnIndex(8 + 2 * $maxYearOfFormation),
-        ];
-
-        if ($extraYears > 0) {
-            $yearColumnWidth = $sheet->getColumnDimension('E')->getWidth();
-            for ($i = 1; $i <= $maxYearOfFormation; $i++) {
-                $sheet->setCellValue($formationYearColumns[$i] . 6, $i)
-                    ->setCellValue($formationYearColumns[$i] . 13, $i)
-                    ->setCellValue($firstHandColumns[$i] . 13, $i);
-                $sheet->getColumnDimension($formationYearColumns[$i])->setWidth($yearColumnWidth);
-                $sheet->getColumnDimension($firstHandColumns[$i])->setWidth($yearColumnWidth);
-            }
-        }
-
-        $sheet->setCellValue('G3', '  Dr ' . ucfirst((string) $user->getFirstname()) . ' ' . ucfirst((string) $user->getLastname()))
-            ->setCellValue('E4', '  ' . ucfirst((string) $year->getHospital()))
-            ->setCellValue('E5', '  Dr ' . ucfirst((string) $year->getMaster()))
-            ->getStyle($formationYearColumns[$year->getYearOfFormation()] . 6)->getBorders()->getOutline()->setBorderStyle(Border::BORDER_THICK);
-
         // Regroupement des interventions de toutes les années (même algorithme que l'ancien moteur).
-        $total = count($data->allSurgeries);
-        $progress->step(ExportStep::Summary, $total);
+        // Calcul pur, sans effet sur la feuille : fait avant les opérations sur la feuille pour
+        // connaître dès le début de l'étape le nombre réel de lignes à écrire.
         $orthoTrauma = [];
         $orthoElective = [];
         $general = [];
-        foreach ($data->allSurgeries as $done => $surgery) {
+        foreach ($data->allSurgeries as $surgery) {
             $yearOfFormation = $surgery['yearOfFormation'];
             $subtype = $surgery['subtype'];
             $nomenclatureId = $surgery['nomenclatureId'];
@@ -460,13 +424,6 @@ final class CarnetDeStageSpreadsheetBuilder
                 $group[$subtype][$nomenclatureId]['years'][$yearOfFormation]['secondHand']++;
             }
             unset($group);
-
-            if (($done + 1) % (self::PROGRESS_EVERY * 4) === 0) {
-                $progress->advance($done + 1);
-            }
-        }
-        if ($total % (self::PROGRESS_EVERY * 4) !== 0) {
-            $progress->advance($total);
         }
 
         // Plan des sections (mêmes positions que l'ancien moteur) : lignes à écrire ou lignes du
@@ -497,6 +454,46 @@ final class CarnetDeStageSpreadsheetBuilder
             }
         }
 
+        // Étape : nombre réel de lignes de la liste récapitulative (codes distincts retenus).
+        $rows = array_sum(array_map(fn ($entry) => is_array($entry) ? count($entry) : 0, $plan));
+        $progress->step(ExportStep::Summary, $rows);
+
+        if ($extraYears > 0) {
+            $sheet->insertNewColumnBefore('S', $extraYears);
+            $sheet->insertNewColumnBefore('K', $extraYears);
+        }
+
+        $formationYearColumns = [];
+        $firstHandColumns = [];
+        for ($i = 1; $i <= $maxYearOfFormation; $i++) {
+            $formationYearColumns[$i] = Coordinate::stringFromColumnIndex(4 + $i);
+            $firstHandColumns[$i] = Coordinate::stringFromColumnIndex(5 + $maxYearOfFormation + $i);
+        }
+        $columns = [
+            'secondHandYears' => $formationYearColumns,
+            'firstHandYears' => $firstHandColumns,
+            'secondHandTotal' => Coordinate::stringFromColumnIndex(5 + $maxYearOfFormation),
+            'firstHandTotal' => Coordinate::stringFromColumnIndex(6 + 2 * $maxYearOfFormation),
+            'total' => Coordinate::stringFromColumnIndex(7 + 2 * $maxYearOfFormation),
+            'percentage' => Coordinate::stringFromColumnIndex(8 + 2 * $maxYearOfFormation),
+        ];
+
+        if ($extraYears > 0) {
+            $yearColumnWidth = $sheet->getColumnDimension('E')->getWidth();
+            for ($i = 1; $i <= $maxYearOfFormation; $i++) {
+                $sheet->setCellValue($formationYearColumns[$i] . 6, $i)
+                    ->setCellValue($formationYearColumns[$i] . 13, $i)
+                    ->setCellValue($firstHandColumns[$i] . 13, $i);
+                $sheet->getColumnDimension($formationYearColumns[$i])->setWidth($yearColumnWidth);
+                $sheet->getColumnDimension($firstHandColumns[$i])->setWidth($yearColumnWidth);
+            }
+        }
+
+        $sheet->setCellValue('G3', '  Dr ' . ucfirst((string) $user->getFirstname()) . ' ' . ucfirst((string) $user->getLastname()))
+            ->setCellValue('E4', '  ' . ucfirst((string) $year->getHospital()))
+            ->setCellValue('E5', '  Dr ' . ucfirst((string) $year->getMaster()))
+            ->getStyle($formationYearColumns[$year->getYearOfFormation()] . 6)->getBorders()->getOutline()->setBorderStyle(Border::BORDER_THICK);
+
         $lastSection = null;
         foreach ($plan as $index => $entry) {
             if (is_array($entry)) {
@@ -505,10 +502,16 @@ final class CarnetDeStageSpreadsheetBuilder
         }
 
         $currentRow = 16;
+        $written = 0;
         foreach ($plan as $index => $entry) {
-            $currentRow = is_int($entry)
-                ? $currentRow + $entry
-                : $this->writeSummaryRows($sheet, $currentRow, $entry, $maxYearOfFormation, $columns, $index === $lastSection);
+            if (is_int($entry)) {
+                $currentRow += $entry;
+                continue;
+            }
+            $currentRow = $this->writeSummaryRows($sheet, $currentRow, $entry, $maxYearOfFormation, $columns, $index === $lastSection);
+            // Avancement réel : lignes de la liste écrites (le coût est dans l'écriture des sections).
+            $written += count($entry);
+            $progress->advance($written);
         }
     }
 
