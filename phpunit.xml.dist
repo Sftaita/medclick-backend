@@ -24,6 +24,16 @@
         </testsuite>
     </testsuites>
 
+    <!-- Génération des références Excel (ancien moteur, longue) et volumes : lancement explicite
+         avec les options group de PHPUnit (voir tests/Excel/ReferenceGenerationTest.php). -->
+    <groups>
+        <exclude>
+            <group>excel-reference-generation</group>
+            <group>excel-volume</group>
+            <group>excel-profile</group>
+        </exclude>
+    </groups>
+
     <source ignoreSuppressionOfDeprecations="true">
         <include>
             <directory>src</directory>

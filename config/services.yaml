@@ -28,6 +28,9 @@ services:
       - "../src/Entity/"
       - "../src/Kernel.php"
       - "../src/Tests/"
+      # Objets de valeur de l'export (pas des services).
+      - "../src/Export/{ExportFailure,ExportStep,TrackingProgress,NullProgress}.php"
+      - "../src/Export/CarnetDeStage/CarnetDeStageData.php"
 
   # controllers are imported separately to make sure services can be injected
   # as action arguments even if you don't extend any base controller class
