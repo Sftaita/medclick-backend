@@ -12,6 +12,19 @@ parameters:
   env(PUBLIC_API_URL): 'https://api-medclick.easymed.fun'
   app.public_frontend_url: '%env(PUBLIC_FRONTEND_URL)%'
   app.public_api_url: '%env(PUBLIC_API_URL)%'
+  # Exports Excel asynchrones (App\Export\Job\ExportSettings, docs/EXPORTS.md).
+  env(MESSENGER_TRANSPORT_DSN): 'doctrine://default?auto_setup=0'
+  env(EXPORT_STORAGE_DIR): '%kernel.project_dir%/var/exports'
+  env(EXPORT_FILE_TTL_MINUTES): '120'
+  env(EXPORT_TIMEOUT_SECONDS): '300'
+  env(EXPORT_STALL_SECONDS): '120'
+  env(EXPORT_PENDING_MAX_SECONDS): '900'
+  env(EXPORT_NOT_DOWNLOADED_AFTER_MINUTES): '30'
+  env(EXPORT_NOT_DOWNLOADED_ALERT_THRESHOLD): '0'
+  env(EXPORT_ALERT_EMAIL): '%env(ERROR_ALERT_EMAIL)%'
+  env(EXPORT_ALERT_DEDUP_MINUTES): '60'
+  env(EXPORT_HISTORY_RETENTION_DAYS): '365'
+  env(EXPORT_MEMORY_LIMIT): '512M'
 
 services:
   # default configuration for services in *this* file
@@ -31,6 +44,9 @@ services:
       # Objets de valeur de l'export (pas des services).
       - "../src/Export/{ExportFailure,ExportStep,TrackingProgress,NullProgress}.php"
       - "../src/Export/CarnetDeStage/CarnetDeStageData.php"
+      - "../src/Export/Job/{ExportCancelled,JobProgress}.php"
+      - "../src/Export/Job/Message/"
+      - "../src/Export/Monitoring/Message/"
 
   # controllers are imported separately to make sure services can be injected
   # as action arguments even if you don't extend any base controller class

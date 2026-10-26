@@ -1,0 +1,28 @@
+framework:
+    messenger:
+        transports:
+            # Générations d'exports Excel, consommées par le worker dédié (docs/EXPORTS.md) :
+            #   php bin/console messenger:consume exports scheduler_exports_monitor
+            # Table messenger_messages créée par migration (auto_setup=0 dans le DSN).
+            exports:
+                dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
+                options:
+                    queue_name: exports
+                    # Message d'un worker tué net : redélivré après 30 min (> durée maximale d'un
+                    # export). L'export est alors déjà déclaré interrompu par la surveillance et le
+                    # message est ignoré (ExportJobManager::start).
+                    redeliver_timeout: 1800
+                # Jamais de nouvelle tentative automatique : l'échec est enregistré et signalé,
+                # l'utilisateur relance lui-même (pas de génération en double).
+                retry_strategy:
+                    max_retries: 0
+
+        routing:
+            App\Export\Job\Message\GenerateExport: exports
+
+when@test:
+    framework:
+        messenger:
+            transports:
+                # Les tests déclenchent eux-mêmes le traitement (tests/Export/ExportTestCase.php).
+                exports: 'in-memory://'

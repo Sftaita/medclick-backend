@@ -64,7 +64,7 @@ final class CarnetDeStageDataLoader
                 ->from(Surgeries::class, 's')
                 ->where('s.year = :year')
                 ->setParameter('year', $year->getId())
-                ->orderBy('s.id', 'ASC')
+                ->orderBy('s.id', \SortDirection::Ascending)
                 ->getQuery()
                 ->getArrayResult();
 

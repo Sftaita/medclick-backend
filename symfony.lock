@@ -389,6 +389,18 @@
             "ref": "fadbfe33303a76e25cb63401050439aa9b1a9c7f"
         }
     },
+    "symfony/messenger": {
+        "version": "8.1",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "6.0",
+            "ref": "d8936e2e2230637ef97e5eecc0eea074eecae58b"
+        },
+        "files": [
+            "./config/packages/messenger.yaml"
+        ]
+    },
     "symfony/mime": {
         "version": "v5.1.5"
     },
@@ -484,6 +496,18 @@
             "./config/routes.yaml"
         ]
     },
+    "symfony/scheduler": {
+        "version": "8.1",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "7.2",
+            "ref": "caea3c928ee9e1b21288fd76aef36f16ea355515"
+        },
+        "files": [
+            "./src/Schedule.php"
+        ]
+    },
     "symfony/security-bundle": {
         "version": "5.1",
         "recipe": {
@@ -558,6 +582,15 @@
     },
     "symfony/twig-pack": {
         "version": "v1.0.0"
+    },
+    "symfony/uid": {
+        "version": "8.1",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "7.0",
+            "ref": "0df5844274d871b37fc3816c57a768ffc60a43a5"
+        }
     },
     "symfony/validator": {
         "version": "4.3",

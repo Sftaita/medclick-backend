@@ -25,9 +25,9 @@ abstract class ExcelTestCase extends ApiTestBase
 {
     public const REFERENCE_DIR = __DIR__ . '/../Fixtures/excel-reference';
 
-    protected function seed(string $scenario): array
+    protected function seed(string $scenario, ?string $email = null): array
     {
-        return (new ExportDatasetFactory($this->em))->build($scenario);
+        return (new ExportDatasetFactory($this->em))->build($scenario, $email);
     }
 
     /**

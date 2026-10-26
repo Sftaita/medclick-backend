@@ -262,7 +262,9 @@ final class CarnetDeStageSpreadsheetBuilder
                 $progress->advance($done + 1);
             }
         }
-        $progress->advance($total);
+        if ($total % self::PROGRESS_EVERY !== 0) {
+            $progress->advance($total);
+        }
 
         $sheet->removeRow($currentRow, 1);
 
@@ -463,7 +465,9 @@ final class CarnetDeStageSpreadsheetBuilder
                 $progress->advance($done + 1);
             }
         }
-        $progress->advance($total);
+        if ($total % (self::PROGRESS_EVERY * 4) !== 0) {
+            $progress->advance($total);
+        }
 
         // Plan des sections (mêmes positions que l'ancien moteur) : lignes à écrire ou lignes du
         // modèle à sauter. La dernière section est écrite exactement comme par l'ancien moteur

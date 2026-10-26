@@ -37,18 +37,21 @@ final class ExportDatasetFactory
     /** @var list<Nomenclature> */
     private array $nomenclatures = [];
     private int $pending = 0;
+    private ?string $email = null;
 
     public function __construct(private EntityManagerInterface $em)
     {
     }
 
     /**
+     * @param string|null $email adresse du résident (défaut : celle des fichiers de référence)
      * @return array{0: User, 1: int}
      */
-    public function build(string $scenario): array
+    public function build(string $scenario, ?string $email = null): array
     {
         $this->seed = crc32($scenario) ?: 1;
         $this->nomenclatures = [];
+        $this->email = $email;
 
         if (str_starts_with($scenario, 'aleatoire-')) {
             $result = $this->random();
@@ -219,8 +222,10 @@ final class ExportDatasetFactory
 
     private function user(string $firstname = 'camille', string $lastname = 'martin'): User
     {
-        $user = (new User())->setEmail('resident.fictif@example.test')->setFirstname($firstname)
-            ->setLastname($lastname)->setRoles([])->setPassword('x')->setSpeciality('ortho');
+        // Mot de passe ApiTestBase::PASSWORD (connexion par JWT dans les tests d'API).
+        $user = (new User())->setEmail($this->email ?? 'resident.fictif@example.test')->setFirstname($firstname)
+            ->setLastname($lastname)->setRoles([])->setSpeciality('ortho')
+            ->setPassword(password_hash('motdepasse', PASSWORD_BCRYPT, ['cost' => 4]));
         $this->em->persist($user);
         $this->em->flush();
 
