@@ -13,6 +13,8 @@ Internet ── Traefik (VPS partagé : SurgicalHub, MedVue, MedClick ; Let's En
 réseau privé medclick-<env>-internal :
    backend ── db (MariaDB 11.8 dédiée, aucun port publié, volume dédié)
    backend ── mailpit (préproduction : capture de TOUS les e-mails ; interface 127.0.0.1:8026)
+   worker  ── db (exports Excel : même image, aucun port ni accès entrant, 1 CPU / 768 Mo ;
+              volume des fichiers partagé avec le backend — voir docs/EXPORTS.md)
 ```
 
 - Une seule origine (frontend et API sous le même nom) : pas de CORS en pratique, pas d'URL
@@ -110,9 +112,19 @@ Restauration :
 - test (base jetable sans réseau, supprimée ensuite) : `restore.sh test <fichier.sql.gz.gpg>` ;
 - réelle (écrase la base du projet, confirmation demandée) : `restore.sh into <projet> <fichier>`.
 
+## Worker des exports Excel
+
+- Service `worker` des deux Compose : `messenger:consume exports scheduler_exports_monitor`
+  (génération des exports et surveillance chaque minute), cache préchauffé au démarrage.
+- `deploy.sh` le (re)crée après le contrôle des migrations ; la première mise en service exige la
+  migration `Version20261027090000` (tables `export_job`, `export_job_event`, `messenger_messages`).
+- Arrêt propre : `docker compose stop worker` laisse finir la génération en cours (120 s).
+- Préproduction : `EXPORT_ALERT_EMAIL` (facultatif) → alertes capturées par Mailpit.
+
 ## Journaux
 
 - Backend : `docker compose logs backend` ; Symfony `var/log` (volume `medclick_<env>_log`).
+- Worker des exports : `docker compose logs worker` (lignes `[export <corrélation>]`).
 - Frontend : `docker compose logs frontend` (accès nginx).
 - Traefik : `/opt/stack/traefik/logs/{traefik,access}.log`.
 - Erreurs applicatives : table `error_log` (`/api/admin/errors`), sans corps de requête ni IP.

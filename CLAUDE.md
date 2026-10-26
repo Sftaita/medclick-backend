@@ -72,6 +72,10 @@ Doc OpenAPI générée par API Platform : `GET /api` (ne couvre pas les contrôl
   (ROLE_ADMIN via `access_control`). `ExcelNewVersion.php` (`/api/excel2/{year}`) est l'export
   courant ; `ExcelGeneratorController.php` (`/api/excel/{year}`) est l'ancienne version.
 - `public/ExcelTemplate.xlsx` — gabarit du carnet de stage (chargé via `kernel.project_dir`).
+- **Exports Excel** : `src/Export/` (moteur `CarnetDeStage/`, tâches asynchrones `Job/`, surveillance
+  `Monitoring/`), worker Messenger (`messenger:consume exports scheduler_exports_monitor`), API
+  `/api/exports/*` et `/api/admin/exports/*`. Le fichier doit rester **identique à l'octet** à
+  l'ancien moteur : `tests/Excel/` (oracle figé, références, comparateur). Voir `docs/EXPORTS.md`.
 - Contrôle d'accès : `config/packages/security.yaml` (`access_control` par préfixe d'URL).
 
 ## Conventions du code existant
@@ -108,3 +112,4 @@ Doc OpenAPI générée par API Platform : `GET /api` (ne couvre pas les contrôl
 - `docs/DECISIONS.md` — décisions d'architecture (ADR) existantes et proposées.
 - `docs/AUDIT.md` — audit et feuille de route pour une application professionnelle.
 - `docs/DEPLOIEMENT.md` — procédure de mise en production (Hostinger), à suivre à la lettre.
+- `docs/EXPORTS.md` — exports Excel : cause des lenteurs, architecture, statuts, alertes, réglages.
