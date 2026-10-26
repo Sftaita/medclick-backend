@@ -12,7 +12,7 @@ use App\Export\Monitoring\ExportMonitor;
 use App\Tests\Excel\ExcelTestCase;
 use Symfony\Component\Clock\Test\ClockSensitiveTrait;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Mailer\Event\MessageEvent;
+use App\Tests\Export\Support\SentEmailCollector;
 use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
 use Symfony\Component\Mime\Email;
 
@@ -28,6 +28,7 @@ abstract class ExportTestCase extends ExcelTestCase
     {
         parent::setUp();
         self::mockTime('2026-10-27 09:00:00');
+        SentEmailCollector::$emails = [];
         (new Filesystem())->remove(static::getContainer()->getParameter('kernel.project_dir') . '/var/exports-test');
     }
 
@@ -115,10 +116,7 @@ abstract class ExportTestCase extends ExcelTestCase
     /** @return list<Email> e-mails envoyés depuis le début du test */
     protected function sentEmails(): array
     {
-        $logger = static::getContainer()->get('mailer.message_logger_listener');
-
-        return array_values(array_filter(array_map(fn (MessageEvent $e) => $e->getMessage(),
-            array_filter($logger->getEvents()->getEvents(), fn (MessageEvent $e) => !$e->isQueued())), fn ($m) => $m instanceof Email));
+        return SentEmailCollector::$emails;
     }
 
     /** Avance l'horloge simulée de $seconds. */

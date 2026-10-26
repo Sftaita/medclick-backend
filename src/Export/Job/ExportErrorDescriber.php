@@ -37,7 +37,7 @@ final class ExportErrorDescriber
     public static function code(\Throwable $exception): string
     {
         $root = $exception instanceof ExportFailure && $exception->getPrevious() ? $exception->getPrevious() : $exception;
-        $code = (new \ReflectionClass($root))->getShortName() . '@' . basename($root->getFile()) . ':' . $root->getLine();
+        $code = (new \ReflectionClass($root))->getShortName() . '@' . self::applicationLocation($root);
         for ($e = $root; $e !== null; $e = $e->getPrevious()) {
             if (preg_match('/SQLSTATE\[([0-9A-Z]{5})\]/', $e->getMessage(), $matches)) {
                 return $code . ' SQLSTATE[' . $matches[1] . ']';
@@ -64,6 +64,24 @@ final class ExportErrorDescriber
         }
 
         return ['exceptions' => $chain, 'code' => self::code($exception), 'trace' => $frames];
+    }
+
+    /**
+     * Emplacement le plus utile au diagnostic : celui de l'exception s'il est dans le code de
+     * l'application (src/), sinon le premier appel depuis src/ (ex. la requête du chargeur plutôt
+     * que le convertisseur d'exceptions de Doctrine).
+     */
+    private static function applicationLocation(\Throwable $exception): string
+    {
+        $src = dirname(__DIR__, 2) . DIRECTORY_SEPARATOR;
+        $frames = [['file' => $exception->getFile(), 'line' => $exception->getLine()], ...$exception->getTrace()];
+        foreach ($frames as $frame) {
+            if (isset($frame['file']) && str_starts_with(str_replace('/', DIRECTORY_SEPARATOR, $frame['file']), $src)) {
+                return basename($frame['file']) . ':' . ($frame['line'] ?? 0);
+            }
+        }
+
+        return basename($exception->getFile()) . ':' . $exception->getLine();
     }
 
     private static function relative(string $path): string

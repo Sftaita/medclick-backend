@@ -109,7 +109,7 @@ class ExportJobRepository extends ServiceEntityRepository
     public function search(array $filters, int $page, int $perPage): array
     {
         $qb = $this->filtered($filters)
-            ->leftJoin('App\Entity\User', 'u', 'WITH', 'u.id = j.userId')
+            ->leftJoin('App\Entity\User', 'u', 'ON', 'u.id = j.userId')
             ->addSelect('u.email AS email')
             ->orderBy('j.id', \SortDirection::Descending)
             ->setFirstResult(($page - 1) * $perPage)

@@ -12,7 +12,7 @@ final class ExportSettings
 {
     public function __construct(
         /** Dossier des fichiers générés (volume partagé entre l'API et le worker). */
-        #[Autowire('%env(EXPORT_STORAGE_DIR)%')]
+        #[Autowire('%env(resolve:EXPORT_STORAGE_DIR)%')]
         public readonly string $storageDir,
         /** Durée de vie d'un fichier prêt avant suppression automatique. */
         #[Autowire('%env(int:EXPORT_FILE_TTL_MINUTES)%')]

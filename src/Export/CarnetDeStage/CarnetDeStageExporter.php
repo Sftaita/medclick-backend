@@ -61,6 +61,9 @@ final class CarnetDeStageExporter
         $progress->step(ExportStep::Writing);
         $temporary = $targetPath . '.part';
         try {
+            if (!is_dir(dirname($temporary)) || !is_writable(dirname($temporary))) {
+                throw new \RuntimeException('Dossier de destination absent ou non accessible en écriture');
+            }
             IOFactory::createWriter($spreadsheet, 'Xlsx')->save($temporary);
             if (!@rename($temporary, $targetPath)) {
                 throw new \RuntimeException('Renommage du fichier temporaire impossible');

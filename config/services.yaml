@@ -72,3 +72,9 @@ services:
           event: lexik_jwt_authentication.on_jwt_created,
           method: updateJwtData,
         }
+
+when@test:
+  services:
+    # E-mails envoyés pendant les tests des exports (tests/Export).
+    App\Tests\Export\Support\SentEmailCollector:
+      autoconfigure: true
