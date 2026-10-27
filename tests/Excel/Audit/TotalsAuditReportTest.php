@@ -15,7 +15,8 @@ final class TotalsAuditReportTest extends ExcelTestCase
 {
     public static function scenarios(): iterable
     {
-        foreach (array_filter(explode(',', (string) getenv('EXCEL_SCENARIOS'))) as $s) {
+        // Sans EXCEL_SCENARIOS : le cas de référence (un fournisseur vide est une erreur PHPUnit, même groupe exclu).
+        foreach (array_filter(explode(',', (string) getenv('EXCEL_SCENARIOS'))) ?: ['audit-reference'] as $s) {
             yield $s => [$s];
         }
     }
@@ -36,8 +37,7 @@ final class TotalsAuditReportTest extends ExcelTestCase
         $detail = array_filter(explode(',', (string) getenv('EXCEL_DETAIL')));
         foreach ($findings as $f) {
             if (!$f['ok'] && in_array($f['rule'], $detail, true)) {
-                fwrite(STDERR, sprintf("  ✗ %s %s : attendu %s, obtenu %s
-", $f['rule'], $f['where'],
+                fwrite(STDERR, sprintf("  ✗ %s %s : attendu %s, obtenu %s\n", $f['rule'], $f['where'],
                     json_encode($f['expected'], JSON_UNESCAPED_UNICODE), json_encode($f['actual'], JSON_UNESCAPED_UNICODE)));
             }
         }
