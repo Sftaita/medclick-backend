@@ -94,6 +94,14 @@ services:
     restart: unless-stopped
     # Cache préchauffé (dont le gabarit Excel analysé) avant de consommer la file.
     command: ["sh", "-c", "php bin/console cache:warmup && exec php bin/console messenger:consume exports scheduler_exports_monitor --time-limit=3600 --memory-limit=400M --sleep=1 -v"]
+    # Le contrôle HTTP de l'image backend ne s'applique pas : le worker ne sert pas de HTTP.
+    # Sain = le processus principal est le consommateur (après le préchauffage du cache).
+    healthcheck:
+      test: ["CMD-SHELL", "grep -qa messenger:consume /proc/1/cmdline && ! grep -qa cache:warmup /proc/1/cmdline"]
+      interval: 30s
+      timeout: 5s
+      start_period: 90s
+      retries: 3
     environment: *backend-environment
     volumes:
       - medclick_prod_log:/app/var/log
