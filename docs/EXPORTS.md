@@ -107,7 +107,9 @@ diagnostic (`EXP-XXXXXXXX`), corrélation des journaux, lien `…/admin/exports?
 administrateur requise). Jamais de pièce jointe ni de donnée médicale.
 
 - Anti-doublon : un incident (type + catégorie + étape + code) n'est signalé qu'une fois par
-  `EXPORT_ALERT_DEDUP_MINUTES` ; les suivants sont marqués « doublon de EXP-… ».
+  `EXPORT_ALERT_DEDUP_MINUTES` ; les suivants sont marqués « doublon de EXP-… ». Pour une panne du
+  worker (`worker_interrupted`, `worker_unavailable`), l'étape en cours est fortuite et n'entre pas
+  dans l'empreinte : un worker qui plante en boucle n'envoie qu'un e-mail par période.
 - Échec d'envoi : statut `failed`, erreur et tentatives conservées ; nouvelle tentative par la
   surveillance (5, 15, 60, 240 min ; 5 au plus) ou bouton « Renvoyer l'alerte » de l'administration.
 - Non téléchargés : évènement seul ; récapitulatif e-mail (au plus un par 24 h) seulement si

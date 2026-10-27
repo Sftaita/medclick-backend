@@ -47,7 +47,11 @@ final class ExportAlerter
     /** Appelée à chaque échec (worker, surveillance, route synchrone). */
     public function onFailure(ExportJob $job): void
     {
-        $fingerprint = sha1(implode('|', [$job->getType(), $job->getErrorCategory(), $job->getErrorStep(), $job->getErrorCode()]));
+        // Panne du worker : l'étape en cours au moment de l'arrêt est fortuite, ce n'est pas un autre
+        // incident (sinon un worker qui plante en boucle enverrait un e-mail par étape).
+        $step = in_array($job->getErrorCategory(), [ExportFailure::WORKER_INTERRUPTED, ExportFailure::WORKER_UNAVAILABLE], true)
+            ? null : $job->getErrorStep();
+        $fingerprint = sha1(implode('|', [$job->getType(), $job->getErrorCategory(), $step, $job->getErrorCode()]));
         $job->setAlertFingerprint($fingerprint);
 
         // Causes fonctionnelles (année supprimée, accès refusé) : historique seulement, pas d'incident.

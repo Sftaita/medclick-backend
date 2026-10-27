@@ -220,6 +220,32 @@ final class ExportFailureTest extends ExportTestCase
         self::assertSame(ExportJob::ALERT_SENT, $this->job($third['id'])->getAlertStatus());
     }
 
+    /**
+     * Constaté sur staging : deux arrêts du worker à des étapes différentes envoyaient deux e-mails.
+     * Pour une panne du worker, l'étape est fortuite : un seul incident, une seule alerte.
+     */
+    public function testWorkerCrashesAtDifferentStepsSendASingleAlert(): void
+    {
+        [$userA, $yearA] = $this->seed('petit');
+        [$userB, $yearB] = $this->seed('petit', 'autre.fictif@example.test');
+        $first = $this->requestExport($this->clientFor($userA), $yearA);
+        $this->manager()->start($this->job($first['id']));
+        $this->travel(121);
+        $this->monitor();
+
+        $second = $this->requestExport($this->clientFor($userB), $yearB);
+        $job = $this->job($second['id']);
+        $this->manager()->start($job);
+        (new \App\Export\Job\JobProgress($this->manager(), $job, hrtime(true), 300))->step(\App\Export\ExportStep::Summary, 10);
+        $this->travel(121);
+        $this->monitor();
+
+        self::assertNotSame($this->job($first['id'])->getErrorStep(), $this->job($second['id'])->getErrorStep());
+        self::assertCount(1, $this->sentEmails());
+        self::assertSame(ExportJob::ALERT_SUPPRESSED, $this->job($second['id'])->getAlertStatus());
+        self::assertSame($first['id'], $this->job($second['id'])->getAlertDuplicateOf());
+    }
+
     public function testFailedAlertIsKeptAndRetried(): void
     {
         [$user, $yearId] = $this->seed('vide');
