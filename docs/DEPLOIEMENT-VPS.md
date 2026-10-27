@@ -179,7 +179,16 @@ Application sans redémarrage des autres services (hash Compose de `db`, `backen
 inchangés) : sauvegarder `docker-compose.yml`, le remplacer, puis
 `docker compose up -d --no-deps --wait legacy-apex-sw`.
 
+`deploy.sh` ne le supprime jamais (aucun `down` ni `--remove-orphans`) et le recrée s'il a disparu ;
+un conteneur à jour n'est pas redémarré.
+
 Retour arrière : `docker compose rm -sf legacy-apex-sw` (le routeur disparaît, l'apex redirige à
 nouveau tout), puis remettre le `docker-compose.yml` sauvegardé. Les navigateurs déjà migrés ne
-sont pas concernés. À conserver tant que d'anciens utilisateurs peuvent revenir sur l'apex
-(au moins plusieurs mois).
+sont pas concernés.
+
+Retrait (pas avant plusieurs mois) : seul un navigateur qui a encore l'ancien SW demande ce fichier
+sur l'apex. Retirer quand le compteur reste à zéro pendant 30 jours consécutifs :
+`grep medclick-prod-apex-sw@docker /opt/stack/traefik/logs/access.log | tail` (date de la dernière
+requête). Puis : retirer le service `legacy-apex-sw` et ses deux `configs` de
+`docker-compose.prod.yml` (PR), copier le fichier sur le VPS et lancer
+`docker compose rm -sf legacy-apex-sw`. Aucun autre service n'est touché.
