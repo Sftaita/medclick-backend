@@ -29,6 +29,11 @@ final class ExportDatasetFactory
 
     public const VOLUMES = ['volume-100', 'volume-1000', 'profil-reel', 'profil-9-annees', 'volume-10000'];
 
+    /** Cas ciblés de l'audit des totaux (tests/Excel/Audit) : un cas particulier par scénario. */
+    public const AUDIT = ['audit-reference', 'audit-deux-maitres', 'audit-trente-superviseurs', 'audit-specialites-generales',
+        'audit-annees-6-7', 'audit-neuf-annees', 'audit-sans-nomenclature', 'audit-consultations-10-dates', 'audit-gardes-10-par-mois',
+        'audit-garde-minuit', 'audit-nouvel-an', 'audit-positions'];
+
     private const ANATOMIC = ['shoulder', 'humerus', 'elbow', 'forearm', 'wristhand', 'back', 'pelvic', 'hip',
         'proximalFemur', 'midFemur', 'distalFemur', 'knee', 'limb', 'ankle', 'foot'];
     private const GENERAL = ['dig', 'general', 'uro', 'vasc', 'thor', 'plastic', 'neuro', 'transp'];
@@ -52,6 +57,14 @@ final class ExportDatasetFactory
         $this->seed = crc32($scenario) ?: 1;
         $this->nomenclatures = [];
         $this->email = $email;
+
+        if (str_starts_with($scenario, 'audit-')) {
+            $result = $this->audit($scenario);
+            $this->em->flush();
+            $this->em->clear();
+
+            return $result;
+        }
 
         if (str_starts_with($scenario, 'aleatoire-')) {
             $result = $this->random();
@@ -162,6 +175,145 @@ final class ExportDatasetFactory
         $this->consultations($year, 15, 2025);
 
         return [$user, $year->getId()];
+    }
+
+    /**
+     * Scénarios d'audit : données minimales et entièrement contrôlées, résultats attendus
+     * calculables à la main (voir docs/AUDIT-TOTAUX-EXCEL.md).
+     */
+    private function audit(string $scenario): array
+    {
+        $user = $this->user();
+        $years = [];
+        $count = match ($scenario) { 'audit-annees-6-7' => 7, 'audit-neuf-annees' => 9, default => 1 };
+        for ($i = 1; $i <= $count; $i++) {
+            $years[$i] = $this->year($user, (string) $i, (2016 + $i) . '-10-01');
+        }
+        $year = end($years);
+        $nom = fn (string $speciality, ?string $type, ?string $subType, int $i) => $this->persistNomenclature($speciality, $type, $subType, $i);
+        $surgery = function (Years $y, string $date, string $position, ?Nomenclature $n, ?Surgeons $aine = null, string $speciality = '') {
+            $s = (new Surgeries())->setYear($y)->setDate(new \DateTime($date))->setPosition($position)
+                ->setSpeciality($n?->getSpeciality() ?? $speciality)->setName($n?->getName() ?? 'Acte sans nomenclature ' . $date)
+                ->setCode($n ? $n->getCodeHospitalisation() . $n->getN() : null)->setNomenclature($n)
+                ->setFirstHand($position === '2' ? (string) $aine?->getId() : null)->setSecondHand($position === '3' ? (string) $aine?->getId() : null);
+            $this->persist($s);
+        };
+        $surgeon = function (Years $y, string $first, string $last, bool $boss) {
+            $s = (new Surgeons())->setFirstName($first)->setLastName($last)->setBoss($boss)->setYear($y);
+            $this->persist($s);
+            $this->em->flush();
+
+            return $s;
+        };
+
+        switch ($scenario) {
+            case 'audit-reference':
+                // 2 superviseurs, 6 interventions : 2 aides, 2 premières mains aidées, 2 premières mains.
+                $a = $surgeon($year, 'Anne', 'Boss', true);
+                $b = $surgeon($year, 'Bruno', 'Alpha', false);
+                $hip = $nom('ortho', '1', 'hip', 1);
+                $knee = $nom('ortho', '2', 'knee', 2);
+                $surgery($year, '2017-10-02', '2', $hip, $a);
+                $surgery($year, '2017-10-03', '2', $knee, $b);
+                $surgery($year, '2017-11-06', '3', $hip, $a);
+                $surgery($year, '2017-11-07', '3', $hip, $b);
+                $surgery($year, '2017-12-04', '1', $knee);
+                $surgery($year, '2018-01-08', '1', $hip);
+                break;
+            case 'audit-deux-maitres':
+                $a = $surgeon($year, 'Anne', 'Boss', true);
+                $b = $surgeon($year, 'Bruno', 'Boss', true);
+                $c = $surgeon($year, 'Carl', 'Alpha', false);
+                $hip = $nom('ortho', '1', 'hip', 1);
+                foreach ([[$a, '2'], [$b, '2'], [$c, '2'], [$a, '3'], [$b, '3'], [null, '1']] as $i => [$who, $p]) {
+                    $surgery($year, sprintf('2017-10-%02d', 2 + $i), $p, $hip, $who);
+                }
+                break;
+            case 'audit-trente-superviseurs':
+                $hip = $nom('ortho', '1', 'hip', 1);
+                $list = [$surgeon($year, 'Anne', 'Boss', true)];
+                for ($i = 0; $i < 29; $i++) {
+                    $list[] = $surgeon($year, 'P' . $i, sprintf('Nom%02d', $i), false);
+                }
+                foreach ($list as $who) {
+                    $surgery($year, '2017-10-02', '2', $hip, $who);
+                }
+                break;
+            case 'audit-specialites-generales':
+                // Chirurgie générale : ni digestive ni urologie ; une vasculaire, une plastique, une neurochirurgie.
+                $a = $surgeon($year, 'Anne', 'Boss', true);
+                $surgery($year, '2017-10-02', '2', $nom('vasc', null, null, 1), $a);
+                $surgery($year, '2017-10-03', '1', $nom('plastic', null, null, 2));
+                $surgery($year, '2017-10-04', '1', $nom('neuro', null, null, 3));
+                break;
+            case 'audit-annees-6-7':
+            case 'audit-neuf-annees':
+                // Une aide en chirurgie générale (digestive) et une en orthopédie (hanche) chaque année.
+                $dig = $nom('dig', null, null, 1);
+                $hip = $nom('ortho', '1', 'hip', 2);
+                foreach ($years as $i => $y) {
+                    $a = $surgeon($y, 'Anne', 'Boss', true);
+                    $surgery($y, (2016 + $i) . '-10-02', '2', $dig, $a);
+                    $surgery($y, (2016 + $i) . '-10-03', '2', $hip, $a);
+                }
+                break;
+            case 'audit-sans-nomenclature':
+                // Sans nomenclature : 2 vasculaires différentes, 1 orthopédie ; une générale avec sous-type ;
+                // une orthopédie au sous-type tronqué.
+                $a = $surgeon($year, 'Anne', 'Boss', true);
+                $surgery($year, '2017-10-02', '2', null, $a, 'vasc');
+                $surgery($year, '2017-10-03', '1', null, null, 'vasc');
+                $surgery($year, '2017-10-04', '1', null, null, 'ortho');
+                $surgery($year, '2017-10-05', '1', $nom('dig', null, 'hip', 1));
+                $surgery($year, '2017-10-06', '1', $nom('ortho', '1', 'proximalFe', 2));
+                break;
+            case 'audit-consultations-10-dates':
+                // 12 dates en novembre (2 patients chacune), 1 en décembre (5 patients).
+                for ($d = 1; $d <= 12; $d++) {
+                    $this->persist((new Consultations())->setYear($year)->setDate(new \DateTime(sprintf('2017-11-%02d', $d)))
+                        ->setDayPart('morning')->setNumber('2')->setSpeciality('ortho'));
+                }
+                $this->persist((new Consultations())->setYear($year)->setDate(new \DateTime('2017-12-04'))->setDayPart('night')->setNumber('5')->setSpeciality('uro'));
+                // Type « plastic » (valeur enregistrée par le frontend ; le moteur attend « plast »).
+                $this->persist((new Consultations())->setYear($year)->setDate(new \DateTime('2017-12-05'))->setDayPart('morning')->setNumber('3')->setSpeciality('plastic'));
+                break;
+            case 'audit-gardes-10-par-mois':
+                // 11 gardes de 12 h en novembre (3 patients chacune), 1 en décembre (7 patients).
+                for ($d = 1; $d <= 11; $d++) {
+                    $this->persist((new Gardes())->setYear($year)->setDateOfStart(new \DateTime(sprintf('2017-11-%02d 08:00', $d)))
+                        ->setDateOfEnd(new \DateTime(sprintf('2017-11-%02d 20:00', $d)))->setNumber('3'));
+                }
+                $this->persist((new Gardes())->setYear($year)->setDateOfStart(new \DateTime('2017-12-04 08:00'))->setDateOfEnd(new \DateTime('2017-12-04 20:00'))->setNumber('7'));
+                break;
+            case 'audit-garde-minuit':
+                // Garde du lundi 06/11/2017 de 12:00 à minuit : après-midi et soir du lundi, rien le mardi.
+                $this->persist((new Gardes())->setYear($year)->setDateOfStart(new \DateTime('2017-11-06 12:00'))->setDateOfEnd(new \DateTime('2017-11-07 00:00'))->setNumber('4'));
+                break;
+            case 'audit-nouvel-an':
+                // Congrès du sam. 30/12/2017 13:00 au mar. 02/01/2018 11:00 : 30/12 a.-m. + soir, 31/12 et 01/01 entiers, 02/01 matin.
+                $this->persist((new Formations())->setYear($year)->setEvent('congres')->setDateOfStart(new \DateTime('2017-12-30 13:00'))
+                    ->setDateOfEnd(new \DateTime('2018-01-02 11:00'))->setName('Congrès')->setDescription('Sujet')->setLocation('Ailleurs')->setRole('participant'));
+                break;
+            case 'audit-positions':
+                $a = $surgeon($year, 'Anne', 'Boss', true);
+                $hip = $nom('ortho', '1', 'hip', 1);
+                foreach (['1', '2', '3', '4', '', '0'] as $i => $p) {
+                    $surgery($year, sprintf('2017-10-%02d', 2 + $i), $p, $hip, $a);
+                }
+                break;
+        }
+
+        return [$user, $year->getId()];
+    }
+
+    private function persistNomenclature(string $speciality, ?string $type, ?string $subType, int $i): Nomenclature
+    {
+        $n = (new Nomenclature())->setSpeciality($speciality)->setName('Acte ' . $speciality . ' ' . $i)
+            ->setCodeHospitalisation((string) (300000 + $i))->setN('1')->setType($type)->setSubType($subType);
+        $this->persist($n);
+        $this->em->flush();
+
+        return $n;
     }
 
     private function casLimites(): array

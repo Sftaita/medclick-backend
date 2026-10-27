@@ -121,8 +121,8 @@ Points notables :
 | GET | `/api/favorites/getMyList` | user | Favoris du user |
 | POST | `/api/favorites/addNew` | user | Ajout favori |
 | PUT | `/api/favorites/updateNew` | user | Modification favori |
-| GET | `/api/excel/{year}` | propriétaire | Export Excel (ancienne version) |
-| GET | `/api/excel2/{year}` | propriétaire | Export Excel (version courante) |
+| GET | `/api/excel/{year}` | propriétaire | Alias de `/api/excel2` (ancien moteur v1 retiré le 27/10/2026) |
+| GET | `/api/excel2/{year}` | propriétaire | Export Excel synchrone (ancien front) ; nouveau front : `/api/exports` (docs/EXPORTS.md) |
 | GET | `/api/statistics/fetch/{userId}` | soi / admin | Statistiques |
 | POST | `/api/statistics/update/{userId}` | admin | Recalcul des statistiques |
 | GET | `/api/userStat/{id}` | soi / admin | Ids des années d'un user |

@@ -130,8 +130,18 @@ exports » du front (`/admin/exports`). Aucun accès aux fichiers.
 - Historique : supprimé après `EXPORT_HISTORY_RETENTION_DAYS` (365 j par défaut).
 - Sauvegardes : les nouvelles tables sont dans la base MariaDB, donc dans `backup.sh` (dump
   complet) ; les fichiers temporaires ne sont volontairement pas sauvegardés.
-- Les anciennes routes synchrones (`/api/excel2`, `/api/excel`) sont aussi historisées
-  (`parameters.channel = "sync"`), sans fichier conservé.
+- Les routes synchrones conservées pour l'ancien front (`/api/excel2` et son alias `/api/excel`)
+  servent le même fichier officiel et sont aussi historisées (`parameters.channel = "sync"`), sans
+  fichier conservé.
+
+## Retrait d'« Excel (Old) » (27/10/2026)
+
+- Ancien moteur v1 (`ExcelGeneratorController`, autre mise en page) supprimé ; plus aucun bouton
+  dans le nouveau front : un seul export, asynchrone.
+- `/api/excel/{year}` reste un **alias** de l'export officiel : l'ancien front CRA encore servi
+  (`frontend.easymed.fun`) l'appelle encore (journaux d'accès). Il reçoit désormais le carnet
+  officiel au lieu de l'ancien format.
+- À retirer définitivement avec l'arrêt de l'ancien front.
 
 ## Réglages (`.env` du serveur, défauts dans `config/services.yaml`)
 

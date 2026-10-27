@@ -70,7 +70,8 @@ Doc OpenAPI générée par API Platform : `GET /api` (ne couvre pas les contrôl
   journalise la connexion dans `ConnectionHistory`.
 - `src/Controller/` — endpoints custom (JSON manuel). `AdminControllers/` sous `/api/admin/*`
   (ROLE_ADMIN via `access_control`). `ExcelNewVersion.php` (`/api/excel2/{year}`) est l'export
-  courant ; `ExcelGeneratorController.php` (`/api/excel/{year}`) est l'ancienne version.
+  synchrone conservé pour l'ancien front ; `/api/excel/{year}` (« Excel (Old) ») n'est plus qu'un
+  alias de ce même export (ancien moteur v1 retiré le 27/10/2026).
 - `public/ExcelTemplate.xlsx` — gabarit du carnet de stage (chargé via `kernel.project_dir`).
 - **Exports Excel** : `src/Export/` (moteur `CarnetDeStage/`, tâches asynchrones `Job/`, surveillance
   `Monitoring/`), worker Messenger (`messenger:consume exports scheduler_exports_monitor`), API

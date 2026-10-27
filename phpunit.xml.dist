@@ -31,6 +31,7 @@
             <group>excel-reference-generation</group>
             <group>excel-volume</group>
             <group>excel-profile</group>
+            <group>excel-audit-report</group>
         </exclude>
     </groups>
 

@@ -15,11 +15,14 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Routing\Attribute\Route;
 
 /**
- * Export « Excel (New) » synchrone, conservé pour les anciens frontends (le nouveau passe par
- * /api/exports, asynchrone avec progression). Même fichier, mêmes réponses qu'avant ; le moteur
- * est désormais App\Export\CarnetDeStage (l'ancien code est figé dans tests/Excel/Legacy, qui
- * vérifie l'équivalence). La demande est enregistrée dans l'historique des exports
+ * Export synchrone du carnet de stage, conservé pour l'ancien frontend (CRA, encore servi) : le
+ * nouveau frontend passe par /api/exports (asynchrone, progression réelle). Même fichier, mêmes
+ * réponses qu'avant ; le moteur est App\Export\CarnetDeStage (l'ancien code est figé dans
+ * tests/Excel/Legacy, qui vérifie l'équivalence). La demande est historisée
  * (App\Export\Job\SyncExportRecorder).
+ *
+ * /api/excel/{year} (« Excel (Old) ») : l'ancien moteur v1 a été retiré (27/10/2026) ; l'adresse
+ * reste un alias de ce même export officiel pour ne pas casser l'ancien frontend.
  */
 class ExcelNewVersion extends AbstractController
 {
@@ -32,6 +35,7 @@ class ExcelNewVersion extends AbstractController
      * @return Response
      */
     #[Route('/api/excel2/{year}', name: 'excel', methods: ['GET'])]
+    #[Route('/api/excel/{year}', name: 'excelOldVersion', methods: ['GET'])]
     public function ExcelGenerator2(int $year, Request $request): Response
     {
         $user = $this->getUser();

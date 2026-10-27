@@ -21,17 +21,17 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 use Symfony\Component\Uid\Uuid;
 
 /**
- * Historique des exports des anciennes routes SYNCHRONES (/api/excel2 et /api/excel), encore
- * appelées par les anciens frontends : chaque demande crée une entrée, même en cas d'échec.
+ * Historique des exports des routes SYNCHRONES (/api/excel2 et son alias /api/excel), encore
+ * appelées par l'ancien frontend : chaque demande crée une entrée, même en cas d'échec.
  * Le fichier est servi directement dans la réponse : aucun fichier n'est conservé, l'envoi
  * complet est observé côté serveur (jamais confirmé par le navigateur).
  */
 final class SyncExportRecorder implements EventSubscriberInterface
 {
-    /** Route => type d'export enregistré. */
+    /** Route => adresse appelée (les deux servent le carnet de stage officiel). */
     private const ROUTES = [
-        'excel' => CarnetDeStageExporter::TYPE,
-        'excelOldVersion' => 'carnet_de_stage_v1',
+        'excel' => '/api/excel2',
+        'excelOldVersion' => '/api/excel',
     ];
     private const JOB = '_sync_export_job';
     private const EXCEPTION = '_sync_export_exception';
@@ -55,16 +55,19 @@ final class SyncExportRecorder implements EventSubscriberInterface
     public function onController(ControllerEvent $event): void
     {
         $request = $event->getRequest();
-        $type = self::ROUTES[$request->attributes->get('_route')] ?? null;
+        $route = self::ROUTES[$request->attributes->get('_route')] ?? null;
         $user = $this->tokenStorage->getToken()?->getUser();
-        if (!$event->isMainRequest() || $type === null || !$user instanceof User) {
+        if (!$event->isMainRequest() || $route === null || !$user instanceof User) {
             return;
         }
 
         try {
             $now = $this->manager->now();
-            $job = new ExportJob(Uuid::v4()->toRfc4122(), bin2hex(random_bytes(8)), $user->getId(), $type,
-                ['yearId' => (int) $request->attributes->get('year'), 'channel' => 'sync'], $now);
+            $parameters = ['yearId' => (int) $request->attributes->get('year'), 'channel' => 'sync'];
+            if ($route === '/api/excel') {
+                $parameters['route'] = $route;
+            }
+            $job = new ExportJob(Uuid::v4()->toRfc4122(), bin2hex(random_bytes(8)), $user->getId(), CarnetDeStageExporter::TYPE, $parameters, $now);
             $job->setStatus(ExportJob::STATUS_RUNNING)->setStartedAt($now)->setHeartbeatAt($now)
                 ->setStep(ExportStep::Preparing->value)->incrementAttempts();
             $this->manager->em()->persist($job);
@@ -101,7 +104,7 @@ final class SyncExportRecorder implements EventSubscriberInterface
 
                 return;
             }
-            // Fichier généré (ancien moteur : généré pendant l'envoi lui-même).
+            // Fichier généré avant l'envoi.
             $job = $this->manager->managed($job);
             $job->setRowCount($request->attributes->get('_export_rows'));
             $this->manager->em()->flush();
@@ -117,7 +120,7 @@ final class SyncExportRecorder implements EventSubscriberInterface
                 try {
                     $callback();
                 } catch (\Throwable $exception) {
-                    // Ancien moteur : la génération a lieu pendant l'envoi.
+                    // Lecture ou envoi du fichier impossible.
                     ob_end_flush();
                     $this->fail($job, Response::HTTP_INTERNAL_SERVER_ERROR, $exception, $elapsed());
 

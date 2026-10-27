@@ -32,8 +32,17 @@ final class ExcelEquivalenceTest extends ExcelTestCase
         }
     }
 
+    /** Cas particuliers de l'audit des totaux (tests/Excel/Audit) : reproduits à l'identique aussi. */
+    public static function auditScenarios(): iterable
+    {
+        foreach (ExportDatasetFactory::AUDIT as $scenario) {
+            yield $scenario => [$scenario];
+        }
+    }
+
     #[DataProvider('scenarios')]
     #[DataProvider('randomScenarios')]
+    #[DataProvider('auditScenarios')]
     public function testNewEngineMatchesLegacyEngine(string $scenario): void
     {
         [$user, $yearId] = $this->seed($scenario);
