@@ -284,6 +284,45 @@ final class ExportLifecycleTest extends ExportTestCase
         self::assertTrue($report['equivalent'], implode("\n", $report['differences']));
     }
 
+    /**
+     * Constaté sur staging : après un gros export, rétablir la limite mémoire d'origine (inférieure à
+     * l'usage du processus) provoquait un avertissement PHP journalisé en erreur. La limite élargie
+     * reste alors en place, sans avertissement.
+     */
+    public function testMemoryLimitIsRestoredOnlyWhenTheUsageAllowsIt(): void
+    {
+        [$user, $yearId] = $this->seed('volume-100');
+        $client = $this->clientFor($user);
+        $job = $this->requestExport($client, $yearId);
+
+        $original = ini_get('memory_limit');
+        $warnings = [];
+        // Limite d'origine juste au-dessus de l'usage actuel : la génération la dépasse.
+        $previous = (string) intdiv(memory_get_usage(true) + 16 * 1024 * 1024, 1024 * 1024) . 'M';
+        ini_set('memory_limit', $previous);
+        set_error_handler(function (int $type, string $message) use (&$warnings): bool {
+            $warnings[] = $message;
+
+            return true;
+        }, \E_WARNING);
+        try {
+            $this->processQueue();
+            $after = ini_get('memory_limit');
+            $usage = memory_get_usage(true);
+        } finally {
+            restore_error_handler();
+            ini_set('memory_limit', $original);
+        }
+
+        self::assertSame([], $warnings);
+        self::assertSame(ExportJob::STATUS_READY, $this->job($job['id'])->getStatus());
+        // Usage supérieur à la limite d'origine (cas d'un test exécuté seul : la génération fait
+        // grandir le processus) : la limite élargie est conservée ; sinon la limite d'origine revient.
+        self::assertSame($usage >= (int) $previous * 1024 * 1024
+            ? static::getContainer()->get(\App\Export\Job\ExportSettings::class)->memoryLimit
+            : $previous, $after);
+    }
+
     public function testSynchronousRoutesAreRecordedInTheHistory(): void
     {
         [$user, $yearId] = $this->seed('petit');

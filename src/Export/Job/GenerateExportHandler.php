@@ -68,11 +68,32 @@ final class GenerateExportHandler
             $this->manager->fail($job, $failure, durationMs: self::elapsedMs($started));
         } finally {
             $this->disarm();
-            ini_set('memory_limit', (string) $previousMemoryLimit);
             // Libère les données chargées (le worker traite les exports les uns après les autres).
             $this->manager->em()->clear();
             gc_collect_cycles();
+            // Limite d'origine rétablie seulement si l'usage actuel le permet (sinon PHP refuse avec un
+            // avertissement) ; à défaut, la limite élargie reste en place et messenger:consume
+            // --memory-limit recycle le worker après ce message.
+            if (memory_get_usage(true) < self::bytes((string) $previousMemoryLimit)) {
+                ini_set('memory_limit', (string) $previousMemoryLimit);
+            }
         }
+    }
+
+    /** Valeur de memory_limit en octets (« -1 » = illimité). */
+    private static function bytes(string $limit): int
+    {
+        if ($limit === '' || $limit === '-1') {
+            return \PHP_INT_MAX;
+        }
+        $value = (int) $limit;
+
+        return match (strtolower(substr($limit, -1))) {
+            'g' => $value * 1024 ** 3,
+            'm' => $value * 1024 ** 2,
+            'k' => $value * 1024,
+            default => $value,
+        };
     }
 
     private function arm(ExportJob $job, JobProgress $progress): void
