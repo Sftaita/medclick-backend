@@ -10,7 +10,8 @@
 # l'URL d'API à la construction ; un même nom serait réécrit par un déploiement du staging).
 #   - api-medclick.easymed.fun   : backend entier (anciens fronts CRA et admin pendant la transition,
 #                                  liens d'activation déjà envoyés) ;
-#   - medclick.be                : redirection permanente vers https://www.medclick.be.
+#   - medclick.be                : redirection permanente vers https://www.medclick.be, sauf
+#                                  /service-worker.js (SW de remplacement de l'ancien front CRA).
 
 name: medclick-prod
 
@@ -129,6 +130,99 @@ services:
       - "traefik.http.middlewares.medclick-prod-to-www.redirectregex.regex=^https://medclick\\.be/(.*)"
       - "traefik.http.middlewares.medclick-prod-to-www.redirectregex.replacement=https://www.medclick.be/$${1}"
       - "traefik.http.middlewares.medclick-prod-to-www.redirectregex.permanent=true"
+
+  # Service worker de remplacement pour https://medclick.be/service-worker.js. L'ancien front CRA
+  # était aussi servi sur l'apex : son SW y continue de servir l'ancienne version depuis le cache, et
+  # ne peut pas se mettre à jour tant que son script est redirigé (refusé par les navigateurs). Ce
+  # script, servi en 200, le remplace, renvoie vers www et retire ses caches. Toutes les autres URL
+  # de l'apex restent redirigées par medclick-prod-apex. Retour arrière : arrêter ce service.
+  legacy-apex-sw:
+    image: nginx:1.29-alpine
+    container_name: medclick-prod-legacy-apex-sw
+    restart: unless-stopped
+    networks:
+      - proxy
+    configs:
+      - source: legacy-apex-sw-nginx
+        target: /etc/nginx/conf.d/default.conf
+      - source: legacy-apex-sw-js
+        target: /usr/share/nginx/apex/service-worker.js
+    labels:
+      - "traefik.enable=${WWW_LIVE:-false}"
+      - "traefik.docker.network=proxy"
+      - "traefik.http.routers.medclick-prod-apex-sw.rule=Host(`medclick.be`) && Path(`/service-worker.js`)"
+      - "traefik.http.routers.medclick-prod-apex-sw.priority=1000"
+      - "traefik.http.routers.medclick-prod-apex-sw.entrypoints=websecure"
+      - "traefik.http.routers.medclick-prod-apex-sw.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.medclick-prod-apex-sw.middlewares=secure-headers@file"
+      - "traefik.http.routers.medclick-prod-apex-sw.service=medclick-prod-legacy-apex-sw"
+      - "traefik.http.services.medclick-prod-legacy-apex-sw.loadbalancer.server.port=80"
+
+configs:
+  legacy-apex-sw-nginx:
+    content: |
+      server {
+          listen 80;
+          server_name _;
+          server_tokens off;
+          location = /service-worker.js {
+              root /usr/share/nginx/apex;
+              default_type application/javascript;
+              add_header Cache-Control "no-cache, no-store, must-revalidate";
+          }
+          location / {
+              return 404;
+          }
+      }
+  legacy-apex-sw-js:
+    content: |
+      // Remplace le service worker de l'ancien front CRA sur https://medclick.be (l'application vit
+      // désormais sur www). Ne touche ni au localStorage ni à IndexedDB : seulement aux caches du SW CRA.
+      const WWW = 'https://www.medclick.be';
+      const isOldCache = (name) => name.startsWith('workbox-precache') || name.startsWith('workbox-runtime') || name === 'images';
+
+      self.addEventListener('install', () => self.skipWaiting());
+
+      self.addEventListener('activate', (event) => event.waitUntil((async () => {
+        await self.clients.claim();
+        // Onglets en arrière-plan : basculés tout de suite. Onglet affiché : à son prochain chargement,
+        // pour ne pas perdre une saisie en cours (l'ancien front reste fonctionnel d'ici là).
+        const windows = await self.clients.matchAll({ type: 'window' });
+        await Promise.all(windows
+          .filter((client) => client.visibilityState !== 'visible')
+          .map((client) => client.navigate(toWww(client.url)).catch(() => {})));
+        await cleanupIfIdle();
+      })()));
+
+      self.addEventListener('fetch', (event) => {
+        const { request } = event;
+        const url = new URL(request.url);
+        if (url.origin !== self.location.origin) return;
+        if (request.mode === 'navigate') {
+          event.respondWith(Response.redirect(toWww(request.url), 302));
+          // Après la redirection, plus aucun onglet sur medclick.be : caches et enregistrement retirés.
+          event.waitUntil(new Promise((resolve) => setTimeout(resolve, 5000)).then(cleanupIfIdle));
+          return;
+        }
+        // Onglet de l'ancien front encore ouvert : ses fichiers (chunks chargés à la demande) restent
+        // servis depuis le cache, le serveur de medclick.be ne les a plus.
+        if (request.method === 'GET') {
+          event.respondWith(caches.match(request).then((cached) => cached || fetch(request)));
+        }
+      });
+
+      function toWww(href) {
+        const url = new URL(href);
+        return WWW + url.pathname + url.search + url.hash;
+      }
+
+      async function cleanupIfIdle() {
+        const windows = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+        if (windows.length > 0) return;
+        const names = await caches.keys();
+        await Promise.all(names.filter(isOldCache).map((name) => caches.delete(name)));
+        await self.registration.unregister();
+      }
 
 networks:
   proxy:

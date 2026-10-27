@@ -152,3 +152,43 @@ L'ancien front charge ses écrans à la demande (`/static/js/*.chunk.js`) ; un S
 force sous un onglet CRA ouvert ferait échouer ces chargements (le nouveau serveur ne les a plus).
 Conséquence pour la bascule : pendant la période de transition, l'ancien front encore ouvert
 appelle toujours `https://api-medclick.easymed.fun/api/` : ce nom doit continuer à servir l'API.
+
+### Ancien front CRA resté sur l'apex `medclick.be` (corrigé le 27/10/2026)
+
+L'ancien front était servi aussi sur `https://medclick.be` (origine distincte de `www`). Après la
+bascule B, l'apex redirige tout vers `www`, y compris `/service-worker.js` : les navigateurs
+refusent alors de mettre à jour le SW CRA (« script resource is behind a redirect ») et celui-ci
+continue de servir l'ancienne version depuis son cache, sans limite de durée.
+
+Correctif : service `legacy-apex-sw` de `docker-compose.prod.yml` (nginx, routeur Traefik
+`Host(medclick.be) && Path(/service-worker.js)`, priorité 1000). Il sert en 200, sans cache HTTP,
+un SW de remplacement qui :
+- s'active aussitôt et sert encore, depuis le cache, les fichiers d'un onglet CRA ouvert ;
+- bascule vers `www` les onglets en arrière-plan ; l'onglet affiché bascule à son prochain
+  chargement (pas de rechargement forcé : une saisie en cours n'est pas perdue) ;
+- redirige toute navigation vers `https://www.medclick.be` (chemin, paramètres et ancre conservés) ;
+- une fois plus aucun onglet ouvert sur l'apex : supprime les seuls caches du SW CRA
+  (`workbox-precache*`, `workbox-runtime*`, `images`) et se désinscrit. `localStorage` et IndexedDB
+  ne sont pas touchés.
+
+En pratique : à la première ouverture, l'ancien front s'affiche une dernière fois ; à la suivante,
+c'est le nouveau. Vérifié sur un banc local (miroir CRA) puis en production dans un Chrome qui
+avait l'ancienne PWA. Les autres URL de l'apex restent redirigées (301/308), `www` est inchangé.
+
+Application sans redémarrage des autres services (hash Compose de `db`, `backend`, `frontend`
+inchangés) : sauvegarder `docker-compose.yml`, le remplacer, puis
+`docker compose up -d --no-deps --wait legacy-apex-sw`.
+
+`deploy.sh` ne le supprime jamais (aucun `down` ni `--remove-orphans`) et le recrée s'il a disparu ;
+un conteneur à jour n'est pas redémarré.
+
+Retour arrière : `docker compose rm -sf legacy-apex-sw` (le routeur disparaît, l'apex redirige à
+nouveau tout), puis remettre le `docker-compose.yml` sauvegardé. Les navigateurs déjà migrés ne
+sont pas concernés.
+
+Retrait (pas avant plusieurs mois) : seul un navigateur qui a encore l'ancien SW demande ce fichier
+sur l'apex. Retirer quand le compteur reste à zéro pendant 30 jours consécutifs :
+`grep medclick-prod-apex-sw@docker /opt/stack/traefik/logs/access.log | tail` (date de la dernière
+requête). Puis : retirer le service `legacy-apex-sw` et ses deux `configs` de
+`docker-compose.prod.yml` (PR), copier le fichier sur le VPS et lancer
+`docker compose rm -sf legacy-apex-sw`. Aucun autre service n'est touché.
