@@ -25,6 +25,9 @@ use Symfony\Component\Mime\Email;
  * - Une absence = un incident = un e-mail (renvoyé en cas d'échec d'envoi, délai croissant) ; aucun
  *   e-mail si un export bloqué par cet arrêt a déjà été signalé, et inversement (ExportAlerter).
  * - Une seule surveillance à la fois (worker, gardien, commande) : bail en base, acquire()/release().
+ * - Surveillance croisée : le worker vérifie à son tour le gardien. Un gardien déjà vu qui ne passe
+ *   plus depuis WATCHDOG_ALERT_SECONDS (ligne retirée de la crontab, cron arrêté…) = un e-mail,
+ *   jusqu'à son retour. Un gardien jamais installé n'est pas signalé (deploy.sh l'avertit).
  */
 final class ExportWorkerWatch
 {
@@ -36,6 +39,8 @@ final class ExportWorkerWatch
     private const LEASE_SECONDS = 120;
     /** Le gardien est considéré actif s'il est passé dans ce délai (il tourne chaque minute). */
     private const WATCHDOG_ACTIVE_SECONDS = 300;
+    /** Gardien signalé par e-mail (worker) s'il ne passe plus depuis ce délai. */
+    private const WATCHDOG_ALERT_SECONDS = 600;
 
     public function __construct(
         private ManagerRegistry $doctrine,
@@ -47,13 +52,19 @@ final class ExportWorkerWatch
     ) {
     }
 
-    /** Signe de vie du worker ; clôt l'absence en cours s'il y en a une. */
-    public function heartbeat(): void
+    /**
+     * Signe de vie du worker ; clôt l'absence en cours s'il y en a une, puis vérifie le gardien.
+     *
+     * @return bool vrai si l'alerte « gardien inactif » vient d'être envoyée
+     */
+    public function heartbeat(): bool
     {
         $this->ensureRow();
         $this->connection()->executeStatement('UPDATE export_monitor_state SET worker_seen_at = ? WHERE id = ?',
             [$this->format($this->now()), ExportMonitorState::ID]);
         $this->recovered();
+
+        return $this->checkWatchdog();
     }
 
     /** Réserve la surveillance ; faux si une autre surveillance est en cours. */
@@ -84,6 +95,7 @@ final class ExportWorkerWatch
         $now = $this->now();
         $this->connection()->executeStatement('UPDATE export_monitor_state SET last_watchdog_at = ? WHERE id = ?',
             [$this->format($now), ExportMonitorState::ID]);
+        $this->watchdogBack();
 
         if ($this->workerAlive($this->state())) {
             $this->recovered();
@@ -143,6 +155,7 @@ final class ExportWorkerWatch
             'watchdog' => [
                 'active' => $watchdogActive,
                 'lastRunAt' => $state->getLastWatchdogAt()?->format(DATE_ATOM),
+                'alertStatus' => $watchdogActive ? null : $state->getWatchdogAlertStatus(),
             ],
             'lastRun' => [
                 'at' => $state->getLastRunAt()?->format(DATE_ATOM),
@@ -196,29 +209,99 @@ final class ExportWorkerWatch
 
             return false;
         }
+
+        return $this->deliver('worker_alert', $status, $state->getWorkerAlertAttempts(), $state->getWorkerAlertLastAttemptAt(),
+            $this->email($state), 'worker arrêté');
+    }
+
+    /** Vérification du gardien par le worker : un e-mail tant qu'un gardien déjà vu ne passe plus. */
+    private function checkWatchdog(): bool
+    {
+        $state = $this->state();
+        $last = $state->getLastWatchdogAt();
+        if ($last === null || $last >= $this->now()->modify('-' . self::WATCHDOG_ALERT_SECONDS . ' seconds')) {
+            return false;
+        }
+        $status = $state->getWatchdogAlertStatus();
+        if (in_array($status, [ExportJob::ALERT_SENT, ExportJob::ALERT_DISABLED], true)) {
+            return false;
+        }
+        if ($status === 'none') {
+            $this->logger->error('[export] Gardien des exports inactif', ['dernierPassage' => $last->format(DATE_ATOM)]);
+        }
+        if ($this->settings->alertEmail === '') {
+            $this->setAlert(['watchdog_alert_status' => ExportJob::ALERT_DISABLED]);
+
+            return false;
+        }
+
+        return $this->deliver('watchdog_alert', $status, $state->getWatchdogAlertAttempts(), $state->getWatchdogAlertLastAttemptAt(),
+            $this->watchdogEmail($last), 'gardien inactif');
+    }
+
+    /** Retour du gardien : son alerte éventuelle est close (un nouvel arrêt sera signalé). */
+    private function watchdogBack(): void
+    {
+        $state = $this->state();
+        if ($state->getWatchdogAlertStatus() === 'none') {
+            return;
+        }
+        $this->setAlert(['watchdog_alert_status' => 'none', 'watchdog_alert_attempts' => 0,
+            'watchdog_alert_last_attempt_at' => null, 'watchdog_alert_last_error' => null]);
+        $this->logger->notice('[export] Gardien des exports rétabli', ['alerte' => $state->getWatchdogAlertStatus()]);
+    }
+
+    /**
+     * Envoi d'une alerte de surveillance (colonnes <prefix>_status, _attempts, _last_attempt_at,
+     * _sent_at, _last_error) ; un envoi en échec est renvoyé selon ExportAlerter::RETRY_DELAYS.
+     */
+    private function deliver(string $prefix, string $status, int $attempts, ?\DateTimeImmutable $lastAttemptAt, Email $email, string $label): bool
+    {
         if ($status === ExportJob::ALERT_FAILED) {
-            $delay = ExportAlerter::RETRY_DELAYS[$state->getWorkerAlertAttempts()] ?? null;
-            if ($delay === null || $state->getWorkerAlertLastAttemptAt() > $this->now()->modify("-$delay minutes")) {
+            $delay = ExportAlerter::RETRY_DELAYS[$attempts] ?? null;
+            if ($delay === null || $lastAttemptAt > $this->now()->modify("-$delay minutes")) {
                 return false;
             }
         }
 
         $now = $this->now();
-        $attempts = $state->getWorkerAlertAttempts() + 1;
+        ++$attempts;
         try {
-            $this->mailer->send($this->email($state));
+            $this->mailer->send($email);
         } catch (\Throwable $failure) {
-            $this->setAlert(['worker_alert_status' => ExportJob::ALERT_FAILED, 'worker_alert_attempts' => $attempts,
-                'worker_alert_last_attempt_at' => $this->format($now),
-                'worker_alert_last_error' => $failure::class . ' : ' . mb_substr($failure->getMessage(), 0, 300)]);
-            $this->logger->error('[export] Alerte « worker arrêté » non envoyée', ['failure' => $failure::class, 'attempt' => $attempts]);
+            $this->setAlert(["{$prefix}_status" => ExportJob::ALERT_FAILED, "{$prefix}_attempts" => $attempts,
+                "{$prefix}_last_attempt_at" => $this->format($now),
+                "{$prefix}_last_error" => $failure::class . ' : ' . mb_substr($failure->getMessage(), 0, 300)]);
+            $this->logger->error("[export] Alerte « $label » non envoyée", ['failure' => $failure::class, 'attempt' => $attempts]);
 
             return false;
         }
-        $this->setAlert(['worker_alert_status' => ExportJob::ALERT_SENT, 'worker_alert_attempts' => $attempts,
-            'worker_alert_last_attempt_at' => $this->format($now), 'worker_alert_sent_at' => $this->format($now), 'worker_alert_last_error' => null]);
+        $this->setAlert(["{$prefix}_status" => ExportJob::ALERT_SENT, "{$prefix}_attempts" => $attempts,
+            "{$prefix}_last_attempt_at" => $this->format($now), "{$prefix}_sent_at" => $this->format($now), "{$prefix}_last_error" => null]);
 
         return true;
+    }
+
+    private function watchdogEmail(\DateTimeImmutable $lastRun): Email
+    {
+        $text = implode("\n", [
+            'Le gardien des exports Excel (tâche planifiée du serveur, chaque minute) ne passe plus : un arrêt',
+            'du worker des exports ne serait plus signalé.',
+            '',
+            'Dernier passage : ' . $this->formatUtc($lastRun),
+            '',
+            'Action : vérifier la ligne « app:exports:monitor --watchdog » de la crontab du serveur et son journal',
+            '(docs/DEPLOIEMENT-VPS.md, exports Excel).',
+            'Détail (connexion administrateur requise) : ' . rtrim($this->settings->publicFrontendUrl, '/') . '/admin/exports',
+            '',
+            'Un seul e-mail par interruption ; le retour du gardien est consigné dans les journaux.',
+        ]);
+
+        return (new Email())
+            ->from('Medclick <service@medclick.be>')
+            ->to($this->settings->alertEmail)
+            ->subject('[MedClick] Gardien des exports Excel inactif — surveillance du worker interrompue')
+            ->text($text);
     }
 
     private function email(ExportMonitorState $state): Email
@@ -268,7 +351,8 @@ final class ExportWorkerWatch
             return;
         }
         try {
-            $connection->insert('export_monitor_state', ['id' => ExportMonitorState::ID, 'worker_alert_status' => 'none', 'worker_alert_attempts' => 0]);
+            $connection->insert('export_monitor_state', ['id' => ExportMonitorState::ID, 'worker_alert_status' => 'none', 'worker_alert_attempts' => 0,
+                'watchdog_alert_status' => 'none', 'watchdog_alert_attempts' => 0]);
         } catch (UniqueConstraintViolationException) {
             // Créée au même instant par un autre processus.
         }

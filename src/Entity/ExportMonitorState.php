@@ -61,6 +61,25 @@ class ExportMonitorState
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
     private ?\DateTimeImmutable $runLeaseUntil = null;
 
+    /**
+     * Alerte « gardien inactif », envoyée par le worker quand un gardien déjà vu ne passe plus :
+     * none, sent, failed, disabled. Remise à none au retour du gardien.
+     */
+    #[ORM\Column(type: Types::STRING, length: 20)]
+    private string $watchdogAlertStatus = 'none';
+
+    #[ORM\Column(type: Types::INTEGER)]
+    private int $watchdogAlertAttempts = 0;
+
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
+    private ?\DateTimeImmutable $watchdogAlertLastAttemptAt = null;
+
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
+    private ?\DateTimeImmutable $watchdogAlertSentAt = null;
+
+    #[ORM\Column(type: Types::STRING, length: 500, nullable: true)]
+    private ?string $watchdogAlertLastError = null;
+
     public function getId(): int
     {
         return $this->id;
@@ -119,5 +138,30 @@ class ExportMonitorState
     public function getRunLeaseUntil(): ?\DateTimeImmutable
     {
         return $this->runLeaseUntil;
+    }
+
+    public function getWatchdogAlertStatus(): string
+    {
+        return $this->watchdogAlertStatus;
+    }
+
+    public function getWatchdogAlertAttempts(): int
+    {
+        return $this->watchdogAlertAttempts;
+    }
+
+    public function getWatchdogAlertLastAttemptAt(): ?\DateTimeImmutable
+    {
+        return $this->watchdogAlertLastAttemptAt;
+    }
+
+    public function getWatchdogAlertSentAt(): ?\DateTimeImmutable
+    {
+        return $this->watchdogAlertSentAt;
+    }
+
+    public function getWatchdogAlertLastError(): ?string
+    {
+        return $this->watchdogAlertLastError;
     }
 }

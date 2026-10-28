@@ -159,6 +159,57 @@ final class ExportWatchdogTest extends ExportTestCase
         self::assertIsArray(static::getContainer()->get(ExportMonitor::class)->runExclusive(ExportWorkerWatch::BY_WORKER));
     }
 
+    public function testStoppedWatchdogIsReportedOnceByTheWorkerUntilItComesBack(): void
+    {
+        $this->workerHeartbeat();
+        $this->watchdog();
+        // La ligne du gardien est retirée de la crontab : seul le worker continue de passer.
+        foreach (range(1, 10) as $minute) {
+            $this->travel(60);
+            $this->workerHeartbeat();
+        }
+        self::assertSame([], $this->sentEmails());
+
+        $this->travel(60);
+        $this->workerHeartbeat();
+        $emails = $this->sentEmails();
+        self::assertCount(1, $emails);
+        self::assertSame('[MedClick] Gardien des exports Excel inactif — surveillance du worker interrompue', $emails[0]->getSubject());
+        self::assertStringContainsString('app:exports:monitor --watchdog', $emails[0]->getTextBody());
+        self::assertStringContainsString('/admin/exports', $emails[0]->getTextBody());
+
+        foreach (range(1, 5) as $minute) {
+            $this->travel(60);
+            $this->workerHeartbeat();
+        }
+        self::assertCount(1, $this->sentEmails());
+        $status = $this->watch()->status();
+        self::assertFalse($status['watchdog']['active']);
+        self::assertSame(ExportJob::ALERT_SENT, $status['watchdog']['alertStatus']);
+
+        // Retour du gardien : incident clos ; une nouvelle interruption est signalée de nouveau.
+        $this->watchdog();
+        self::assertTrue($this->watch()->status()['watchdog']['active']);
+        self::assertNull($this->watch()->status()['watchdog']['alertStatus']);
+        foreach (range(1, 11) as $minute) {
+            $this->travel(60);
+            $this->workerHeartbeat();
+        }
+        self::assertCount(2, $this->sentEmails());
+        // Le worker est resté présent tout du long : aucune alerte « worker arrêté ».
+        self::assertSame('running', $this->watch()->status()['worker']['status']);
+    }
+
+    public function testWatchdogNeverInstalledIsNotReportedByTheWorker(): void
+    {
+        foreach (range(1, 30) as $minute) {
+            $this->workerHeartbeat();
+            $this->travel(60);
+        }
+        self::assertSame([], $this->sentEmails());
+        self::assertFalse($this->watch()->status()['watchdog']['active']);
+    }
+
     public function testAdministrationShowsWorkerAndWatchdogState(): void
     {
         $client = $this->clientFor($this->createUser('admin@example.test', ['ROLE_ADMIN']));
