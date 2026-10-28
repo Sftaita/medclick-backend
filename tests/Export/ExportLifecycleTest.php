@@ -289,6 +289,10 @@ final class ExportLifecycleTest extends ExportTestCase
      * l'usage du processus) provoquait un avertissement PHP journalisé en erreur. La limite élargie
      * reste alors en place, sans avertissement.
      */
+    // Processus séparé : le test règle la limite mémoire sur l'usage du processus ; dans la suite
+    // complète (un seul processus), la mémoire accumulée par les tests précédents fait dépasser la
+    // limite élargie et arrête PHP (« Allowed memory size exhausted ») : constaté avec composer test.
+    #[\PHPUnit\Framework\Attributes\RunInSeparateProcess]
     public function testMemoryLimitIsRestoredOnlyWhenTheUsageAllowsIt(): void
     {
         [$user, $yearId] = $this->seed('volume-100');
