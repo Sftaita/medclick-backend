@@ -47,7 +47,7 @@ réseau privé medclick-<env>-internal :
 | `DB_NAME`, `DB_USER`, `DB_PASSWORD`, `DB_ROOT_PASSWORD` | base dédiée |
 | `APP_SECRET` | secret Symfony de l'environnement |
 | `JWT_PASSPHRASE` | phrase de passe des clés JWT de l'environnement (jamais celles d'un autre) |
-| `BACKEND_TAG`, `FRONTEND_TAG` | posées par `deploy.sh` (7 premiers caractères des SHA) |
+| `BACKEND_TAG`, `FRONTEND_TAG` | enregistrées par `deploy.sh` à chaque déploiement (7 premiers caractères des SHA) ; le Compose refuse de démarrer sans elles : une commande manuelle utilise toujours les images du dernier déploiement |
 
 Le Compose fixe en plus : `APP_ENV=prod`, `APP_DEBUG=0`, `MAILER_DSN=smtp://mailpit:1025`
 (préproduction), `PUBLIC_FRONTEND_URL` = `PUBLIC_API_URL` = `PUBLIC_URL` (liens des e-mails et

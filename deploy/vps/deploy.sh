@@ -41,6 +41,12 @@ PREVIOUS_FRONTEND_IMAGE=$(docker inspect --format '{{.Config.Image}}' "medclick-
 export PREVIOUS_FRONTEND_IMAGE
 echo "assets précédents repris de : $PREVIOUS_FRONTEND_IMAGE"
 docker compose build
+# Étiquettes de ce déploiement enregistrées dans .env : une commande docker compose lancée à la main
+# dans ce dossier utilise ces images, jamais une plus ancienne (le Compose refuse une étiquette absente).
+for TAG_VAR in BACKEND_TAG FRONTEND_TAG; do
+  sed -i "/^${TAG_VAR}=/d" .env && echo "${TAG_VAR}=${!TAG_VAR}" >> .env
+done
+[ "$(stat -c %a .env)" = "600" ] || { echo ".env doit rester en 600"; exit 1; }
 # Mailpit n'existe qu'en préproduction (capture des e-mails).
 docker compose up -d --wait db $(docker compose config --services | grep -x mailpit || true)
 

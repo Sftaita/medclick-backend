@@ -41,7 +41,7 @@ services:
     build:
       context: ./src/backend
       dockerfile: deploy/vps/backend.Dockerfile
-    image: medclick-prod-backend:${BACKEND_TAG:-latest}
+    image: medclick-prod-backend:${BACKEND_TAG:?BACKEND_TAG absent, lancer deploy.sh qui l enregistre dans .env}
     container_name: medclick-prod-backend
     restart: unless-stopped
     environment: &backend-environment
@@ -90,7 +90,7 @@ services:
 
   # Worker des exports Excel (voir docker-compose.staging.yml) : aucune entrée réseau, ressources plafonnées.
   worker:
-    image: medclick-prod-backend:${BACKEND_TAG:-latest}
+    image: medclick-prod-backend:${BACKEND_TAG:?BACKEND_TAG absent, lancer deploy.sh qui l enregistre dans .env}
     container_name: medclick-prod-worker
     restart: unless-stopped
     # Cache préchauffé (dont le gabarit Excel analysé) avant de consommer la file.
@@ -128,7 +128,7 @@ services:
         VITE_API_URL: https://www.medclick.be/api/
         # Image en service (deploy.sh) : ses assets/ restent servis pour les onglets ouverts.
         PREVIOUS_IMAGE: ${PREVIOUS_FRONTEND_IMAGE:-nginx:1.29-alpine}
-    image: medclick-prod-frontend:${FRONTEND_TAG:-latest}
+    image: medclick-prod-frontend:${FRONTEND_TAG:?FRONTEND_TAG absent, lancer deploy.sh qui l enregistre dans .env}
     container_name: medclick-prod-frontend
     restart: unless-stopped
     networks:
