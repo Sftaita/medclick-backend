@@ -118,7 +118,9 @@ Doc OpenAPI générée par API Platform : `GET /api` (ne couvre pas les contrôl
 - Dépôt front : `frontend/` = application React/Vite déployée sur le VPS ; `src/js/` à la racine =
   ancien front CRA, **non déployé par la chaîne du VPS**, encore servi ailleurs et utilisateur des
   alias `/api/excel2`, `/api/excel`.
-- Travaux restants :
+- Travaux restants : voir **`docs/A_FAIRE.md`** pour la liste de référence et les critères de validation.
+  - étude d'un éventuel monorepo privé (backend + frontend, **non décidée**) ;
+  - nettoyage ou retrait contrôlé de l'ancien frontend CRA et de ses libellés « Excel (New)/(Old) » ;
   - confirmations en attente du journal de mise en production (V6 e-mail de test, V7 et V8 export
     avec le compte du responsable) ;
   - écarts H1 à H15 du carnet Excel, reportés (ADR-204, `docs/AUDIT-TOTAUX-EXCEL.md`) : chacun
@@ -134,6 +136,7 @@ Doc OpenAPI générée par API Platform : `GET /api` (ne couvre pas les contrôl
 ## Docs
 
 - `docs/ARCHITECTURE.md` — domaine, modèle de données, endpoints, flux.
+- **`docs/A_FAIRE.md` — feuille de route post-3.2.0 : monorepo envisagé, ancien frontend CRA, écarts H1 à H15.**
 - `docs/DECISIONS.md` — décisions d'architecture (ADR) existantes et proposées.
 - `docs/AUDIT.md` — audit et feuille de route pour une application professionnelle.
 - `docs/DEPLOIEMENT-VPS.md` — déploiement sur le VPS (production et préproduction), worker, gardien.
