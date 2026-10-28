@@ -80,6 +80,10 @@ Doc OpenAPI générée par API Platform : `GET /api` (ne couvre pas les contrôl
   `tests/Fixtures/excel-reference/`. Voir `docs/EXPORTS.md`.
 - Contrôle d'accès : `config/packages/security.yaml` (`access_control` par préfixe d'URL).
 
+- **Espaces sponsors** : `docs/SPONSORS.md` — campagnes par emplacement (`src/Service/SponsorDelivery.php`),
+  impressions réellement vues et clics dédoublonnés (`marketing_view`), statistiques (`SponsorStats.php`).
+  Ne jamais compter une impression côté serveur sur un simple appel d'API.
+
 ## Conventions du code existant
 
 - Code, commentaires, messages d'erreur et commits **en français**.

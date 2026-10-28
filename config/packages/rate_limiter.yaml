@@ -14,6 +14,11 @@ framework:
             policy: sliding_window
             limit: 20
             interval: '1 minute'
+        # Impressions et clics publicitaires : quelques événements par écran et par minute suffisent.
+        marketing_event:
+            policy: sliding_window
+            limit: 60
+            interval: '1 minute'
         # Demandes d'export Excel, par utilisateur (App\Controller\ExportController).
         export_request:
             policy: sliding_window
