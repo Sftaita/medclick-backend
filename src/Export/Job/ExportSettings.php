@@ -23,6 +23,9 @@ final class ExportSettings
         /** Sans signe de vie du worker pendant cette durée, une génération en cours est déclarée interrompue. */
         #[Autowire('%env(int:EXPORT_STALL_SECONDS)%')]
         public readonly int $stallSeconds,
+        /** Sans signe de vie du worker pendant cette durée (et sans export qui avance), le gardien le déclare absent. */
+        #[Autowire('%env(int:EXPORT_WORKER_ABSENT_SECONDS)%')]
+        public readonly int $workerAbsentSeconds,
         /** Une demande jamais prise en charge au-delà de cette durée échoue (worker indisponible). */
         #[Autowire('%env(int:EXPORT_PENDING_MAX_SECONDS)%')]
         public readonly int $pendingMaxSeconds,

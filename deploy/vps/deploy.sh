@@ -75,3 +75,7 @@ fi
 # recréé s'il a disparu, laissé tel quel sinon.
 docker compose up -d --wait frontend $(docker compose config --services | grep -x legacy-apex-sw || true)
 docker compose ps
+
+# Gardien des exports (cron de l'hôte, indépendant du worker, docs/DEPLOIEMENT-VPS.md) : signalé s'il manque.
+crontab -l 2>/dev/null | grep -q "apps/medclick-$ENV_NAME .*app:exports:monitor --watchdog" \
+  || echo "ATTENTION : gardien des exports absent de la crontab (docs/DEPLOIEMENT-VPS.md, « Worker des exports Excel »)."

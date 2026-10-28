@@ -115,9 +115,32 @@ administrateur requise). Jamais de pièce jointe ni de donnée médicale.
 - Non téléchargés : évènement seul ; récapitulatif e-mail (au plus un par 24 h) seulement si
   `EXPORT_NOT_DOWNLOADED_ALERT_THRESHOLD` > 0 et atteint.
 
+### Gardien indépendant du worker (`App\Export\Monitoring\ExportWorkerWatch`)
+
+La surveillance tourne chaque minute dans le worker ; si le worker est arrêté (à la main, crash non
+relancé), elle s'arrête avec lui. Un **gardien** planifié sur le serveur (cron de l'hôte, chaque
+minute, `app:exports:monitor --watchdog` exécuté dans le conteneur de l'API) prend le relais, sans
+dépendre d'aucune consultation :
+
+- même surveillance que le worker (exports bloqués, jamais pris en charge, expirations, alertes à
+  renvoyer…), une seule à la fois (bail en base, table `export_monitor_state`) ;
+- présence du worker : la surveillance planifiée du worker enregistre un signe de vie chaque
+  minute ; sans signe de vie depuis `EXPORT_WORKER_ABSENT_SECONDS` (180 s) **et** sans export en
+  cours qui avance (génération longue), le worker est déclaré absent ;
+- une absence = un incident = **un e-mail** « Worker des exports Excel arrêté » (renvoyé en cas
+  d'échec d'envoi : 5, 15, 60, 240 min). Pas de second e-mail si un export bloqué par cet arrêt a
+  déjà été signalé, et les exports qui échouent ensuite (`worker_unavailable`) sont marqués
+  « incident déjà signalé ». Retour du worker : incident clos (journal), un nouvel arrêt est
+  signalé de nouveau ;
+- administration : état du worker (actif, arrêté depuis…, jamais vu) et du gardien (actif s'il est
+  passé dans les 5 dernières minutes : un gardien absent de la crontab se voit).
+
+Installation : `docs/DEPLOIEMENT-VPS.md` (« Worker des exports Excel ») ; `deploy.sh` avertit si la
+ligne manque dans la crontab.
+
 ### Administration
 
-`GET /api/admin/exports` (compteurs, filtres statut/type/utilisateur/période, 50 par page),
+`GET /api/admin/exports` (état du worker et du gardien, compteurs, filtres statut/type/utilisateur/période, 50 par page),
 `GET /api/admin/exports/{id}` (étapes, évènements, erreur, alerte — consultation journalisée dans
 l'historique de l'export), `POST /api/admin/exports/{id}/alert/retry`. Page « Surveillance des
 exports » du front (`/admin/exports`). Aucun accès aux fichiers.
@@ -154,6 +177,7 @@ exports » du front (`/admin/exports`). Aucun accès aux fichiers.
 | `EXPORT_FILE_TTL_MINUTES` | 120 | durée de vie d'un fichier |
 | `EXPORT_TIMEOUT_SECONDS` | 300 | durée maximale d'une génération |
 | `EXPORT_STALL_SECONDS` | 120 | sans signe de vie → interrompu |
+| `EXPORT_WORKER_ABSENT_SECONDS` | 180 | worker sans signe de vie → absent (gardien) |
 | `EXPORT_PENDING_MAX_SECONDS` | 900 | jamais pris en charge → échec |
 | `EXPORT_NOT_DOWNLOADED_AFTER_MINUTES` | 30 | signalement « non téléchargé » |
 | `EXPORT_NOT_DOWNLOADED_ALERT_THRESHOLD` | 0 | récapitulatif e-mail (0 = jamais) |
@@ -167,7 +191,8 @@ exports » du front (`/admin/exports`). Aucun accès aux fichiers.
 - Worker : service `worker` des Compose VPS (`deploy/vps/`), démarré par `deploy.sh` après le
   contrôle des migrations. `docker compose logs worker` ; arrêt propre (`docker compose stop worker`)
   : la génération en cours se termine (120 s de grâce).
-- Surveillance à la demande : `php bin/console app:exports:monitor`.
+- Surveillance à la demande : `php bin/console app:exports:monitor` ; gardien (cron, chaque
+  minute) : `app:exports:monitor --watchdog` (n'affiche rien quand tout va bien, `-v` pour le détail).
 - File : `php bin/console messenger:stats`.
 - Développement local sans worker : `php bin/console messenger:consume exports scheduler_exports_monitor -vv`.
 

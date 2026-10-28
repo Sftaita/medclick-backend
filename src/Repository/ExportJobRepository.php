@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\ExportJob;
+use App\Export\ExportFailure;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
@@ -84,6 +85,35 @@ class ExportJobRepository extends ServiceEntityRepository
     }
 
     /** Dernière alerte envoyée pour un même incident depuis $since (anti-doublon). */
+    /** Un export en cours a donné signe de vie depuis $since (le worker travaille). */
+    public function hasRunningHeartbeatSince(\DateTimeImmutable $since): bool
+    {
+        return (int) $this->createQueryBuilder('j')
+            ->select('COUNT(j.id)')
+            ->where('j.status = :running')
+            ->andWhere('j.heartbeatAt >= :since')
+            ->setParameter('running', ExportJob::STATUS_RUNNING)
+            ->setParameter('since', $since)
+            ->getQuery()
+            ->getSingleScalarResult() > 0;
+    }
+
+    /** Dernière alerte envoyée pour une panne du worker (export interrompu ou jamais pris en charge). */
+    public function findWorkerAlertSentSince(\DateTimeImmutable $since): ?ExportJob
+    {
+        return $this->createQueryBuilder('j')
+            ->where('j.errorCategory IN (:categories)')
+            ->andWhere('j.alertStatus = :sent')
+            ->andWhere('j.alertSentAt >= :since')
+            ->setParameter('categories', [ExportFailure::WORKER_INTERRUPTED, ExportFailure::WORKER_UNAVAILABLE])
+            ->setParameter('sent', ExportJob::ALERT_SENT)
+            ->setParameter('since', $since)
+            ->orderBy('j.alertSentAt', \SortDirection::Descending)
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
     public function findAlertSentSince(string $fingerprint, \DateTimeImmutable $since, int $excludeId): ?ExportJob
     {
         return $this->createQueryBuilder('j')

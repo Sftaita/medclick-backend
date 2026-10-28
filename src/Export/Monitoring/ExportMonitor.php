@@ -11,8 +11,9 @@ use App\Export\Job\ExportStorage;
 use App\Repository\ExportJobRepository;
 
 /**
- * Surveillance périodique des exports (chaque minute, voir ExportMonitorSchedule ; aussi
- * « bin/console app:exports:monitor ») :
+ * Surveillance périodique des exports, chaque minute, par le worker (ExportMonitorSchedule) et par
+ * le gardien planifié sur le serveur, indépendant du worker (« bin/console app:exports:monitor
+ * --watchdog », docs/EXPORTS.md) ; une seule à la fois (runExclusive) :
  *
  * 1. exports en cours sans signe de vie, trop longs ou jamais pris en charge → échec + alerte ;
  * 2. fichiers prêts jamais téléchargés après EXPORT_NOT_DOWNLOADED_AFTER_MINUTES → évènement
@@ -30,7 +31,25 @@ final class ExportMonitor
         private ExportStorage $storage,
         private ExportAlerter $alerter,
         private ExportSettings $settings,
+        private ExportWorkerWatch $workerWatch,
     ) {
+    }
+
+    /**
+     * Surveillance si aucune autre n'est en cours (worker et gardien passent chaque minute).
+     *
+     * @return array<string, int>|null null si une autre surveillance est en cours
+     */
+    public function runExclusive(string $by): ?array
+    {
+        if (!$this->workerWatch->acquire()) {
+            return null;
+        }
+        try {
+            return $this->run();
+        } finally {
+            $this->workerWatch->release($by);
+        }
     }
 
     /**

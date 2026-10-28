@@ -8,6 +8,7 @@ use App\Entity\User;
 use App\Export\Job\ExportAlerter;
 use App\Export\Job\ExportJobManager;
 use App\Export\Job\ExportJobPresenter;
+use App\Export\Monitoring\ExportWorkerWatch;
 use App\Repository\ExportJobEventRepository;
 use App\Repository\ExportJobRepository;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -31,6 +32,7 @@ class ExportMonitoringController
         private ExportJobPresenter $presenter,
         private ExportJobManager $manager,
         private Security $security,
+        private ExportWorkerWatch $workerWatch,
     ) {
     }
 
@@ -58,6 +60,8 @@ class ExportMonitoringController
         $result = $this->jobs->search($filters, $page, 50);
 
         return new JsonResponse([
+            // État du worker et du gardien planifié (présence, dernière surveillance).
+            'monitoring' => $this->workerWatch->status(),
             'counts' => $this->jobs->countByStatus($filters),
             'total' => $result['total'],
             'page' => $page,

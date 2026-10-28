@@ -7,6 +7,7 @@ use App\Entity\ExportJobEvent;
 use App\Entity\User;
 use App\Export\ExportFailure;
 use App\Export\ExportStep;
+use App\Export\Monitoring\ExportWorkerWatch;
 use App\Repository\ExportJobRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Psr\Clock\ClockInterface;
@@ -32,7 +33,7 @@ final class ExportAlerter
 {
     public const MAX_ATTEMPTS = 5;
     /** Délai avant la tentative suivante (minutes), selon le nombre de tentatives déjà faites. */
-    private const RETRY_DELAYS = [1 => 5, 2 => 15, 3 => 60, 4 => 240];
+    public const RETRY_DELAYS = [1 => 5, 2 => 15, 3 => 60, 4 => 240];
 
     public function __construct(
         private ManagerRegistry $doctrine,
@@ -41,6 +42,7 @@ final class ExportAlerter
         private ClockInterface $clock,
         private LoggerInterface $logger,
         private ExportSettings $settings,
+        private ExportWorkerWatch $workerWatch,
     ) {
     }
 
@@ -73,6 +75,13 @@ final class ExportAlerter
         if ($original !== null) {
             $job->setAlertStatus(ExportJob::ALERT_SUPPRESSED)->setAlertDuplicateOf($original->getPublicId());
             $this->record($job, ExportJobEvent::ALERT_SUPPRESSED, 'Incident déjà signalé (alerte de ' . $original->getDiagnosticId() . ')');
+
+            return;
+        }
+        // L'arrêt du worker a déjà été signalé par le gardien : même incident.
+        if ($step === null && $this->workerWatch->workerAlertSentSince($since)) {
+            $job->setAlertStatus(ExportJob::ALERT_SUPPRESSED);
+            $this->record($job, ExportJobEvent::ALERT_SUPPRESSED, 'Incident déjà signalé (alerte « worker des exports arrêté »)');
 
             return;
         }

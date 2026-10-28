@@ -12,6 +12,7 @@ use App\Export\ExportFailure;
 use App\Export\Job\ExportAlerter;
 use App\Export\Job\ExportJobManager;
 use App\Export\Job\ExportSettings;
+use App\Export\Monitoring\ExportWorkerWatch;
 use App\Export\NullProgress;
 use App\Repository\ExportJobRepository;
 use Psr\Log\NullLogger;
@@ -333,12 +334,12 @@ final class ExportFailureTest extends ExportTestCase
     {
         $settings = static::getContainer()->get(ExportSettings::class);
         $settings = new ExportSettings($settings->storageDir, $settings->fileTtlMinutes, $settings->timeoutSeconds,
-            $settings->stallSeconds, $settings->pendingMaxSeconds, $settings->notDownloadedAfterMinutes, $notDownloadedThreshold,
-            $settings->alertEmail, $settings->alertDedupMinutes, $settings->historyRetentionDays, $settings->memoryLimit,
-            $settings->publicFrontendUrl);
+            $settings->stallSeconds, $settings->workerAbsentSeconds, $settings->pendingMaxSeconds, $settings->notDownloadedAfterMinutes,
+            $notDownloadedThreshold, $settings->alertEmail, $settings->alertDedupMinutes, $settings->historyRetentionDays,
+            $settings->memoryLimit, $settings->publicFrontendUrl);
 
         return new ExportAlerter(static::getContainer()->get('doctrine'), static::getContainer()->get(ExportJobRepository::class),
-            $mailer, Clock::get(), new NullLogger(), $settings);
+            $mailer, Clock::get(), new NullLogger(), $settings, static::getContainer()->get(ExportWorkerWatch::class));
     }
 
     private function exporter(?CarnetDeStageTemplate $template = null): CarnetDeStageExporter

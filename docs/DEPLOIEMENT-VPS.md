@@ -120,6 +120,16 @@ Restauration :
   migration `Version20261027090000` (tables `export_job`, `export_job_event`, `messenger_messages`).
 - Arrêt propre : `docker compose stop worker` laisse finir la génération en cours (120 s).
 - Préproduction : `EXPORT_ALERT_EMAIL` (facultatif) → alertes capturées par Mailpit.
+- **Gardien** (indépendant du worker, docs/EXPORTS.md) : une ligne dans la crontab de `deploy`,
+  par environnement, une fois (migration `Version20261028090000`, table `export_monitor_state`) :
+
+  ```
+  * * * * * cd /opt/stack/apps/medclick-<env> && flock -n /tmp/medclick-<env>-exports-watchdog.lock docker compose exec -T backend php bin/console app:exports:monitor --watchdog >> /home/deploy/logs/medclick-<env>-exports-watchdog.log 2>&1
+  ```
+
+  Il n'écrit dans son journal que lorsqu'il agit (export bloqué, worker absent…). `deploy.sh`
+  avertit si la ligne manque. Worker arrêté : `docker compose up -d worker` dans le dossier de
+  l'environnement (les étiquettes d'images du dernier déploiement sont dans `.env`).
 
 ## Journaux
 
