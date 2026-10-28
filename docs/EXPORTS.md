@@ -1,12 +1,25 @@
 # Exports Excel (carnet de stage)
 
-Génération asynchrone du carnet de stage officiel, avec progression réelle, historique permanent,
-surveillance et alertes. Le fichier produit est **identique à l'octet** à celui de l'ancien moteur
-(`/api/excel2`, commit `b659514`) ; voir « Équivalence » ci-dessous.
+Un seul générateur du carnet de stage officiel (`src/Export/CarnetDeStage/`), exécuté en
+asynchrone avec progression réelle, historique permanent, surveillance et alertes. Le format du
+fichier est figé par des fichiers de référence : voir « Non-régression du fichier Excel ».
 
-## Cause des dépassements de délai (corrigée)
+## API Excel
 
-L'ancien moteur insérait une ligne Excel **par intervention** (carnet de stage) et **par code**
+- **API canonique : `/api/exports`** (`App\Controller\ExportController`, détail ci-dessous) :
+  demande, progression, historique, téléchargement. Seul parcours du front (bouton « Excel » par
+  année).
+- **Alias de compatibilité** (temporaires) : `GET /api/excel2/{year}` et `GET /api/excel/{year}`
+  (`App\Controller\CarnetDeStageExcelController`). Même générateur, même fichier, génération
+  synchrone ; contrat inchangé : 200 + fichier `.xlsx` (`export.xlsx`), 403 année d'un autre
+  utilisateur, 404 année ou utilisateur inconnus, 401 sans authentification. Historisés
+  (`parameters.channel = "sync"`), sans fichier conservé. Encore appelés par le front CRA servi
+  à `frontend.easymed.fun` et par les onglets ouverts avant la mise à jour ; à retirer quand les
+  journaux d'accès ne montrent plus d'appel.
+
+## Performances (cause des dépassements de délai, corrigée en 3.2.0)
+
+Avant 3.2.0, la génération insérait une ligne Excel **par intervention** (carnet de stage) et **par code**
 (liste récapitulative) avec `insertNewRowBefore()`. Chaque insertion réécrit toute la feuille et
 réanalyse toutes ses formules (1 042 dans la liste récapitulative, ~0,15 s par insertion) : coût
 quadratique. S'y ajoutaient le chargement du gabarit (~3 s, 1 190 formules, 665 fusions), une
@@ -14,12 +27,11 @@ requête par code de nomenclature (N+1) et ~2 700 recherches de style (empreinte
 du classeur). Le PHP web s'arrête à 30 s : le profil le plus lourd (~1 350 interventions sur
 l'année, 3 650 au total, 371 codes) prenait 82 s dans l'image de production.
 
-Le nouveau moteur (`src/Export/CarnetDeStage/`) garde le même algorithme instruction par
-instruction, mais insère les lignes d'une section **en un appel** (même résultat : chaque ligne
+Depuis 3.2.0, le générateur garde le même algorithme instruction par instruction, mais insère les lignes d'une section **en un appel** (même résultat : chaque ligne
 insérée reprend le style de la ligne modèle), charge les données en un nombre fixe de requêtes,
 met le gabarit analysé en cache (signé, `cache:warmup`) et calcule une fois chaque style centré.
 
-| Jeu (fictif) | Ancien moteur | Nouveau moteur | Mémoire max (nouveau) |
+| Jeu (fictif) | Avant 3.2.0 | 3.2.0 | Mémoire max (3.2.0) |
 |---|---|---|---|
 | 100 interventions | 9,2 s | 1,5 s | ~84 Mo |
 | 1 000 | 53,7 s | 6,1 s | ~83 Mo |
@@ -133,7 +145,12 @@ dépendre d'aucune consultation :
   « incident déjà signalé ». Retour du worker : incident clos (journal), un nouvel arrêt est
   signalé de nouveau ;
 - administration : état du worker (actif, arrêté depuis…, jamais vu) et du gardien (actif s'il est
-  passé dans les 5 dernières minutes : un gardien absent de la crontab se voit).
+  passé dans les 5 dernières minutes : un gardien absent de la crontab se voit) ;
+- surveillance croisée : le worker vérifie à son tour le gardien. Un gardien déjà vu qui ne passe
+  plus depuis 10 minutes (ligne retirée de la crontab, cron arrêté…) = **un e-mail** « Gardien des
+  exports Excel inactif » (renvoyé en cas d'échec d'envoi), jusqu'à son retour ; un nouvel arrêt
+  est signalé de nouveau. Un gardien jamais installé n'est pas signalé par e-mail (`deploy.sh`
+  l'avertit, l'administration l'affiche).
 
 Installation : `docs/DEPLOIEMENT-VPS.md` (« Worker des exports Excel ») ; `deploy.sh` avertit si la
 ligne manque dans la crontab.
@@ -155,18 +172,7 @@ exports » du front (`/admin/exports`). Aucun accès aux fichiers.
 - Historique : supprimé après `EXPORT_HISTORY_RETENTION_DAYS` (365 j par défaut).
 - Sauvegardes : les nouvelles tables sont dans la base MariaDB, donc dans `backup.sh` (dump
   complet) ; les fichiers temporaires ne sont volontairement pas sauvegardés.
-- Les routes synchrones conservées pour l'ancien front (`/api/excel2` et son alias `/api/excel`)
-  servent le même fichier officiel et sont aussi historisées (`parameters.channel = "sync"`), sans
-  fichier conservé.
-
-## Retrait d'« Excel (Old) » (27/10/2026)
-
-- Ancien moteur v1 (`ExcelGeneratorController`, autre mise en page) supprimé ; plus aucun bouton
-  dans le nouveau front : un seul export, asynchrone.
-- `/api/excel/{year}` reste un **alias** de l'export officiel : l'ancien front CRA encore servi
-  (`frontend.easymed.fun`) l'appelle encore (journaux d'accès). Il reçoit désormais le carnet
-  officiel au lieu de l'ancien format.
-- À retirer définitivement avec l'arrêt de l'ancien front.
+- Les alias synchrones (`/api/excel2`, `/api/excel`) sont aussi historisés, sans fichier conservé.
 
 ## Réglages (`.env` du serveur, défauts dans `config/services.yaml`)
 
@@ -196,19 +202,22 @@ exports » du front (`/admin/exports`). Aucun accès aux fichiers.
 - File : `php bin/console messenger:stats`.
 - Développement local sans worker : `php bin/console messenger:consume exports scheduler_exports_monitor -vv`.
 
-## Équivalence du fichier Excel (tests)
+## Non-régression du fichier Excel (tests)
 
-- Oracle : copie figée de l'ancien moteur (`tests/Excel/Legacy/`), seuls namespace, nom de classe
-  et route changent.
-- Références produites **avant** la refactorisation : `tests/Fixtures/excel-reference/` (12 scénarios
-  fictifs) et `var/excel-reference/` (volumes, `--group excel-reference-generation`).
+- Références figées (format officiel du carnet, validé en préproduction ; données fictives) :
+  `tests/Fixtures/excel-reference/` (30 cas : 12 scénarios, 6 tirages aléatoires, 12 cas de l'audit
+  des totaux ; `manifest.json` : empreinte SHA-256, date d'édition, origine) et
+  `var/excel-reference/` (volumes de 100 à 10 000 interventions, non versionnés). Une référence ne
+  se régénère pas : une différence est une régression, ou un changement de format décidé
+  explicitement (nouvelles références, nouvelle validation).
 - Comparateur `tests/Excel/XlsxComparator.php` : (1) parties du paquet identiques à l'octet ou après
   canonisation XML (seules les dates de `docProps/core.xml` tolérées), (2) sémantique : feuilles,
   chaque cellule (valeur, type, formule, style résolu), fusions, dimensions, mise en page et
   impression, volets, protections, validations, mises en forme conditionnelles, filtres, liens,
   commentaires, dessins, noms définis, propriétés. `php tests/Excel/bin/compare-xlsx.php a.xlsx b.xlsx`.
-- `ExcelEquivalenceTest` : ancien vs nouveau moteur (12 scénarios + 6 tirages aléatoires), nouveau
-  vs références ; `--group excel-volume` pour 100 à 10 000 interventions.
+- `ExcelReferenceTest` : le fichier produit est comparé à la référence de chacun des 30 cas ;
+  `--group excel-volume` pour les volumes. Les alias synchrones servent le même fichier
+  (`tests/Export/ExportLifecycleTest.php`).
 - Remarque : PhpSpreadsheet nomme l'image du gabarit d'après son chemin ; un fichier produit sous
   Windows et un autre dans le conteneur diffèrent donc par ce seul nom interne (contenu identique).
   Les comparaisons se font toujours dans le même environnement.

@@ -15,28 +15,23 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Routing\Attribute\Route;
 
 /**
- * Export synchrone du carnet de stage, conservé pour l'ancien frontend (CRA, encore servi) : le
- * nouveau frontend passe par /api/exports (asynchrone, progression réelle). Même fichier, mêmes
- * réponses qu'avant ; le moteur est App\Export\CarnetDeStage (l'ancien code est figé dans
- * tests/Excel/Legacy, qui vérifie l'équivalence). La demande est historisée
- * (App\Export\Job\SyncExportRecorder).
- *
- * /api/excel/{year} (« Excel (Old) ») : l'ancien moteur v1 a été retiré (27/10/2026) ; l'adresse
- * reste un alias de ce même export officiel pour ne pas casser l'ancien frontend.
+ * Alias SYNCHRONES de l'export du carnet de stage, conservés temporairement pour la compatibilité
+ * (frontend CRA encore servi, onglets ouverts) : /api/excel2/{year} et /api/excel/{year}. L'API
+ * canonique est /api/exports (ExportController : génération asynchrone, progression, historique,
+ * téléchargement). Même générateur (App\Export\CarnetDeStage), même fichier ; contrat de réponse
+ * inchangé (200 + fichier .xlsx, 403 année d'un autre utilisateur, 404 année inconnue). Chaque
+ * demande est historisée (App\Export\Job\SyncExportRecorder). Voir docs/EXPORTS.md.
  */
-class ExcelNewVersion extends AbstractController
+class CarnetDeStageExcelController extends AbstractController
 {
     public function __construct(private CarnetDeStageExporter $exporter, private ExportStorage $storage)
     {
     }
 
-    /**
-     * @param int $year Définie l'année d'interet pour l'extraction des données.
-     * @return Response
-     */
-    #[Route('/api/excel2/{year}', name: 'excel', methods: ['GET'])]
-    #[Route('/api/excel/{year}', name: 'excelOldVersion', methods: ['GET'])]
-    public function ExcelGenerator2(int $year, Request $request): Response
+    /** @param int $year identifiant de l'année de formation (Years) */
+    #[Route('/api/excel2/{year}', name: 'carnet_de_stage_excel', methods: ['GET'])]
+    #[Route('/api/excel/{year}', name: 'carnet_de_stage_excel_alias', methods: ['GET'])]
+    public function download(int $year, Request $request): Response
     {
         $user = $this->getUser();
         if (!$user instanceof User) {

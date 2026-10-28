@@ -3,7 +3,7 @@
 namespace App\Export;
 
 /**
- * Progression ignorée (génération synchrone de l'ancienne route /api/excel2).
+ * Progression ignorée (alias synchrones /api/excel2 et /api/excel).
  */
 final class NullProgress implements ExportProgress
 {

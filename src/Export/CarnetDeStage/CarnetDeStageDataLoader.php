@@ -16,10 +16,10 @@ use Doctrine\ORM\EntityManagerInterface;
 /**
  * Charge les données d'un carnet de stage en un nombre fixe de requêtes : années, interventions
  * (une requête par année, sans hydratation d'entités), nomenclatures (une requête), superviseurs,
- * consultations, gardes et formations. L'ancien moteur chargeait la nomenclature de chaque
- * intervention à la demande (une requête par code distinct, soit plusieurs centaines).
+ * consultations, gardes et formations (et non la nomenclature de chaque intervention à la
+ * demande, une requête par code distinct, soit plusieurs centaines).
  *
- * Ordre des interventions : celui de la collection Years::getSurgeries() de l'ancien moteur
+ * Ordre des interventions : celui du format historique, la collection Years::getSurgeries()
  * (requête sans ORDER BY sur l'index year_id, donc par id croissant en InnoDB comme en SQLite),
  * rendu ici explicite par « ORDER BY s.id ».
  */
@@ -96,7 +96,7 @@ final class CarnetDeStageDataLoader
             currentYearSurgeries: $currentYearSurgeries,
             consultations: $this->consultationRepository->getConsultations($currentYear->getId()),
             uniqueDates: $this->consultationRepository->getUniqDate($currentYear->getId()),
-            // Mêmes appels que l'ancien moteur (tableau contenant l'année).
+            // Appels du format historique (tableau contenant l'année).
             gardes: $this->gardeRepository->getGardes([$currentYear]),
             formations: $this->formationsRepository->getFormations([$currentYear]),
         );
@@ -127,7 +127,7 @@ final class CarnetDeStageDataLoader
         foreach ($surgeries as &$surgery) {
             $id = $surgery['nomenclatureId'];
             if ($id !== null && !isset($nomenclatures[$id])) {
-                // L'ancien moteur échouait aussi (entité introuvable au chargement paresseux).
+                // Échec voulu, comme dans le format historique (entité introuvable au chargement paresseux).
                 throw new ExportFailure(ExportFailure::DATABASE, "Nomenclature $id introuvable", ExportStep::Loading);
             }
             $surgery['type'] = $id !== null ? $nomenclatures[$id]['type'] : null;

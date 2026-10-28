@@ -21,8 +21,8 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 use Symfony\Component\Uid\Uuid;
 
 /**
- * Historique des exports des routes SYNCHRONES (/api/excel2 et son alias /api/excel), encore
- * appelées par l'ancien frontend : chaque demande crée une entrée, même en cas d'échec.
+ * Historique des exports des alias SYNCHRONES (/api/excel2 et /api/excel, conservés pour la
+ * compatibilité) : chaque demande crée une entrée, même en cas d'échec.
  * Le fichier est servi directement dans la réponse : aucun fichier n'est conservé, l'envoi
  * complet est observé côté serveur (jamais confirmé par le navigateur).
  */
@@ -30,8 +30,8 @@ final class SyncExportRecorder implements EventSubscriberInterface
 {
     /** Route => adresse appelée (les deux servent le carnet de stage officiel). */
     private const ROUTES = [
-        'excel' => '/api/excel2',
-        'excelOldVersion' => '/api/excel',
+        'carnet_de_stage_excel' => '/api/excel2',
+        'carnet_de_stage_excel_alias' => '/api/excel',
     ];
     private const JOB = '_sync_export_job';
     private const EXCEPTION = '_sync_export_exception';

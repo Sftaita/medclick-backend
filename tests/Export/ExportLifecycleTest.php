@@ -49,7 +49,7 @@ final class ExportLifecycleTest extends ExportTestCase
             self::assertIsInt($step['durationMs']);
         }
 
-        // Fichier téléchargé = fichier de référence produit par l'ancien moteur avant la refactorisation.
+        // Fichier téléchargé = fichier de référence figé (tests/Fixtures/excel-reference).
         $download = $this->body($client, '/api/' . $ready['downloadUrl']);
         self::assertSame(200, $download['status']);
         self::assertSame('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', $download['headers']['content-type'][0]);
@@ -241,7 +241,7 @@ final class ExportLifecycleTest extends ExportTestCase
     {
         [$user, $yearId] = $this->seed('volume-100');
         $progress = new \App\Tests\Excel\Support\TimingProgress();
-        $this->runNew($user, $yearId, $progress);
+        $this->runExport($user, $yearId, $progress);
 
         $steps = array_map(fn ($s) => $s['step'], $progress->steps);
         self::assertSame([ExportStep::Loading, ExportStep::Template, ExportStep::Surgeries, ExportStep::Supervisors, ExportStep::Summary, ExportStep::Sheets, ExportStep::Writing], $steps);
@@ -278,7 +278,7 @@ final class ExportLifecycleTest extends ExportTestCase
         self::assertSame('done', $ready['steps'][5]['state']);
         self::assertLessThanOrEqual(2700, $ready['steps'][5]['total']);
         // Contenu identique à celui du moteur appelé directement.
-        $direct = $this->runNew($user, $yearId, clock: \Symfony\Component\Clock\Clock::get());
+        $direct = $this->runExport($user, $yearId, clock: \Symfony\Component\Clock\Clock::get());
         $download = $this->body($client, '/api/' . $ready['downloadUrl']);
         $report = (new XlsxComparator())->compare($this->tmp($direct['bytes']), $this->tmp($download['content']));
         self::assertTrue($report['equivalent'], implode("\n", $report['differences']));

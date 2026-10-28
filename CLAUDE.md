@@ -69,14 +69,14 @@ Doc OpenAPI générée par API Platform : `GET /api` (ne couvre pas les contrôl
 - `src/Security/UserChecker.php` — bloque le login si compte non activé (`token` non null) et
   journalise la connexion dans `ConnectionHistory`.
 - `src/Controller/` — endpoints custom (JSON manuel). `AdminControllers/` sous `/api/admin/*`
-  (ROLE_ADMIN via `access_control`). `ExcelNewVersion.php` (`/api/excel2/{year}`) est l'export
-  synchrone conservé pour l'ancien front ; `/api/excel/{year}` (« Excel (Old) ») n'est plus qu'un
-  alias de ce même export (ancien moteur v1 retiré le 27/10/2026).
+  (ROLE_ADMIN via `access_control`). `CarnetDeStageExcelController.php` : alias synchrones de
+  compatibilité `/api/excel2/{year}` et `/api/excel/{year}` (même fichier que `/api/exports`).
 - `public/ExcelTemplate.xlsx` — gabarit du carnet de stage (chargé via `kernel.project_dir`).
 - **Exports Excel** : `src/Export/` (moteur `CarnetDeStage/`, tâches asynchrones `Job/`, surveillance
   `Monitoring/`), worker Messenger (`messenger:consume exports scheduler_exports_monitor`), API
-  `/api/exports/*` et `/api/admin/exports/*`. Le fichier doit rester **identique à l'octet** à
-  l'ancien moteur : `tests/Excel/` (oracle figé, références, comparateur). Voir `docs/EXPORTS.md`.
+  `/api/exports/*` (API canonique) et `/api/admin/exports/*`. Un seul générateur ; le fichier doit
+  rester identique aux références figées : `tests/Excel/` (`ExcelReferenceTest`, comparateur) et
+  `tests/Fixtures/excel-reference/`. Voir `docs/EXPORTS.md`.
 - Contrôle d'accès : `config/packages/security.yaml` (`access_control` par préfixe d'URL).
 
 ## Conventions du code existant
@@ -87,7 +87,7 @@ Doc OpenAPI générée par API Platform : `GET /api` (ne couvre pas les contrôl
 - Contrôleurs custom : `json_decode($request->getContent(), true)` + `JsonResponse`.
 - Les nouvelles versions d'endpoints coexistent avec les anciennes pour ne pas casser les
   anciens frontends (ex. `/api/surgeries/add` vs `/api/surgeries/addNewSurgery`,
-  `/api/excel` vs `/api/excel2`). Ne pas supprimer une ancienne route sans vérifier le front.
+  alias `/api/excel`, `/api/excel2`). Ne pas supprimer une ancienne route sans vérifier le front.
 - Champs `position` d'une intervention : `1` = 1re main, `2` = 2e main (aide),
   `3` = 1re main aidée. `firstHand`/`secondHand` stockent un id (string).
 - Code d'intervention = `codeHospitalisation . n` de la nomenclature.

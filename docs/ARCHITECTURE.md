@@ -121,8 +121,8 @@ Points notables :
 | GET | `/api/favorites/getMyList` | user | Favoris du user |
 | POST | `/api/favorites/addNew` | user | Ajout favori |
 | PUT | `/api/favorites/updateNew` | user | Modification favori |
-| GET | `/api/excel/{year}` | propriétaire | Alias de `/api/excel2` (ancien moteur v1 retiré le 27/10/2026) |
-| GET | `/api/excel2/{year}` | propriétaire | Export Excel synchrone (ancien front) ; nouveau front : `/api/exports` (docs/EXPORTS.md) |
+| POST/GET | `/api/exports`, `/api/exports/{id}`, `…/download` | propriétaire | **API Excel canonique** : export asynchrone du carnet de stage (docs/EXPORTS.md) |
+| GET | `/api/excel2/{year}`, `/api/excel/{year}` | propriétaire | Alias synchrones de compatibilité (même fichier, contrat inchangé) |
 | GET | `/api/statistics/fetch/{userId}` | soi / admin | Statistiques |
 | POST | `/api/statistics/update/{userId}` | admin | Recalcul des statistiques |
 | GET | `/api/userStat/{id}` | soi / admin | Ids des années d'un user |
@@ -163,13 +163,14 @@ Tout `/api` non listé comme public exige un JWT (dernière règle de `access_co
 3. Le contrôleur copie nom/spécialité/code depuis `Nomenclature`, positionne
    `firstHand`/`secondHand` selon `position`, fixe `createdAt`, persiste.
 
-## 7. Export Excel (`ExcelNewVersion`)
+## 7. Export Excel (carnet de stage)
 
-Charge `ExcelTemplate.xlsx` (chemin relatif au répertoire courant = `public/`), vérifie que
-l'année appartient au user, puis remplit : page de garde, carnet (superviseurs triés maître
+Un seul générateur, `src/Export/CarnetDeStage/` (détail : `docs/EXPORTS.md`). Charge
+`public/ExcelTemplate.xlsx` (analysé une fois, en cache), vérifie que l'année appartient au user,
+puis remplit : page de garde, carnet (superviseurs triés maître
 de stage d'abord), interventions triées, récapitulatifs par spécialité (ortho, traumato,
-dig, uro, vasc, plast), consultations par mois, gardes, formations. Réponse en
-`StreamedResponse` .xlsx.
+dig, uro, vasc, plast), consultations par mois, gardes, formations. Généré par le worker pour
+`/api/exports`, ou directement dans la réponse pour les alias synchrones (`CarnetDeStageExcelController`).
 
 ## 8. Configuration et environnements
 

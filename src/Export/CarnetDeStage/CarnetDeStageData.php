@@ -7,7 +7,7 @@ use App\Entity\Years;
 
 /**
  * Données d'un carnet de stage, chargées en une passe (voir CarnetDeStageDataLoader), dans l'ordre
- * exact où l'ancien moteur les lisait : l'ordre des lignes du fichier Excel en dépend.
+ * historique du carnet de stage : l'ordre des lignes du fichier Excel en dépend.
  */
 final class CarnetDeStageData
 {

@@ -9,7 +9,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
  * Audit automatique des totaux du carnet de stage (CarnetTotalsAuditor : recalcul indépendant à
  * partir des données source, contrôle des valeurs, des formules et de leurs plages).
  *
- * Le fichier doit rester identique à l'ancien moteur : les écarts historiques découverts ne sont
+ * Le fichier doit rester identique aux références (format historique) : les écarts historiques découverts ne sont
  * PAS corrigés (décision en attente, voir docs/AUDIT-TOTAUX-EXCEL.md). Ce test fige donc l'état
  * audité : toute règle respectée doit le rester, et chaque écart connu doit garder exactement la
  * même ampleur. Un nouvel écart, ou la correction d'un écart connu, fait échouer le test.
@@ -58,7 +58,7 @@ final class TotalsAuditTest extends ExcelTestCase
     public function testTotalsMatchTheAuditedState(string $scenario): void
     {
         [$user, $yearId] = $this->seed($scenario);
-        $result = $this->runNew($user, $yearId);
+        $result = $this->runExport($user, $yearId);
         $path = tempnam(sys_get_temp_dir(), 'audit') . '.xlsx';
         file_put_contents($path, $result['bytes']);
         try {
@@ -88,7 +88,7 @@ final class TotalsAuditTest extends ExcelTestCase
     public function testHandComputedReferenceCase(): void
     {
         [$user, $yearId] = $this->seed('audit-reference');
-        $result = $this->runNew($user, $yearId);
+        $result = $this->runExport($user, $yearId);
         $path = tempnam(sys_get_temp_dir(), 'audit') . '.xlsx';
         file_put_contents($path, $result['bytes']);
         $book = \PhpOffice\PhpSpreadsheet\IOFactory::load($path);

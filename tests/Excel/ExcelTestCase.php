@@ -12,13 +12,9 @@ use App\Export\NullProgress;
 use App\Tests\ApiTestBase;
 use Psr\Clock\ClockInterface;
 use Symfony\Component\Clock\NativeClock;
-use App\Tests\Excel\Legacy\LegacyExcelNewVersion;
-use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\DependencyInjection\ParameterBag\ContainerBag;
-use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 
 /**
- * Exécute les moteurs d'export sur les jeux de données fictifs, dans les conditions de la
+ * Exécute l'export du carnet de stage sur les jeux de données fictifs, dans les conditions de la
  * production : avertissements PHP non bloquants (APP_DEBUG=0 → journalisés, pas d'exception).
  */
 abstract class ExcelTestCase extends ApiTestBase
@@ -31,43 +27,11 @@ abstract class ExcelTestCase extends ApiTestBase
     }
 
     /**
-     * Moteur figé (oracle) : renvoie le contenu XLSX tel que servi par /api/excel2.
+     * Génère le carnet de stage (CarnetDeStageExporter) et renvoie le contenu XLSX.
      *
      * @return array{bytes: string, seconds: float, peakMemory: int, warnings: list<string>}
      */
-    protected function runLegacy(User $user, int $yearId): array
-    {
-        $container = static::getContainer();
-        $container->get('security.token_storage')->setToken(new UsernamePasswordToken($user, 'api', $user->getRoles()));
-        $this->em->clear();
-
-        $controller = new LegacyExcelNewVersion(
-            $container->get('security.helper'),
-            $container->get(\App\Repository\UserRepository::class),
-            $container->get(\App\Repository\YearsRepository::class),
-            $container->get(\App\Repository\ConsultationsRepository::class),
-            $container->get(\App\Repository\GardesRepository::class),
-            $container->get(\App\Repository\FormationsRepository::class),
-        );
-        $locator = new Container();
-        $locator->set('parameter_bag', new ContainerBag($container));
-        $controller->setContainer($locator);
-
-        return $this->measure(function () use ($controller, $yearId) {
-            $response = $controller->ExcelGenerator2($yearId);
-            ob_start();
-            $response->sendContent();
-
-            return ob_get_clean();
-        });
-    }
-
-    /**
-     * Nouveau moteur (CarnetDeStageExporter), même conditions que runLegacy().
-     *
-     * @return array{bytes: string, seconds: float, peakMemory: int, warnings: list<string>}
-     */
-    protected function runNew(User $user, int $yearId, ?ExportProgress $progress = null, ?ClockInterface $clock = null): array
+    protected function runExport(User $user, int $yearId, ?ExportProgress $progress = null, ?ClockInterface $clock = null): array
     {
         $container = static::getContainer();
         $this->em->clear();

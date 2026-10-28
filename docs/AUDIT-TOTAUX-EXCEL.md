@@ -1,7 +1,7 @@
 # Audit des totaux du carnet de stage Excel (27/10/2026)
 
-**Statut : écarts historiques documentés, AUCUN corrigé.** Le fichier reste identique à l'octet à
-celui de l'ancien moteur (exigence en vigueur). Chaque correction demande une décision : elle
+**Statut : écarts historiques documentés, AUCUN corrigé.** Le fichier reste identique à l'octet au
+format historique du carnet (exigence en vigueur, fichiers de référence). Chaque correction demande une décision : elle
 changerait le fichier officiel.
 
 ## Méthode

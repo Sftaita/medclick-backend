@@ -62,7 +62,7 @@ final class ExportAccessTest extends ExportTestCase
             file_put_contents($path, $download['content']);
             // Page de garde : l'adresse du propriétaire, et seulement la sienne.
             self::assertSame($user->getEmail(), IOFactory::load($path)->getSheet(0)->getCell('F28')->getValue());
-            $direct = $this->runNew($user, $yearId, clock: \Symfony\Component\Clock\Clock::get());
+            $direct = $this->runExport($user, $yearId, clock: \Symfony\Component\Clock\Clock::get());
             self::assertTrue($this->compareBytes($direct['bytes'], $download['content'])['equivalent']);
         }
         self::assertCount(3, array_unique(array_map(fn ($j) => $this->job($j['id'])->getFileSha256(), $jobs)));

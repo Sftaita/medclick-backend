@@ -14,16 +14,15 @@ use Psr\Clock\ClockInterface;
 /**
  * Remplit le gabarit du carnet de stage (public/ExcelTemplate.xlsx).
  *
- * Transcription fidèle de l'ancien moteur (ExcelNewVersion, copie figée dans
- * tests/Excel/Legacy) : mêmes cellules, mêmes valeurs, mêmes styles, même ordre d'opérations.
- * Seule différence : les lignes d'une section sont insérées en UN appel à insertNewRowBefore()
+ * Reproduit à l'identique le format historique du carnet : mêmes cellules, mêmes valeurs, mêmes
+ * styles, même ordre d'opérations. Les lignes d'une section sont insérées en UN appel à insertNewRowBefore()
  * au lieu d'un appel par ligne. Chaque insertion réécrit toute la feuille et réanalyse toutes
- * ses formules (1 042 dans la liste récapitulative) : l'ancien moteur avait un coût quadratique
- * (plus de 2 minutes pour ~1 350 interventions). Insérer N lignes d'un coup donne exactement le
+ * ses formules (1 042 dans la liste récapitulative) : une insertion par ligne aurait un coût
+ * quadratique (plus de 2 minutes pour ~1 350 interventions). Insérer N lignes d'un coup donne exactement le
  * même résultat (chaque ligne insérée reprend le style de la ligne modèle, non encore modifiée),
- * ce que vérifient les tests d'équivalence (tests/Excel/ExcelEquivalenceTest.php).
+ * ce que vérifient les fichiers de référence (tests/Excel/ExcelReferenceTest.php).
  *
- * Les bizarreries de l'ancien moteur sont conservées à l'identique (ex. : seules les interventions
+ * Les particularités du format historique sont conservées à l'identique (ex. : seules les interventions
  * générales sans sous-type figurent dans la liste récapitulative).
  */
 final class CarnetDeStageSpreadsheetBuilder
@@ -139,7 +138,7 @@ final class CarnetDeStageSpreadsheetBuilder
         }
         unset($supervisor);
 
-        // Liste des superviseurs (quelques lignes : insertions unitaires, comme l'ancien moteur).
+        // Liste des superviseurs (quelques lignes : insertions unitaires, comme le format historique).
         if (!empty($supervisors)) {
             $row = 39;
             $step = 1;
@@ -203,7 +202,7 @@ final class CarnetDeStageSpreadsheetBuilder
         }
         $supervisorIndex = [];
         foreach ($supervisors as $index => $supervisor) {
-            // Premier superviseur de même id (comparaison souple, comme l'ancien « == » dans une boucle avec break).
+            // Premier superviseur de même id (comparaison souple « == » dans une boucle avec break, comme le format historique).
             $supervisorIndex[(string) $supervisor['id']] ??= $index;
         }
 
@@ -335,8 +334,8 @@ final class CarnetDeStageSpreadsheetBuilder
     }
 
     /**
-     * Indice du superviseur dont l'id est égal (« == ») à l'id donné, comme la boucle de l'ancien
-     * moteur : recherche directe par clé, puis parcours complet pour les comparaisons souples rares
+     * Indice du superviseur dont l'id est égal (« == ») à l'id donné, comme la boucle du format
+     * historique : recherche directe par clé, puis parcours complet pour les comparaisons souples rares
      * (ex. id nul ou chaîne vide).
      *
      * @param array<string, int> $supervisorIndex
@@ -390,7 +389,7 @@ final class CarnetDeStageSpreadsheetBuilder
         }
         $extraYears = $maxYearOfFormation - 7;
 
-        // Regroupement des interventions de toutes les années (même algorithme que l'ancien moteur).
+        // Regroupement des interventions de toutes les années (algorithme du format historique).
         // Calcul pur, sans effet sur la feuille : fait avant les opérations sur la feuille pour
         // connaître dès le début de l'étape le nombre réel de lignes à écrire.
         $orthoTrauma = [];
@@ -435,8 +434,8 @@ final class CarnetDeStageSpreadsheetBuilder
             unset($group);
         }
 
-        // Plan des sections (mêmes positions que l'ancien moteur) : lignes à écrire ou lignes du
-        // modèle à sauter. La dernière section est écrite exactement comme par l'ancien moteur
+        // Plan des sections (positions du format historique) : lignes à écrire ou lignes du
+        // modèle à sauter. La dernière section est écrite exactement comme le format historique
         // (voir writeSummaryRows).
         $plan = [];
         foreach ([$orthoElective, $orthoTrauma] as $index => $group) {
@@ -453,7 +452,7 @@ final class CarnetDeStageSpreadsheetBuilder
             }
         }
 
-        // Interventions générales : seules celles sans sous-type (clé ""), comme l'ancien moteur.
+        // Interventions générales : seules celles sans sous-type (clé ""), comme le format historique.
         $plan[] = 10;
         foreach (self::SPECIALITIES as $speciality) {
             $detailsList = array_values(array_filter($general[''] ?? [], fn ($details) => $details['speciality'] === $speciality['value']));
@@ -528,19 +527,19 @@ final class CarnetDeStageSpreadsheetBuilder
      * Écrit une section de la liste récapitulative à partir de la ligne modèle $row ; renvoie la
      * ligne qui suit la section.
      *
-     * L'ancien moteur insérait une ligne par élément puis supprimait la dernière, restée vide :
-     * N + 1 opérations qui réécrivent chacune la feuille et ses 1 042 formules (~0,15 s chacune).
+     * Le format historique est obtenu en insérant une ligne par élément puis en supprimant la
+     * dernière, restée vide : N + 1 opérations qui réécrivent chacune la feuille et ses 1 042 formules (~0,15 s chacune).
      * Insérer directement N - 1 lignes donne la même feuille (cellules, styles, formules, fusions,
      * dimensions) en une opération au plus.
      *
-     * $asLegacy (dernière section de la feuille) : N lignes insérées, puis la ligne vide supprimée,
-     * comme l'ancien moteur. Chaque insertion/suppression retrie l'index interne des cellules, dont
+     * $rowByRow (dernière section de la feuille) : N lignes insérées, puis la ligne vide supprimée,
+     * comme le format historique. Chaque insertion/suppression retrie l'index interne des cellules, dont
      * l'ordre détermine celui de la table des chaînes partagées du fichier : reproduire la dernière
      * opération de la feuille rend le fichier identique à l'octet, pas seulement équivalent.
      */
-    private function writeSummaryRows(Worksheet $sheet, int $row, array $rows, int $maxYearOfFormation, array $columns, bool $asLegacy): int
+    private function writeSummaryRows(Worksheet $sheet, int $row, array $rows, int $maxYearOfFormation, array $columns, bool $rowByRow): int
     {
-        if ($asLegacy) {
+        if ($rowByRow) {
             $sheet->insertNewRowBefore($row + 1, count($rows));
         } elseif (count($rows) > 1) {
             $sheet->insertNewRowBefore($row + 1, count($rows) - 1);
@@ -576,7 +575,7 @@ final class CarnetDeStageSpreadsheetBuilder
 
             $row++;
         }
-        if ($asLegacy) {
+        if ($rowByRow) {
             $sheet->removeRow($row, 1);
         }
 
@@ -604,14 +603,14 @@ final class CarnetDeStageSpreadsheetBuilder
         $rawByMonth = [1 => 18, 2 => 20, 3 => 22, 4 => 24, 5 => 26, 6 => 28, 7 => 30, 8 => 32, 9 => 34, 10 => 12, 11 => 14, 12 => 16];
         $colByMonth = array_fill(1, 12, 'B');
 
-        // Somme par mois inutilisée, conservée : l'ancien moteur échoue (TypeError) sur un nombre non
-        // numérique à cet endroit, le nouveau échoue donc dans les mêmes cas.
+        // Somme par mois inutilisée, conservée : le format historique échoue (TypeError) sur un nombre
+        // non numérique à cet endroit, l'export échoue donc dans les mêmes cas.
         $sumByMonth = array_fill(1, 12, 0);
         foreach ($consultations as $consultation) {
             $sumByMonth[date_format($consultation['date'], 'n')] += $consultation['number'];
         }
 
-        // Total des consultations par date (même format 'd-m-y' que l'ancien moteur).
+        // Total des consultations par date (format historique 'd-m-y').
         $totalsByDate = [];
         foreach ($consultations as $consultation) {
             $key = date_format($consultation['date'], 'd-m-y');
@@ -692,7 +691,7 @@ final class CarnetDeStageSpreadsheetBuilder
 
         $rows = ['1' => '17', '2' => '19', '3' => '21', '4' => '23', '5' => '25', '6' => '27', '7' => '29', '8' => '31', '9' => '33', '10' => '11', '11' => '13', '12' => '15'];
         $colByMonth = array_fill(1, 12, 'B');
-        // Inutilisée, conservée pour échouer dans les mêmes cas que l'ancien moteur (voir consultations).
+        // Inutilisée, conservée pour échouer dans les mêmes cas que le format historique (voir consultations).
         $sumByMonth = array_fill(1, 12, 0);
 
         for ($month = 1; $month <= 12; $month++) {
@@ -819,7 +818,7 @@ final class CarnetDeStageSpreadsheetBuilder
 
                 foreach ($formations as $formation) {
                     // Un type inconnu n'ajoute une colonne que s'il compte au moins une demi-journée ce
-                    // mois-ci (l'ancien moteur ne créait la clé qu'à la première incrémentation).
+                    // mois-ci (le format historique ne crée la clé qu'à la première incrémentation).
                     $type = $formation['event'];
                     $counts = $table[$type] ?? [];
                     $this->countPeriods($counts, $formation, $n);
@@ -879,7 +878,7 @@ final class CarnetDeStageSpreadsheetBuilder
 
     /**
      * Compte les demi-journées (matin < 12:00, après-midi < 18:00, soir) occupées par un évènement
-     * (formation ou garde) pour le mois $n. Règles identiques à l'ancien moteur, y compris ses
+     * (formation ou garde) pour le mois $n. Règles du format historique, y compris ses
      * particularités (le jour de début d'un évènement de plusieurs jours est celui du début, même
      * si le mois de fin diffère ; heures comparées en chaînes « HH:MM »).
      *
@@ -1006,7 +1005,7 @@ final class CarnetDeStageSpreadsheetBuilder
         $row = 88;
         foreach ($sections as $section) {
             foreach ($section as $formation) {
-                // L'ancien moteur modifiait ces dates en place (objets partagés) : conservé à l'identique.
+                // Dates modifiées en place (objets partagés), comme le format historique : conservé à l'identique.
                 $startDate = $formation['dateOfStart'];
                 $startDate->setTime(0, 0);
                 $endDate = $formation['dateOfEnd'];

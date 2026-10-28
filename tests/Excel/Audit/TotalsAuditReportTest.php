@@ -25,7 +25,7 @@ final class TotalsAuditReportTest extends ExcelTestCase
     public function testReport(string $scenario): void
     {
         [$user, $yearId] = $this->seed($scenario);
-        $result = $this->runNew($user, $yearId);
+        $result = $this->runExport($user, $yearId);
         $path = tempnam(sys_get_temp_dir(), 'audit') . '.xlsx';
         file_put_contents($path, $result['bytes']);
         $findings = (new CarnetTotalsAuditor())->audit($this->em->getConnection(), $user->getId(), $yearId, $path);

@@ -12,8 +12,8 @@ use PhpOffice\PhpSpreadsheet\Calculation\Exception as CalculationException;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
 /**
- * Génère le carnet de stage officiel (export « Excel (New) », /api/excel2) dans un fichier.
- * Utilisé par la génération asynchrone (ExportJob) et par l'ancienne route synchrone.
+ * Génère le carnet de stage officiel (export Excel) dans un fichier. Seul générateur : utilisé par
+ * la génération asynchrone (ExportJob, /api/exports) et par les alias synchrones (/api/excel2, /api/excel).
  *
  * Chaque échec est qualifié (ExportFailure) avec l'étape en cours : base de données, génération
  * du classeur ou écriture du fichier. Le fichier est écrit sous un nom temporaire puis renommé :
