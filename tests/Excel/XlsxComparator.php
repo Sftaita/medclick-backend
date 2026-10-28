@@ -107,6 +107,28 @@ final class XlsxComparator
             $parts[$name] = $zip->getFromIndex($i);
         }
         $zip->close();
+
+        // Images (xl/media) nommées par PhpSpreadsheet md5(chemin du gabarit) : le nom dépend du
+        // dossier d'installation du projet (poste, CI, conteneur), pas du fichier. Renommées d'après
+        // leur contenu, références comprises : le contenu des images reste comparé à l'octet.
+        $renamed = [];
+        foreach ($parts as $name => $content) {
+            if (preg_match('#^xl/media/[a-f0-9]{32}(\.\w+)$#', $name, $match)) {
+                $renamed[basename($name)] = 'contenu-' . substr(hash('sha256', $content), 0, 32) . $match[1];
+            }
+        }
+        if ($renamed !== []) {
+            $normalized = [];
+            foreach ($parts as $name => $content) {
+                if (isset($renamed[basename($name)]) && str_starts_with($name, 'xl/media/')) {
+                    $name = 'xl/media/' . $renamed[basename($name)];
+                } elseif (str_ends_with($name, '.rels')) {
+                    $content = strtr($content, $renamed);
+                }
+                $normalized[$name] = $content;
+            }
+            $parts = $normalized;
+        }
         ksort($parts);
 
         return $parts;
