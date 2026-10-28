@@ -1,5 +1,9 @@
 # Déploiement en production
 
+> **Historique.** La production a quitté Hostinger lors de la bascule vers le VPS (23 et
+> 24/10/2026) : procédure en vigueur dans `docs/DEPLOIEMENT-VPS.md`. Ce document décrit l'ancien
+> hébergement et n'est conservé que pour mémoire.
+
 ## Infrastructure
 
 - Hébergement mutualisé **Hostinger** (LiteSpeed), MySQL. PHP **8.4 obligatoire** depuis

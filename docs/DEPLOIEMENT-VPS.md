@@ -1,7 +1,9 @@
 # Déploiement MedClick sur le VPS (préproduction, puis production)
 
-Remplacera `docs/DEPLOIEMENT.md` (Hostinger mutualisé) après la bascule, qui fera l'objet d'un lot
-séparé avec plan de retour arrière. **Aucun secret dans ce document.**
+Procédure en vigueur : la production tourne sur le VPS depuis la bascule des 23 et 24/10/2026
+(`docs/RUNBOOK-BASCULE.md`) ; `docs/DEPLOIEMENT.md` (Hostinger mutualisé) n'est plus qu'historique.
+Version en production : MedClick 3.2.0 (28/10/2026, `docs/PLAN-MEP-EXPORTS.md`). Règles de
+déploiement : ADR-207 de `docs/DECISIONS.md`. **Aucun secret dans ce document.**
 
 ## Architecture
 
@@ -116,10 +118,13 @@ Restauration :
 
 - Service `worker` des deux Compose : `messenger:consume exports scheduler_exports_monitor`
   (génération des exports et surveillance chaque minute), cache préchauffé au démarrage.
-- `deploy.sh` le (re)crée après le contrôle des migrations ; la première mise en service exige la
-  migration `Version20261027090000` (tables `export_job`, `export_job_event`, `messenger_messages`).
+- `deploy.sh` le (re)crée après le contrôle des migrations ; la première mise en service exige les
+  migrations `Version20261027090000` (tables `export_job`, `export_job_event`, `messenger_messages`),
+  `Version20261028090000` (`export_monitor_state`) et `Version20261029090000` (alerte du gardien).
 - Arrêt propre : `docker compose stop worker` laisse finir la génération en cours (120 s).
-- Préproduction : `EXPORT_ALERT_EMAIL` (facultatif) → alertes capturées par Mailpit.
+- Alertes : `ERROR_ALERT_EMAIL` et `EXPORT_ALERT_EMAIL` dans le `.env` de l'environnement (jamais
+  dans le dépôt) ; en préproduction, capturées par Mailpit. Contrôle de l'acheminement réel :
+  `docker compose exec -T backend php bin/console mailer:test <adresse> --from=service@medclick.be`.
 - **Gardien** (indépendant du worker, docs/EXPORTS.md) : une ligne dans la crontab de `deploy`,
   par environnement, une fois (migration `Version20261028090000`, table `export_monitor_state`) :
 
@@ -128,7 +133,9 @@ Restauration :
   ```
 
   Il n'écrit dans son journal que lorsqu'il agit (export bloqué, worker absent…). `deploy.sh`
-  avertit si la ligne manque. Worker arrêté : `docker compose up -d worker` dans le dossier de
+  avertit si la ligne manque ; une fois le gardien vu, le worker envoie un e-mail s'il ne passe
+  plus depuis 10 min (surveillance croisée). Installée en production le 28/10/2026 ; ajout seul,
+  après copie de la crontab (`crontab -l > backups/crontab-…`), contrôlé par `diff`. Worker arrêté : `docker compose up -d worker` dans le dossier de
   l'environnement (les étiquettes d'images du dernier déploiement sont dans `.env`).
 
 ## Journaux

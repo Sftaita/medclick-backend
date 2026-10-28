@@ -4,6 +4,10 @@
 format historique du carnet (exigence en vigueur, fichiers de référence). Chaque correction demande une décision : elle
 changerait le fichier officiel.
 
+**Décision du 28/10/2026 (ADR-204 de `docs/DECISIONS.md`)** : aucune correction dans la 3.2.0 ;
+les écarts H1 à H15 seront analysés et corrigés après sa mise en production, chacun par une
+décision explicite (modification de `TotalsAuditTest`, nouvelles références, nouvelle validation).
+
 ## Méthode
 
 1. Chaque total du fichier est rattaché à une règle métier (tableau ci-dessous).

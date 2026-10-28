@@ -1,6 +1,7 @@
 # MedClick backend — Documentation technique
 
-> État au 30/09/2026, établi par lecture du code (branche `master`, commit `cf10252`).
+> Établi le 30/09/2026 par lecture du code (commit `cf10252`) ; mis à jour pour MedClick 3.2.0
+> (28/10/2026) : pile technique, exports Excel, hébergement. Décisions : `docs/DECISIONS.md`.
 
 ## 1. Le produit
 
@@ -25,17 +26,18 @@ statistiques de connexion, campagnes marketing (bannières affichées dans l'app
 ## 2. Architecture
 
 ```
-SPA (medclick.be, repo séparé)
-        │  HTTPS + JWT (Authorization: Bearer)
+SPA React/Vite (www.medclick.be, dépôt séparé)
+        │  HTTPS + JWT (Authorization: Bearer) — Traefik (VPS)
         ▼
-Symfony 5.1 ── API Platform 2.5 (CRUD générique /api/{resource})
+Symfony 8.1 / PHP 8.4 (FrankenPHP) ── API Platform 4 (CRUD générique /api/{resource})
    │         └─ Contrôleurs custom (/api/..., /activation/{token})
-   │         └─ Subscribers KernelEvents::VIEW (logique pré-écriture)
+   │         └─ State processors (src/State/, logique pré-écriture)
    ▼
-Doctrine ORM ── MySQL
+Doctrine ORM 3 ── MariaDB 11.8 (dédiée)
    │
-   ├─ PhpSpreadsheet → export .xlsx
-   └─ Symfony Mailer (Gmail) → emails Twig (activation, reset mot de passe)
+   ├─ Symfony Messenger (transport Doctrine) → worker : export .xlsx (PhpSpreadsheet), surveillance
+   ├─ Gardien (cron de l'hôte) : surveillance du worker, indépendante de lui
+   └─ Symfony Mailer (Gmail) → e-mails Twig (activation, reset mot de passe, alertes techniques)
 ```
 
 Deux styles d'endpoint coexistent :
@@ -175,10 +177,11 @@ dig, uro, vasc, plast), consultations par mois, gardes, formations. Généré pa
 ## 8. Configuration et environnements
 
 Variables : `APP_ENV`, `APP_SECRET`, `DATABASE_URL`, `CORS_ALLOW_ORIGIN`, `JWT_SECRET_KEY`,
-`JWT_PUBLIC_KEY`, `JWT_PASSPHRASE`, `MAILER_DSN`, `API_URL`.
-Clés JWT dans `config/jwt/` (gitignorées). `Procfile` présent (Heroku) mais la base de
-production pointe vers un hébergement mutualisé : la cible de déploiement réelle est à
-documenter.
+`JWT_PUBLIC_KEY`, `JWT_PASSPHRASE`, `MAILER_DSN`, `API_URL`, alertes (`ERROR_ALERT_EMAIL`,
+`EXPORT_ALERT_EMAIL`) et réglages des exports (`EXPORT_*`, `docs/EXPORTS.md`).
+Clés JWT dans `config/jwt/` (gitignorées). Hébergement : VPS (Docker Compose, Traefik), production
+et préproduction depuis la bascule des 23 et 24/10/2026 : `docs/DEPLOIEMENT-VPS.md` (le `Procfile`
+Heroku et `docs/DEPLOIEMENT.md`, Hostinger, sont historiques).
 
 ## 9. Commandes console
 
