@@ -50,7 +50,8 @@ services:
       JWT_PASSPHRASE: ${JWT_PASSPHRASE}
       # Tous les e-mails sont capturés par Mailpit : aucun envoi réel.
       MAILER_DSN: smtp://mailpit:1025
-      ERROR_ALERT_EMAIL: ""
+      # Alertes techniques (erreurs 500, exports) : capturées par Mailpit, jamais envoyées.
+      ERROR_ALERT_EMAIL: ${ERROR_ALERT_EMAIL:-}
       PUBLIC_FRONTEND_URL: ${PUBLIC_URL}
       PUBLIC_API_URL: ${PUBLIC_URL}
       # Exports Excel asynchrones (docs/EXPORTS.md) : alertes vers Mailpit (capturées, jamais envoyées).

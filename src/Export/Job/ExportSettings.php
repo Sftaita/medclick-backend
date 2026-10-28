@@ -35,8 +35,11 @@ final class ExportSettings
         /** Nombre d'exports non téléchargés (24 h) déclenchant un récapitulatif par e-mail ; 0 = jamais. */
         #[Autowire('%env(int:EXPORT_NOT_DOWNLOADED_ALERT_THRESHOLD)%')]
         public readonly int $notDownloadedAlertThreshold,
-        /** Destinataire des alertes (vide = aucune alerte e-mail, l'évènement reste dans l'historique). */
-        #[Autowire('%env(EXPORT_ALERT_EMAIL)%')]
+        /**
+         * Destinataire des alertes : EXPORT_ALERT_EMAIL, sinon ERROR_ALERT_EMAIL (vide = aucune alerte
+         * e-mail, l'évènement reste dans l'historique).
+         */
+        #[Autowire('%env(string:default:export.alert_email_fallback:EXPORT_ALERT_EMAIL)%')]
         public readonly string $alertEmail,
         /** Un même incident (type, catégorie, étape, code) n'est alerté qu'une fois par période. */
         #[Autowire('%env(int:EXPORT_ALERT_DEDUP_MINUTES)%')]
