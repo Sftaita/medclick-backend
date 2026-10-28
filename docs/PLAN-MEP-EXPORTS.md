@@ -2,7 +2,8 @@
 
 Mise en production de MedClick 3.2.0 : export Excel asynchrone (worker, suivi, surveillance,
 gardien), validé sur la préproduction. **Rien n'est exécuté en production sans l'autorisation
-explicite du responsable.** Aucun secret ni adresse personnelle dans ce document. Références :
+explicite du responsable.** **Exécuté le 28/10/2026 : voir « Journal d'exécution » en fin de
+document.** Aucun secret ni adresse personnelle dans ce document. Références :
 `docs/EXPORTS.md`, `docs/DEPLOIEMENT-VPS.md`.
 
 Notations : 👤 décision ou action humaine, 🤖 action exécutable par l'opérateur, 🔒 point d'arrêt
@@ -153,3 +154,82 @@ Durée ≈ 5 min.
 Décision humaine. `restore.sh into` avec le dump de l'étape 1 : **les écritures faites depuis
 sont perdues** ; les identifier d'abord (comparaison par table, comme R-A2 de
 `docs/RUNBOOK-BASCULE.md`) et les réinjecter avant la restauration.
+
+## Journal d'exécution — production, 28/10/2026 (heures UTC)
+
+Exécuté sur autorisation explicite du responsable. **MedClick 3.2.0 en production depuis 17:29.**
+
+### Versions
+
+| | Avant | Déployé | Origine |
+|---|---|---|---|
+| Backend (`master`) | `57aae39` | `3df788f` | fusion `--no-ff` de `feature/export-excel-async` (`49e6a0d`), arbre `0311534` identique à celui validé en préproduction |
+| Front (`main`) | `b5f6224` | `7b4b4a2` | fusion `--no-ff` de `feature/export-excel-progress` (`86dc29c`), arbre `29d9cf2` identique à celui validé en préproduction |
+
+Préproduction à la validation : backend `49e6a0d`, front `86dc29c` (même contenu).
+
+### Déroulé
+
+| Heure | Étape | Résultat |
+|---|---|---|
+| ~17:15 | Préflight : conteneurs, disque (51 Go libres), sauvegarde de la nuit (03:50) | SHA-256 OK, `restore.sh test` réussi (base jetable supprimée) |
+| 17:24 | Fusions poussées (`master`, `main`) | arbres identiques à ceux validés |
+| 17:24 | `backup.sh` (chiffrée, copiée hors VPS) | SHA-256 OK, présente sur le stockage distant |
+| 17:25 | Dump local + copies `.env`, `deploy.sh`, `docker-compose.yml`, `.commit`, `src/pwa/frontend`, crontab, liste des images | `backups/*-avant-3.2.0-20261028-172553` |
+| ~17:26 | `.env` : `ERROR_ALERT_EMAIL`, `EXPORT_ALERT_EMAIL` | seules ces deux lignes ajoutées, fichier en 600 |
+| 17:27 | Front `7b4b4a2` livré, `deploy.sh` de `3df788f` installé, 1er passage | arrêt attendu : 3 migrations en attente |
+| ~17:28 | Migrations `Version20261027090000`, `Version20261028090000`, `Version20261029090000` | exécutées ; nouvelles tables présentes ; comptages des tables existantes inchangés |
+| 17:29 | 2e passage de `deploy.sh` | backend et worker `3df788f`, front `7b4b4a2`, `legacy-apex-sw` conservé ; étiquettes enregistrées dans `.env` |
+| ~17:29 | Ligne du gardien ajoutée à la crontab | `diff` avec la copie = uniquement les lignes du gardien |
+| 17:30 | Vérifications | voir ci-dessous |
+
+### Vérifications
+
+Terminées :
+
+- V1–V3 : conteneurs `healthy` aux SHA déployés ; worker « Consuming messages from transports
+  "exports, scheduler_exports_monitor" » ; destinataires d'alerte transmis au backend et au worker.
+- V4 : `www` 200, apex 301 vers `www`, `/api/terms-conditions` 200 ; « 3.2.0 » dans le module de
+  la page d'accueil servi.
+- V5 : worker actif (signe de vie chaque minute), gardien actif (passage chaque minute), aucune
+  alerte en cours.
+- V9 (partiel) : `/api/exports`, `/api/excel2/{year}`, `/api/excel/{year}`, `/api/admin/exports`
+  répondent 401 sans jeton. L'isolation entre utilisateurs (18 contrôles) a été vérifiée en
+  préproduction sur le même contenu, pas en production (aucun compte de test en production).
+- V10 : worker ≈ 38 Mo / 768 Mo au repos, aucun impact visible sur les autres applications.
+- V11 : aucune nouvelle entrée dans `error_log` depuis le déploiement.
+
+En attente de confirmation (responsable) :
+
+- V6 : e-mail de test `mailer:test` envoyé à 17:30:41 vers l'adresse des alertes : réception
+  (une seule fois, hors indésirables) à confirmer. Seule vérification de la livraison réelle par
+  le SMTP de production (la préproduction capture tout dans Mailpit).
+- V7 : export réel avec le compte du responsable (progression, téléchargement, ouverture dans Excel).
+- V8 : alias `/api/excel2` et `/api/excel` avec le même compte (même contenu que V7).
+
+Non réalisée : V12 (arrêt volontaire du worker en production, facultatif ; vérifié en préproduction).
+
+### Particularités observées
+
+- **Rotation des sauvegardes** : `backup.sh` ne garde qu'une sauvegarde par jour ; l'exécution de
+  17:24 a remplacé, localement et à distance, celle de 03:50 (vérifiée juste avant). Lancer
+  `backup.sh` deux fois le même jour ne conserve que la dernière.
+- **Index hors Doctrine** : `doctrine:schema:validate` signale un écart de schéma en production :
+  index `wdbi_name_191_031fbf8277a9` sur `nomenclature.name` (préfixe 191), présent avant le
+  déploiement (dump de 17:25), absent du mapping. Laissé en place (recherche dans la nomenclature).
+  **Ne jamais lancer `doctrine:schema:update` en production** : il le supprimerait. À intégrer au
+  mapping ou à la baseline (ADR-105).
+- Avertissement attendu des migrations : « 30 previously executed migrations … not registered »
+  (schéma historique géré hors migrations).
+- **Premier passage du gardien (17:30:04)** 4 s avant le premier signe de vie du worker : absence
+  journalisée pendant le délai de grâce d'un worker jamais vu, **sans e-mail**, close au signe de
+  vie suivant. Comportement attendu d'une première installation.
+
+### Points de vigilance (J0 → J+7)
+
+- Surveillance quotidienne listée plus haut (« Surveillance (J0 → J+7) »).
+- Appels restants aux alias `/api/excel2`, `/api/excel` (journaux Traefik) avant toute décision
+  de retrait (ADR-203).
+- Retour arrière possible tant que les copies `backups/*-avant-3.2.0-20261028-172553` et les images
+  `57aae39` / `b5f6224` restent sur le VPS : ne pas les supprimer avant la fin de la période de
+  surveillance.

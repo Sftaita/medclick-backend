@@ -10,7 +10,8 @@ Le frontend (SPA, repo séparé) consomme cette API. Documentation détaillée :
 
 ## Stack
 
-- **PHP 8.4** (production : Hostinger, LiteSpeed ; dev local : WAMP avec PHP 8.4), **Symfony 8.1**
+- **PHP 8.4** (production et préproduction : VPS Docker, FrankenPHP, MariaDB 11.8, Traefik — voir
+  `docs/DEPLOIEMENT-VPS.md` ; dev local : WAMP avec PHP 8.4), **Symfony 8.1**
   (version non LTS : suivre 8.2, 8.3… jusqu'à la LTS 8.4, prévue en novembre 2027)
 - **API Platform 4** (`#[ApiResource]`, namespace `ApiPlatform\Metadata`, state processors dans `src/State/`)
 - Doctrine ORM 3 / DBAL 4 / DoctrineBundle 3 (objets paresseux natifs PHP 8.4) + MySQL (`DATABASE_URL`)
@@ -94,8 +95,10 @@ Doc OpenAPI générée par API Platform : `GET /api` (ne couvre pas les contrôl
 
 ## Pièges connus
 
-- Modifier une entité ⇒ **générer une migration** (seules 2 migrations existent, le schéma
-  historique a été géré hors migrations : vérifier `doctrine:schema:validate`).
+- Modifier une entité ⇒ **générer une migration** (le schéma historique a été géré hors
+  migrations ; seules les tables récentes en ont une : vérifier `doctrine:schema:validate`).
+  En production, un index ajouté hors Doctrine (`nomenclature.name`) fait échouer
+  `schema:validate` : **ne jamais lancer `doctrine:schema:update` en production**.
 - Tout nouveau contrôleur custom qui charge une ressource par id doit **vérifier
   `isGranted('OWNER', ...)`** ; toute nouvelle entité exposée doit déclarer ses opérations
   avec `security_post_denormalize` et être ajoutée à `OwnershipVoter` et `CurrentUserExtension`.
@@ -107,10 +110,35 @@ Doc OpenAPI générée par API Platform : `GET /api` (ne couvre pas les contrôl
 - Le mailer utilise `templates/email/*.html.twig` ; le lien d'activation pointe sur
   `/activation/{token}` qui redirige vers `https://www.medclick.be/#/login`.
 
+## État actuel et travaux restants (mis à jour le 28/10/2026)
+
+- **En production : MedClick 3.2.0** depuis le 28/10/2026 (backend `master` `3df788f`, front
+  `main` `7b4b4a2` du dépôt privé `pwa-medclick`). Journal : `docs/PLAN-MEP-EXPORTS.md` ;
+  décisions : ADR-201 à ADR-209 de `docs/DECISIONS.md`.
+- Dépôt front : `frontend/` = application React/Vite déployée sur le VPS ; `src/js/` à la racine =
+  ancien front CRA, **non déployé par la chaîne du VPS**, encore servi ailleurs et utilisateur des
+  alias `/api/excel2`, `/api/excel`.
+- Travaux restants :
+  - confirmations en attente du journal de mise en production (V6 e-mail de test, V7 et V8 export
+    avec le compte du responsable) ;
+  - écarts H1 à H15 du carnet Excel, reportés (ADR-204, `docs/AUDIT-TOTAUX-EXCEL.md`) : chacun
+    exige une décision du responsable, car il change le fichier officiel ;
+  - retrait des alias `/api/excel2`, `/api/excel` quand plus aucun appel (ADR-203) ;
+  - baseline des migrations et index hors Doctrine de la production (ADR-105) ;
+  - alertes `npm audit` des outils de développement du front (ADR-208) ;
+  - surveillance externe du site (limite de ADR-205) ; retrait de `legacy-apex-sw` (pas avant
+    plusieurs mois, `docs/DEPLOIEMENT-VPS.md`) ; montées Symfony 8.2+ jusqu'à la LTS 8.4.
+- Règles : préproduction d'abord, production uniquement sur autorisation explicite du responsable
+  (ADR-207) ; aucune adresse e-mail ni donnée réelle dans ce dépôt public.
+
 ## Docs
 
 - `docs/ARCHITECTURE.md` — domaine, modèle de données, endpoints, flux.
 - `docs/DECISIONS.md` — décisions d'architecture (ADR) existantes et proposées.
 - `docs/AUDIT.md` — audit et feuille de route pour une application professionnelle.
-- `docs/DEPLOIEMENT.md` — procédure de mise en production (Hostinger), à suivre à la lettre.
-- `docs/EXPORTS.md` — exports Excel : cause des lenteurs, architecture, statuts, alertes, réglages.
+- `docs/DEPLOIEMENT-VPS.md` — déploiement sur le VPS (production et préproduction), worker, gardien.
+- `docs/PLAN-MEP-EXPORTS.md` — plan et **journal** de la mise en production 3.2.0 (28/10/2026).
+- `docs/EXPORTS.md` — exports Excel : API, architecture, statuts, surveillance, alertes, réglages, tests.
+- `docs/AUDIT-TOTAUX-EXCEL.md` — écarts historiques H1 à H15 des totaux du carnet (non corrigés).
+- `docs/RUNBOOK-BASCULE.md` — bascule Hostinger → VPS (23 et 24/10/2026) et retours arrière.
+- `docs/DEPLOIEMENT.md` — ancien hébergement Hostinger (historique, ne plus suivre).

@@ -1,5 +1,8 @@
 # Exports Excel (carnet de stage)
 
+En production depuis MedClick 3.2.0 (28/10/2026). Décisions : `docs/DECISIONS.md` (ADR-201 à
+ADR-208).
+
 Un seul générateur du carnet de stage officiel (`src/Export/CarnetDeStage/`), exécuté en
 asynchrone avec progression réelle, historique permanent, surveillance et alertes. Le format du
 fichier est figé par des fichiers de référence : voir « Non-régression du fichier Excel ».
@@ -60,7 +63,8 @@ Front ── POST /api/exports {yearId} ──► API (FrankenPHP)
 
 Choix : Symfony Messenger avec le transport Doctrine (la base existante, aucun service à ajouter),
 un seul worker (une génération à la fois : ressources bornées sur le VPS partagé), surveillance
-planifiée exécutée par ce worker (aucune tâche cron sur l'hôte). Pas de SSE : l'interrogation
+planifiée exécutée par ce worker et par un gardien indépendant (une ligne de crontab sur l'hôte,
+voir « Gardien indépendant du worker »). Pas de SSE : l'interrogation
 périodique suffit (une requête légère par seconde et par export en cours) et traverse Traefik sans
 réglage.
 
@@ -106,8 +110,9 @@ récupération des interventions, chargement du modèle, **traitement des interv
 | `worker_unavailable` | jamais pris en charge après `EXPORT_PENDING_MAX_SECONDS` |
 | `not_found`, `access_denied` | données supprimées entre-temps (pas d'alerte) |
 
-La détection des exports bloqués tourne chaque minute dans le worker **et** à chaque consultation
-de l'état ou de l'administration : un worker arrêté ne laisse jamais un export « en cours ».
+La détection des exports bloqués tourne chaque minute dans le worker, dans le gardien (même si le
+worker est arrêté) **et** à chaque consultation de l'état ou de l'administration : un worker
+arrêté ne laisse jamais un export « en cours ».
 Les changements de statut sont des `UPDATE … WHERE status IN (…)` : API, worker et surveillance ne
 peuvent pas s'écraser.
 
