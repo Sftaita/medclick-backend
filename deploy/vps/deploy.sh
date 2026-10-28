@@ -65,5 +65,7 @@ if docker compose config --services | grep -qx worker; then
   docker compose up -d worker
 fi
 
-docker compose up -d --wait frontend
+# legacy-apex-sw n'existe qu'en production (SW de remplacement de l'ancien front sur l'apex) :
+# recréé s'il a disparu, laissé tel quel sinon.
+docker compose up -d --wait frontend $(docker compose config --services | grep -x legacy-apex-sw || true)
 docker compose ps
