@@ -41,6 +41,12 @@ PREVIOUS_FRONTEND_IMAGE=$(docker inspect --format '{{.Config.Image}}' "medclick-
 export PREVIOUS_FRONTEND_IMAGE
 echo "assets précédents repris de : $PREVIOUS_FRONTEND_IMAGE"
 docker compose build
+# Étiquettes de ce déploiement enregistrées dans .env : une commande docker compose lancée à la main
+# dans ce dossier utilise ces images, jamais une plus ancienne (le Compose refuse une étiquette absente).
+for TAG_VAR in BACKEND_TAG FRONTEND_TAG; do
+  sed -i "/^${TAG_VAR}=/d" .env && echo "${TAG_VAR}=${!TAG_VAR}" >> .env
+done
+[ "$(stat -c %a .env)" = "600" ] || { echo ".env doit rester en 600"; exit 1; }
 # Mailpit n'existe qu'en préproduction (capture des e-mails).
 docker compose up -d --wait db $(docker compose config --services | grep -x mailpit || true)
 
@@ -59,7 +65,17 @@ if [ "${PENDING:-0}" != "0" ]; then
   exit 2
 fi
 
+# Worker des exports Excel, après les migrations (il lit la file messenger_messages) ; recréé à
+# chaque déploiement pour exécuter le nouveau code. Arrêt propre : génération en cours terminée.
+if docker compose config --services | grep -qx worker; then
+  docker compose up -d worker
+fi
+
 # legacy-apex-sw n'existe qu'en production (SW de remplacement de l'ancien front sur l'apex) :
 # recréé s'il a disparu, laissé tel quel sinon.
 docker compose up -d --wait frontend $(docker compose config --services | grep -x legacy-apex-sw || true)
 docker compose ps
+
+# Gardien des exports (cron de l'hôte, indépendant du worker, docs/DEPLOIEMENT-VPS.md) : signalé s'il manque.
+crontab -l 2>/dev/null | grep -q "apps/medclick-$ENV_NAME .*app:exports:monitor --watchdog" \
+  || echo "ATTENTION : gardien des exports absent de la crontab (docs/DEPLOIEMENT-VPS.md, « Worker des exports Excel »)."

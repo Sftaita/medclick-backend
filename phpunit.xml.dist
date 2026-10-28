@@ -24,6 +24,16 @@
         </testsuite>
     </testsuites>
 
+    <!-- Volumes, profil et rapport d'audit Excel (longs) : lancement explicite avec les options
+         group de PHPUnit (voir tests/Excel). -->
+    <groups>
+        <exclude>
+            <group>excel-volume</group>
+            <group>excel-profile</group>
+            <group>excel-audit-report</group>
+        </exclude>
+    </groups>
+
     <source ignoreSuppressionOfDeprecations="true">
         <include>
             <directory>src</directory>

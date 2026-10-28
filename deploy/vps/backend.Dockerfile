@@ -18,9 +18,10 @@ RUN composer install --no-dev --optimize-autoloader --no-scripts --no-interactio
 FROM dunglas/frankenphp:1-php8.4
 
 # Extensions exigées par le projet (composer check-platform-reqs) : intl, zip, gd (PhpSpreadsheet),
-# pdo_mysql, opcache. sodium est compilé dans l'image PHP officielle (lcobucci/jwt l'exige ; il
+# pdo_mysql, opcache ; pcntl pour le worker des exports (durée maximale par signal, arrêt propre).
+# sodium est compilé dans l'image PHP officielle (lcobucci/jwt l'exige ; il
 # manquait au PHP CLI d'Hostinger).
-RUN install-php-extensions intl zip gd opcache pdo_mysql
+RUN install-php-extensions intl zip gd opcache pdo_mysql pcntl
 
 WORKDIR /app
 COPY . .

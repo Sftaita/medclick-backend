@@ -23,11 +23,11 @@ class RouteIntegrityTest extends ApiTestBase
             if (str_starts_with($name, '_api_') || str_starts_with($name, 'api_') || !str_starts_with($route->getPath(), '/api/')) {
                 continue;
             }
-            // Valeur d'exemple compatible avec la contrainte du paramètre (id, ou nom de fichier
-            // <sha256>.webp des visuels de campagne).
+            // Valeur d'exemple compatible avec la contrainte du paramètre (id, nom de fichier
+            // <sha256>.webp des visuels de campagne, ou UUID v4 des exports).
             $path = preg_replace_callback('/\{([^}]+)\}/', static function (array $m) use ($route) {
                 $requirement = $route->getRequirement($m[1]);
-                foreach (['42', str_repeat('a', 64) . '.webp'] as $sample) {
+                foreach (['42', str_repeat('a', 64) . '.webp', '5213ede1-65a1-4fd2-b737-f8140a44153e'] as $sample) {
                     if ($requirement === null || preg_match('#^(?:' . $requirement . ')$#', $sample)) {
                         return $sample;
                     }

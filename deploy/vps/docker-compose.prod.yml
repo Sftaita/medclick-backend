@@ -41,10 +41,10 @@ services:
     build:
       context: ./src/backend
       dockerfile: deploy/vps/backend.Dockerfile
-    image: medclick-prod-backend:${BACKEND_TAG:-latest}
+    image: medclick-prod-backend:${BACKEND_TAG:?BACKEND_TAG absent, lancer deploy.sh qui l enregistre dans .env}
     container_name: medclick-prod-backend
     restart: unless-stopped
-    environment:
+    environment: &backend-environment
       APP_ENV: prod
       APP_DEBUG: "0"
       APP_SECRET: ${APP_SECRET}
@@ -63,9 +63,13 @@ services:
       # Valeurs actuelles de la production (identiques aux défauts de config/services.yaml).
       PUBLIC_FRONTEND_URL: https://www.medclick.be
       PUBLIC_API_URL: https://api-medclick.easymed.fun
+      # Exports Excel asynchrones (docs/EXPORTS.md) ; alertes : EXPORT_ALERT_EMAIL, sinon ERROR_ALERT_EMAIL.
+      EXPORT_ALERT_EMAIL: ${EXPORT_ALERT_EMAIL:-}
+      EXPORT_STORAGE_DIR: /app/var/exports
     volumes:
       - medclick_prod_jwt:/app/config/jwt
       - medclick_prod_log:/app/var/log
+      - medclick_prod_exports:/app/var/exports
     networks:
       - proxy
       - medclick-prod-internal
@@ -84,6 +88,36 @@ services:
       - "traefik.http.routers.medclick-prod-api.service=medclick-prod-backend"
       - "traefik.http.services.medclick-prod-backend.loadbalancer.server.port=80"
 
+  # Worker des exports Excel (voir docker-compose.staging.yml) : aucune entrée réseau, ressources plafonnées.
+  worker:
+    image: medclick-prod-backend:${BACKEND_TAG:?BACKEND_TAG absent, lancer deploy.sh qui l enregistre dans .env}
+    container_name: medclick-prod-worker
+    restart: unless-stopped
+    # Cache préchauffé (dont le gabarit Excel analysé) avant de consommer la file.
+    command: ["sh", "-c", "php bin/console cache:warmup && exec php bin/console messenger:consume exports scheduler_exports_monitor --time-limit=3600 --memory-limit=400M --sleep=1 -v"]
+    # Le contrôle HTTP de l'image backend ne s'applique pas : le worker ne sert pas de HTTP.
+    # Sain = le processus principal est le consommateur (après le préchauffage du cache).
+    healthcheck:
+      test: ["CMD-SHELL", "grep -qa messenger:consume /proc/1/cmdline && ! grep -qa cache:warmup /proc/1/cmdline"]
+      interval: 30s
+      timeout: 5s
+      start_period: 90s
+      retries: 3
+    environment: *backend-environment
+    volumes:
+      - medclick_prod_log:/app/var/log
+      - medclick_prod_exports:/app/var/exports
+    networks:
+      - medclick-prod-internal
+    depends_on:
+      db:
+        condition: service_healthy
+      backend:
+        condition: service_healthy
+    mem_limit: 768m
+    cpus: 1.0
+    stop_grace_period: 120s
+
   frontend:
     build:
       context: ./src/pwa/frontend
@@ -94,7 +128,7 @@ services:
         VITE_API_URL: https://www.medclick.be/api/
         # Image en service (deploy.sh) : ses assets/ restent servis pour les onglets ouverts.
         PREVIOUS_IMAGE: ${PREVIOUS_FRONTEND_IMAGE:-nginx:1.29-alpine}
-    image: medclick-prod-frontend:${FRONTEND_TAG:-latest}
+    image: medclick-prod-frontend:${FRONTEND_TAG:?FRONTEND_TAG absent, lancer deploy.sh qui l enregistre dans .env}
     container_name: medclick-prod-frontend
     restart: unless-stopped
     networks:
@@ -235,3 +269,4 @@ volumes:
   medclick_prod_db:
   medclick_prod_jwt:
   medclick_prod_log:
+  medclick_prod_exports:

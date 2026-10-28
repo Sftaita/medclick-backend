@@ -13,6 +13,8 @@ Internet ── Traefik (VPS partagé : SurgicalHub, MedVue, MedClick ; Let's En
 réseau privé medclick-<env>-internal :
    backend ── db (MariaDB 11.8 dédiée, aucun port publié, volume dédié)
    backend ── mailpit (préproduction : capture de TOUS les e-mails ; interface 127.0.0.1:8026)
+   worker  ── db (exports Excel : même image, aucun port ni accès entrant, 1 CPU / 768 Mo ;
+              volume des fichiers partagé avec le backend — voir docs/EXPORTS.md)
 ```
 
 - Une seule origine (frontend et API sous le même nom) : pas de CORS en pratique, pas d'URL
@@ -45,7 +47,7 @@ réseau privé medclick-<env>-internal :
 | `DB_NAME`, `DB_USER`, `DB_PASSWORD`, `DB_ROOT_PASSWORD` | base dédiée |
 | `APP_SECRET` | secret Symfony de l'environnement |
 | `JWT_PASSPHRASE` | phrase de passe des clés JWT de l'environnement (jamais celles d'un autre) |
-| `BACKEND_TAG`, `FRONTEND_TAG` | posées par `deploy.sh` (7 premiers caractères des SHA) |
+| `BACKEND_TAG`, `FRONTEND_TAG` | enregistrées par `deploy.sh` à chaque déploiement (7 premiers caractères des SHA) ; le Compose refuse de démarrer sans elles : une commande manuelle utilise toujours les images du dernier déploiement |
 
 Le Compose fixe en plus : `APP_ENV=prod`, `APP_DEBUG=0`, `MAILER_DSN=smtp://mailpit:1025`
 (préproduction), `PUBLIC_FRONTEND_URL` = `PUBLIC_API_URL` = `PUBLIC_URL` (liens des e-mails et
@@ -110,9 +112,29 @@ Restauration :
 - test (base jetable sans réseau, supprimée ensuite) : `restore.sh test <fichier.sql.gz.gpg>` ;
 - réelle (écrase la base du projet, confirmation demandée) : `restore.sh into <projet> <fichier>`.
 
+## Worker des exports Excel
+
+- Service `worker` des deux Compose : `messenger:consume exports scheduler_exports_monitor`
+  (génération des exports et surveillance chaque minute), cache préchauffé au démarrage.
+- `deploy.sh` le (re)crée après le contrôle des migrations ; la première mise en service exige la
+  migration `Version20261027090000` (tables `export_job`, `export_job_event`, `messenger_messages`).
+- Arrêt propre : `docker compose stop worker` laisse finir la génération en cours (120 s).
+- Préproduction : `EXPORT_ALERT_EMAIL` (facultatif) → alertes capturées par Mailpit.
+- **Gardien** (indépendant du worker, docs/EXPORTS.md) : une ligne dans la crontab de `deploy`,
+  par environnement, une fois (migration `Version20261028090000`, table `export_monitor_state`) :
+
+  ```
+  * * * * * cd /opt/stack/apps/medclick-<env> && flock -n /tmp/medclick-<env>-exports-watchdog.lock docker compose exec -T backend php bin/console app:exports:monitor --watchdog >> /home/deploy/logs/medclick-<env>-exports-watchdog.log 2>&1
+  ```
+
+  Il n'écrit dans son journal que lorsqu'il agit (export bloqué, worker absent…). `deploy.sh`
+  avertit si la ligne manque. Worker arrêté : `docker compose up -d worker` dans le dossier de
+  l'environnement (les étiquettes d'images du dernier déploiement sont dans `.env`).
+
 ## Journaux
 
 - Backend : `docker compose logs backend` ; Symfony `var/log` (volume `medclick_<env>_log`).
+- Worker des exports : `docker compose logs worker` (lignes `[export <corrélation>]`).
 - Frontend : `docker compose logs frontend` (accès nginx).
 - Traefik : `/opt/stack/traefik/logs/{traefik,access}.log`.
 - Erreurs applicatives : table `error_log` (`/api/admin/errors`), sans corps de requête ni IP.

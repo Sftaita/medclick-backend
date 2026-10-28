@@ -1,0 +1,335 @@
+{
+    "aleatoire-1": {
+        "generatedAt": "2026-10-28T17:13:15+01:00",
+        "engine": "ExcelNewVersion@b659514 (copie figée tests/Excel/Legacy)",
+        "exportDate": "28-10-2026",
+        "sha256": "12bb297f2fecad6a37b158fea7efdd51c977626fdbe8dc46822bd8bcee5dd455",
+        "bytes": 163280,
+        "seconds": 7.529,
+        "peakMemoryMb": 41.1,
+        "warnings": [
+            "LegacyExcelNewVersion.php:676 Undefined array key \"\"",
+            "LegacyExcelNewVersion.php:676 foreach() argument must be of type array|object, null given"
+        ]
+    },
+    "aleatoire-2": {
+        "generatedAt": "2026-10-28T17:13:29+01:00",
+        "engine": "ExcelNewVersion@b659514 (copie figée tests/Excel/Legacy)",
+        "exportDate": "28-10-2026",
+        "sha256": "dd9d6e0175a94cfb775df39f111be3597a6d5db7e47dcc18ee143901982476af",
+        "bytes": 161237,
+        "seconds": 14.103,
+        "peakMemoryMb": 32.7,
+        "warnings": []
+    },
+    "aleatoire-3": {
+        "generatedAt": "2026-10-28T17:13:43+01:00",
+        "engine": "ExcelNewVersion@b659514 (copie figée tests/Excel/Legacy)",
+        "exportDate": "28-10-2026",
+        "sha256": "36dba5e58972deb3865db6f74d62ed05bc7e73767947c74f3604bcc7e1410715",
+        "bytes": 165761,
+        "seconds": 12.859,
+        "peakMemoryMb": 31.2,
+        "warnings": []
+    },
+    "aleatoire-4": {
+        "generatedAt": "2026-10-28T17:13:56+01:00",
+        "engine": "ExcelNewVersion@b659514 (copie figée tests/Excel/Legacy)",
+        "exportDate": "28-10-2026",
+        "sha256": "fae21ac0f064bee9ca48579c105b89ac8c6f74a222b753ba2f584ef9686c266e",
+        "bytes": 161857,
+        "seconds": 12.513,
+        "peakMemoryMb": 31.7,
+        "warnings": []
+    },
+    "aleatoire-5": {
+        "generatedAt": "2026-10-28T17:14:16+01:00",
+        "engine": "ExcelNewVersion@b659514 (copie figée tests/Excel/Legacy)",
+        "exportDate": "28-10-2026",
+        "sha256": "629f7e3507ae1f99039487dd8a25ce98aa174ba7caefaaae69acc9ba0976ebb1",
+        "bytes": 166573,
+        "seconds": 19.781,
+        "peakMemoryMb": 30.2,
+        "warnings": []
+    },
+    "aleatoire-6": {
+        "generatedAt": "2026-10-28T17:14:27+01:00",
+        "engine": "ExcelNewVersion@b659514 (copie figée tests/Excel/Legacy)",
+        "exportDate": "28-10-2026",
+        "sha256": "1e4b7a5371b8663229ea0a0728150a4fff524e60c3dcffbe884827b47c4c7b88",
+        "bytes": 162795,
+        "seconds": 10.658,
+        "peakMemoryMb": 31.5,
+        "warnings": []
+    },
+    "aucun-superviseur": {
+        "generatedAt": "2026-10-26T11:03:44+01:00",
+        "engine": "ExcelNewVersion@b659514 (copie figée tests/Excel/Legacy)",
+        "exportDate": "26-10-2026",
+        "sha256": "691353a29c04303aad2924a06162a011b3e51dc680ed9ca8801c9fe54e1f3db6",
+        "bytes": 159688,
+        "seconds": 11.269,
+        "peakMemoryMb": 29.2,
+        "warnings": []
+    },
+    "audit-annees-6-7": {
+        "generatedAt": "2026-10-28T17:15:14+01:00",
+        "engine": "ExcelNewVersion@b659514 (copie figée tests/Excel/Legacy)",
+        "exportDate": "28-10-2026",
+        "sha256": "db66bb44416d65b7bcece5c4ebbc75b2ce0328da1c6af803a6c8bde5314a3231",
+        "bytes": 156902,
+        "seconds": 8.384,
+        "peakMemoryMb": 33,
+        "warnings": []
+    },
+    "audit-consultations-10-dates": {
+        "generatedAt": "2026-10-28T17:15:36+01:00",
+        "engine": "ExcelNewVersion@b659514 (copie figée tests/Excel/Legacy)",
+        "exportDate": "28-10-2026",
+        "sha256": "4108029f178c38ec1ff05f26eb25e3c2726aac3c12ecbb3d2f625d9212c36d6a",
+        "bytes": 156570,
+        "seconds": 6.179,
+        "peakMemoryMb": 29.2,
+        "warnings": [
+            "LegacyExcelNewVersion.php:676 Undefined array key \"\"",
+            "LegacyExcelNewVersion.php:676 foreach() argument must be of type array|object, null given"
+        ]
+    },
+    "audit-deux-maitres": {
+        "generatedAt": "2026-10-28T17:14:44+01:00",
+        "engine": "ExcelNewVersion@b659514 (copie figée tests/Excel/Legacy)",
+        "exportDate": "28-10-2026",
+        "sha256": "40c43689b53467be7c99d93ec1e8b6159d1188f10f7001261e74ff2971af0c1a",
+        "bytes": 157262,
+        "seconds": 7.651,
+        "peakMemoryMb": 33,
+        "warnings": [
+            "LegacyExcelNewVersion.php:676 Undefined array key \"\"",
+            "LegacyExcelNewVersion.php:676 foreach() argument must be of type array|object, null given"
+        ]
+    },
+    "audit-garde-minuit": {
+        "generatedAt": "2026-10-28T17:15:51+01:00",
+        "engine": "ExcelNewVersion@b659514 (copie figée tests/Excel/Legacy)",
+        "exportDate": "28-10-2026",
+        "sha256": "41e8f29a395c88b9cb27f8d1e2e1eda6601e8fcf88acfabc22e6d19d5e6fe469",
+        "bytes": 156550,
+        "seconds": 6.403,
+        "peakMemoryMb": 39.2,
+        "warnings": [
+            "LegacyExcelNewVersion.php:676 Undefined array key \"\"",
+            "LegacyExcelNewVersion.php:676 foreach() argument must be of type array|object, null given"
+        ]
+    },
+    "audit-gardes-10-par-mois": {
+        "generatedAt": "2026-10-28T17:15:43+01:00",
+        "engine": "ExcelNewVersion@b659514 (copie figée tests/Excel/Legacy)",
+        "exportDate": "28-10-2026",
+        "sha256": "04a6f7857dbd67192ccadbde1a8c63824dd8491553c174605944a6c5df056754",
+        "bytes": 156942,
+        "seconds": 6.152,
+        "peakMemoryMb": 29.2,
+        "warnings": [
+            "LegacyExcelNewVersion.php:676 Undefined array key \"\"",
+            "LegacyExcelNewVersion.php:676 foreach() argument must be of type array|object, null given"
+        ]
+    },
+    "audit-neuf-annees": {
+        "generatedAt": "2026-10-28T17:15:22+01:00",
+        "engine": "ExcelNewVersion@b659514 (copie figée tests/Excel/Legacy)",
+        "exportDate": "28-10-2026",
+        "sha256": "62225e08b1ae85f5844fa7f626a3401332b210e51e90f072c903bba7a0692937",
+        "bytes": 159434,
+        "seconds": 7.778,
+        "peakMemoryMb": 29.4,
+        "warnings": []
+    },
+    "audit-nouvel-an": {
+        "generatedAt": "2026-10-28T17:15:58+01:00",
+        "engine": "ExcelNewVersion@b659514 (copie figée tests/Excel/Legacy)",
+        "exportDate": "28-10-2026",
+        "sha256": "3d0c56d858ef04fd31035ade486b04f4af92680e7fcaea36a493d33ab8b876b1",
+        "bytes": 156750,
+        "seconds": 6.242,
+        "peakMemoryMb": 29.2,
+        "warnings": [
+            "LegacyExcelNewVersion.php:676 Undefined array key \"\"",
+            "LegacyExcelNewVersion.php:676 foreach() argument must be of type array|object, null given"
+        ]
+    },
+    "audit-positions": {
+        "generatedAt": "2026-10-28T17:16:06+01:00",
+        "engine": "ExcelNewVersion@b659514 (copie figée tests/Excel/Legacy)",
+        "exportDate": "28-10-2026",
+        "sha256": "4078204ed31c43b66d4aff450ab4b7bb1fe78575a1e94887974abc8a465e6d5a",
+        "bytes": 157086,
+        "seconds": 7.462,
+        "peakMemoryMb": 29,
+        "warnings": [
+            "LegacyExcelNewVersion.php:676 Undefined array key \"\"",
+            "LegacyExcelNewVersion.php:676 foreach() argument must be of type array|object, null given"
+        ]
+    },
+    "audit-reference": {
+        "generatedAt": "2026-10-28T17:14:36+01:00",
+        "engine": "ExcelNewVersion@b659514 (copie figée tests/Excel/Legacy)",
+        "exportDate": "28-10-2026",
+        "sha256": "26614e5246d9c63d7bfe975feb450d00a595218f732f8b91bf486d67b33b47a2",
+        "bytes": 157369,
+        "seconds": 7.814,
+        "peakMemoryMb": 29.1,
+        "warnings": [
+            "LegacyExcelNewVersion.php:676 Undefined array key \"\"",
+            "LegacyExcelNewVersion.php:676 foreach() argument must be of type array|object, null given"
+        ]
+    },
+    "audit-sans-nomenclature": {
+        "generatedAt": "2026-10-28T17:15:29+01:00",
+        "engine": "ExcelNewVersion@b659514 (copie figée tests/Excel/Legacy)",
+        "exportDate": "28-10-2026",
+        "sha256": "a6fa742287e54e64a53204846832b0c3359102f476188f64caf4f75f1efbc7f2",
+        "bytes": 157072,
+        "seconds": 6.36,
+        "peakMemoryMb": 29.2,
+        "warnings": []
+    },
+    "audit-specialites-generales": {
+        "generatedAt": "2026-10-28T17:15:05+01:00",
+        "engine": "ExcelNewVersion@b659514 (copie figée tests/Excel/Legacy)",
+        "exportDate": "28-10-2026",
+        "sha256": "58565d4c0bdf85f57aeca3c72b857ccecca40c5877ae58a595268016b60f0296",
+        "bytes": 156973,
+        "seconds": 8.943,
+        "peakMemoryMb": 29.2,
+        "warnings": []
+    },
+    "audit-trente-superviseurs": {
+        "generatedAt": "2026-10-28T17:14:55+01:00",
+        "engine": "ExcelNewVersion@b659514 (copie figée tests/Excel/Legacy)",
+        "exportDate": "28-10-2026",
+        "sha256": "77a7e4d882a607c20d5c10f6e446aad8dcd02c141ef3fc00025b117b746aac93",
+        "bytes": 161945,
+        "seconds": 10.473,
+        "peakMemoryMb": 29.5,
+        "warnings": [
+            "LegacyExcelNewVersion.php:676 Undefined array key \"\"",
+            "LegacyExcelNewVersion.php:676 foreach() argument must be of type array|object, null given"
+        ]
+    },
+    "cas-limites": {
+        "generatedAt": "2026-10-26T11:04:41+01:00",
+        "engine": "ExcelNewVersion@b659514 (copie figée tests/Excel/Legacy)",
+        "exportDate": "26-10-2026",
+        "sha256": "eb36401bef432c839c455b62bd1324b580e1c8d4ee8821f5bbf937959d5a2c74",
+        "bytes": 168592,
+        "seconds": 14.191,
+        "peakMemoryMb": 30.3,
+        "warnings": []
+    },
+    "consultations-denses": {
+        "generatedAt": "2026-10-26T11:04:03+01:00",
+        "engine": "ExcelNewVersion@b659514 (copie figée tests/Excel/Legacy)",
+        "exportDate": "26-10-2026",
+        "sha256": "8002645b63b66c2202f63ab0d91542c4e45dab39d2f09ad64f988c287f1f85d8",
+        "bytes": 164438,
+        "seconds": 10.898,
+        "peakMemoryMb": 29.7,
+        "warnings": []
+    },
+    "formations-complexes": {
+        "generatedAt": "2026-10-26T11:04:21+01:00",
+        "engine": "ExcelNewVersion@b659514 (copie figée tests/Excel/Legacy)",
+        "exportDate": "26-10-2026",
+        "sha256": "51e6f00c2a538a19be28cf294dbc0672f6bccbaf960eb2bff6e863dc1b44a008",
+        "bytes": 160426,
+        "seconds": 10.707,
+        "peakMemoryMb": 33.4,
+        "warnings": []
+    },
+    "huit-annees": {
+        "generatedAt": "2026-10-26T11:02:34+01:00",
+        "engine": "ExcelNewVersion@b659514 (copie figée tests/Excel/Legacy)",
+        "exportDate": "26-10-2026",
+        "sha256": "67801db9ee3cb61e570df0df3b0d969b7fc29e8281344285537dd8e96d824d51",
+        "bytes": 163225,
+        "seconds": 13.819,
+        "peakMemoryMb": 32.5,
+        "warnings": []
+    },
+    "multi-annees": {
+        "generatedAt": "2026-10-26T11:02:13+01:00",
+        "engine": "ExcelNewVersion@b659514 (copie figée tests/Excel/Legacy)",
+        "exportDate": "26-10-2026",
+        "sha256": "1edd76ad306779309e60ea8a5ccaa78712fd113f338c70e1be147b4594315951",
+        "bytes": 162668,
+        "seconds": 14.764,
+        "peakMemoryMb": 38.7,
+        "warnings": []
+    },
+    "petit": {
+        "generatedAt": "2026-10-26T11:01:05+01:00",
+        "engine": "ExcelNewVersion@b659514 (copie figée tests/Excel/Legacy)",
+        "exportDate": "26-10-2026",
+        "sha256": "329e0a2dd1de70b5a3eddd4289afe6f6092ca258a7f1e449532ef03a4097786a",
+        "bytes": 160999,
+        "seconds": 10.138,
+        "peakMemoryMb": 32.6,
+        "warnings": []
+    },
+    "sans-general": {
+        "generatedAt": "2026-10-26T11:04:59+01:00",
+        "engine": "ExcelNewVersion@b659514 (copie figée tests/Excel/Legacy)",
+        "exportDate": "26-10-2026",
+        "sha256": "b8407fc0576ef21518ebc04a05005a5f49a9598f728fa6f375879ba2e649e096",
+        "bytes": 160487,
+        "seconds": 9.991,
+        "peakMemoryMb": 29.3,
+        "warnings": [
+            "LegacyExcelNewVersion.php:676 Undefined array key \"\"",
+            "LegacyExcelNewVersion.php:676 foreach() argument must be of type array|object, null given"
+        ]
+    },
+    "sans-maitre": {
+        "generatedAt": "2026-10-26T11:02:52+01:00",
+        "engine": "ExcelNewVersion@b659514 (copie figée tests/Excel/Legacy)",
+        "exportDate": "26-10-2026",
+        "sha256": "6b73e774c2a8487ca1fb08cd9bf865027051efc0db29ce28682b518bb574b34d",
+        "bytes": 161466,
+        "seconds": 10.92,
+        "peakMemoryMb": 30.4,
+        "warnings": []
+    },
+    "seul-maitre": {
+        "generatedAt": "2026-10-26T11:03:09+01:00",
+        "engine": "ExcelNewVersion@b659514 (copie figée tests/Excel/Legacy)",
+        "exportDate": "26-10-2026",
+        "sha256": "a60d43a8935f33dd5a51d54b418dc7aa01a75b343b982639b5e2af2fa21cca87",
+        "bytes": 159894,
+        "seconds": 9.921,
+        "peakMemoryMb": 31.2,
+        "warnings": []
+    },
+    "un-superviseur": {
+        "generatedAt": "2026-10-26T11:03:26+01:00",
+        "engine": "ExcelNewVersion@b659514 (copie figée tests/Excel/Legacy)",
+        "exportDate": "26-10-2026",
+        "sha256": "e895af82726e22d896c2087f533a087d2c061dc1f586ac3d180daa43288296da",
+        "bytes": 159590,
+        "seconds": 10.778,
+        "peakMemoryMb": 29.1,
+        "warnings": []
+    },
+    "vide": {
+        "generatedAt": "2026-10-26T11:00:55+01:00",
+        "engine": "ExcelNewVersion@b659514 (copie figée tests/Excel/Legacy)",
+        "exportDate": "26-10-2026",
+        "sha256": "d84030bd23f49430cc4deabcc1d2ad763edb2679924fc4c66d4331d82f4f05b2",
+        "bytes": 156560,
+        "seconds": 4.9,
+        "peakMemoryMb": 40.6,
+        "warnings": [
+            "LegacyExcelNewVersion.php:676 Undefined array key \"\"",
+            "LegacyExcelNewVersion.php:676 foreach() argument must be of type array|object, null given"
+        ]
+    }
+}

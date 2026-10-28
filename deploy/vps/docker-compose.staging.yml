@@ -36,10 +36,10 @@ services:
     build:
       context: ./src/backend
       dockerfile: deploy/vps/backend.Dockerfile
-    image: medclick-backend:${BACKEND_TAG:-staging}
+    image: medclick-backend:${BACKEND_TAG:?BACKEND_TAG absent, lancer deploy.sh qui l enregistre dans .env}
     container_name: medclick-staging-backend
     restart: unless-stopped
-    environment:
+    environment: &backend-environment
       APP_ENV: prod
       APP_DEBUG: "0"
       APP_SECRET: ${APP_SECRET}
@@ -50,13 +50,19 @@ services:
       JWT_PASSPHRASE: ${JWT_PASSPHRASE}
       # Tous les e-mails sont capturés par Mailpit : aucun envoi réel.
       MAILER_DSN: smtp://mailpit:1025
-      ERROR_ALERT_EMAIL: ""
+      # Alertes techniques (erreurs 500, exports) : capturées par Mailpit, jamais envoyées.
+      ERROR_ALERT_EMAIL: ${ERROR_ALERT_EMAIL:-}
       PUBLIC_FRONTEND_URL: ${PUBLIC_URL}
       PUBLIC_API_URL: ${PUBLIC_URL}
+      # Exports Excel asynchrones (docs/EXPORTS.md) : alertes vers Mailpit (capturées, jamais envoyées).
+      EXPORT_ALERT_EMAIL: ${EXPORT_ALERT_EMAIL:-}
+      EXPORT_STORAGE_DIR: /app/var/exports
     volumes:
       # Clés JWT propres à cet environnement, générées une fois (deploy.sh), jamais dans l'image.
       - medclick_staging_jwt:/app/config/jwt
       - medclick_staging_log:/app/var/log
+      # Fichiers générés par le worker, servis par l'API (téléchargement réservé au propriétaire).
+      - medclick_staging_exports:/app/var/exports
     networks:
       - proxy
       - medclick-staging-internal
@@ -77,6 +83,40 @@ services:
       - "traefik.http.routers.medclick-staging-api.service=medclick-staging-backend"
       - "traefik.http.services.medclick-staging-backend.loadbalancer.server.port=80"
 
+  # Worker des exports Excel : génère les fichiers demandés (une génération à la fois) et exécute
+  # la surveillance planifiée (exports bloqués, expiration, rétention, alertes), chaque minute.
+  # Même image que le backend. Aucun accès entrant (pas sur « proxy »). Ressources plafonnées pour
+  # ne pas affecter les autres applications du VPS. Redémarré automatiquement (fin de --time-limit,
+  # dépassement mémoire) ; arrêt propre : la génération en cours se termine (stop_grace_period).
+  worker:
+    image: medclick-backend:${BACKEND_TAG:?BACKEND_TAG absent, lancer deploy.sh qui l enregistre dans .env}
+    container_name: medclick-staging-worker
+    restart: unless-stopped
+    # Cache préchauffé (dont le gabarit Excel analysé) avant de consommer la file.
+    command: ["sh", "-c", "php bin/console cache:warmup && exec php bin/console messenger:consume exports scheduler_exports_monitor --time-limit=3600 --memory-limit=400M --sleep=1 -v"]
+    # Le contrôle HTTP de l'image backend ne s'applique pas : le worker ne sert pas de HTTP.
+    # Sain = le processus principal est le consommateur (après le préchauffage du cache).
+    healthcheck:
+      test: ["CMD-SHELL", "grep -qa messenger:consume /proc/1/cmdline && ! grep -qa cache:warmup /proc/1/cmdline"]
+      interval: 30s
+      timeout: 5s
+      start_period: 90s
+      retries: 3
+    environment: *backend-environment
+    volumes:
+      - medclick_staging_log:/app/var/log
+      - medclick_staging_exports:/app/var/exports
+    networks:
+      - medclick-staging-internal
+    depends_on:
+      db:
+        condition: service_healthy
+      backend:
+        condition: service_healthy
+    mem_limit: 768m
+    cpus: 1.0
+    stop_grace_period: 120s
+
   frontend:
     build:
       context: ./src/pwa/frontend
@@ -88,7 +128,7 @@ services:
         VITE_API_URL: ${PUBLIC_URL}/api/
         # Image en service (deploy.sh) : ses assets/ restent servis pour les onglets ouverts.
         PREVIOUS_IMAGE: ${PREVIOUS_FRONTEND_IMAGE:-nginx:1.29-alpine}
-    image: medclick-frontend:${FRONTEND_TAG:-staging}
+    image: medclick-frontend:${FRONTEND_TAG:?FRONTEND_TAG absent, lancer deploy.sh qui l enregistre dans .env}
     container_name: medclick-staging-frontend
     restart: unless-stopped
     networks:
@@ -135,3 +175,4 @@ volumes:
   medclick_staging_db:
   medclick_staging_jwt:
   medclick_staging_log:
+  medclick_staging_exports:
