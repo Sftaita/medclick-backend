@@ -48,7 +48,8 @@ Le serveur (`POST /api/marketing/events`) :
 
 - refuse les types et emplacements inconnus (400) ; ignore (`recorded: false`) une campagne
   inconnue, non diffusée aujourd'hui ou pas sur cet emplacement ;
-- ignore les **doublons** du même visiteur sur 30 minutes (même campagne, emplacement, type) ;
+- ignore les **doublons** du même visiteur sur 30 minutes (même campagne, emplacement, type),
+  y compris de part et d'autre de minuit (empreintes du jour et de la veille comparées) ;
 - visiteur = utilisateur connecté (`u:<id>`) sinon identifiant aléatoire du navigateur (`a:<uuid>`,
   localStorage), jamais stocké tel quel : empreinte `HMAC-SHA256(APP_SECRET, visiteur | jour)` qui
   change chaque jour et est **effacée après 24 h** ;
@@ -110,7 +111,9 @@ empreinte des données existantes identique avant et après la migration, schém
 
 Vérification locale faite sur MariaDB 11.3.2 ; la production est en 11.8 : rejouer sur la
 préproduction (`mariadb:11.8`) avec une copie fraîche de production (« Copie production →
-préproduction », `docs/DEPLOIEMENT-VPS.md`). Script en lecture seule : `deploy/vps/sponsors-verification.sql`.
+préproduction », `docs/DEPLOIEMENT-VPS.md`). Script en lecture seule : `deploy/vps/sponsors-verification.sql` (empreintes MD5 par ligne combinées
+par `BIT_XOR`, sans `GROUP_CONCAT` : celui-ci est tronqué sans erreur au-delà de
+`group_concat_max_len`, 1 Mo, et ne verrait plus les dernières lignes d'une grosse table).
 
 ```bash
 D=/opt/stack/apps/medclick-staging; cd $D
