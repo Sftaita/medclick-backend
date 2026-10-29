@@ -122,7 +122,7 @@ SQL='mariadb -u"$MARIADB_USER" -p"$MARIADB_PASSWORD" "$MARIADB_DATABASE" --force
 $C exec -T db sh -c "$SQL" < src/backend/deploy/vps/sponsors-verification.sql > avant.txt   # partie 2 : erreurs normales
 ./deploy.sh <sha_backend> <sha_front_actuel>                                                 # s'arrête sur la migration
 $C exec backend php bin/console doctrine:migrations:migrate -n
-$C exec backend php bin/console doctrine:schema:validate                                     # « in sync »
+$C exec backend php bin/console doctrine:schema:update --dump-sql                           # seul écart admis : DROP INDEX wdbi_name_191_031fbf8277a9 (voir ci-dessous)
 $C exec -T db sh -c "$SQL" < src/backend/deploy/vps/sponsors-verification.sql > apres.txt
 diff <(grep -E '^(marketing|partner)' avant.txt) <(grep -E '^(marketing|partner)' apres.txt) && echo "EMPREINTES IDENTIQUES"
 # Test du retour arrière, puis remontée :
@@ -132,6 +132,11 @@ diff <(grep -E '^(marketing|partner)' avant.txt) <(grep -E '^(marketing|partner)
 $C exec backend php bin/console doctrine:migrations:migrate -n
 ./deploy.sh <sha_backend> <sha_front>
 ```
+
+Index préexistant : la production porte un index `wdbi_name_191_031fbf8277a9` sur `nomenclature(name(191))`,
+ajouté hors de l'application avant la 3.2.0 (présent dans le dump `prod-avant-3.2.0`). Absent du mapping,
+il fait toujours répondre « not in sync » à `doctrine:schema:validate`. Sans lien avec cette version :
+ne pas le supprimer ici (il sert la recherche dans la nomenclature) ; à intégrer au mapping séparément.
 
 Attendu dans `apres.txt` : une seule ligne `["login_interstitial"] 5 0 0 <nombre de campagnes>` et
 une seule ligne `legacy_view login_interstitial <nombre de vues> 0`. Puis contrôles manuels :
@@ -145,7 +150,9 @@ Ordre (procédure `docs/DEPLOIEMENT-VPS.md`) :
    attente. Entre ces deux étapes, les routes marketing échouent (colonnes absentes) : le front
    « fail-open » n'affiche simplement pas de publicité. Enchaîner aussitôt :
 3. **Migration** : `docker compose exec backend php bin/console doctrine:migrations:migrate -n`, puis
-   `doctrine:schema:validate` (« in sync ») et `GET /api/marketing/slots` (200).
+   `doctrine:schema:update --dump-sql` (seul écart admis : l'index préexistant ci-dessous),
+   `deploy/vps/sponsors-verification.sql` (empreintes identiques) et `GET /api/marketing/slots` (200).
+   Relancer ensuite `./deploy.sh` (worker et frontend ne redémarrent pas tant qu'une migration attend).
 4. **Frontend** : nouvelle archive dans `src/pwa` + `.commit`, puis `./deploy.sh <sha_backend> <sha_front>`.
    L'ancien front fonctionne avec le nouveau backend (plein écran, clics historiques) ; seuls ses
    affichages plein écran ne sont plus comptés tant que le nouveau front n'est pas en ligne.
