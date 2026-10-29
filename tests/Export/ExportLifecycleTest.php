@@ -55,9 +55,20 @@ final class ExportLifecycleTest extends ExportTestCase
         self::assertSame('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', $download['headers']['content-type'][0]);
         self::assertSame((string) $ready['fileSize'], $download['headers']['content-length'][0]);
         self::assertStringContainsString('no-store', $download['headers']['cache-control'][0]);
-        $report = $this->compareBytes(file_get_contents(self::REFERENCE_DIR . '/petit.xlsx'), $download['content']);
+        $reference = file_get_contents(self::REFERENCE_DIR . '/petit.xlsx');
+        $report = $this->compareBytes($reference, $download['content']);
         self::assertTrue($report['equivalent'], implode("\n", $report['differences']));
-        self::assertSame($report['stats']['parties'], $report['stats']['partiesIdentiquesOctet']);
+        // Toutes les parties identiques à l'octet, sauf docProps/core.xml quand le fuseau de PHP n'est
+        // pas celui des références (Europe/Brussels ; UTC en CI) : dates du gabarit écrites avec un
+        // autre décalage (+02:00 / +00:00), identiques après C14N. Seule cette partie, seulement ces
+        // dates, et pour le même instant : toute autre différence reste un échec.
+        $stats = $report['stats'];
+        self::assertSame($stats['parties'], $stats['partiesIdentiquesOctet'] + $stats['partiesIdentiquesC14N']);
+        self::assertSame($stats['partiesIdentiquesC14N'], count($report['toleratedVolatile']));
+        foreach ($report['toleratedVolatile'] as $tolerated) {
+            self::assertMatchesRegularExpression('/^docProps\/core\.xml : (created|modified)(, (created|modified))?$/', $tolerated);
+        }
+        self::assertSame(self::coreInstants($reference), self::coreInstants($download['content']));
 
         // Envoi observé côté serveur, mais pas encore confirmé : le statut reste « prêt ».
         self::assertSame(ExportJob::STATUS_READY, $this->job($job['id'])->getStatus());
@@ -360,5 +371,24 @@ final class ExportLifecycleTest extends ExportTestCase
         file_put_contents($path, $bytes);
 
         return $path;
+    }
+
+    /** Dates de création et de modification de docProps/core.xml, en horodatages (fuseau neutralisé). */
+    private static function coreInstants(string $xlsx): array
+    {
+        $path = tempnam(sys_get_temp_dir(), 'core');
+        file_put_contents($path, $xlsx);
+        $zip = new \ZipArchive();
+        $zip->open($path);
+        $core = $zip->getFromName('docProps/core.xml');
+        $zip->close();
+        unlink($path);
+        $instants = [];
+        foreach (['created', 'modified'] as $name) {
+            self::assertSame(1, preg_match("#<dcterms:$name\\b[^>]*>([^<]+)</dcterms:$name>#", $core, $match), "dcterms:$name absent");
+            $instants[$name] = (new \DateTimeImmutable($match[1]))->getTimestamp();
+        }
+
+        return $instants;
     }
 }
