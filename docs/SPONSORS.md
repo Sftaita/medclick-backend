@@ -106,6 +106,35 @@ Vérifié sur une copie de la structure de production (MariaDB, schéma 3.2.0 + 
 empreinte des données existantes identique avant et après la migration, schéma conforme au mapping
 (`doctrine:schema:validate`), migration descendante revenant à l'octet près à l'état initial.
 
+### Vérification finale sur MariaDB 11.8 (préproduction, avant la production)
+
+Vérification locale faite sur MariaDB 11.3.2 ; la production est en 11.8 : rejouer sur la
+préproduction (`mariadb:11.8`) avec une copie fraîche de production (« Copie production →
+préproduction », `docs/DEPLOIEMENT-VPS.md`). Script en lecture seule : `deploy/vps/sponsors-verification.sql`.
+
+```bash
+D=/opt/stack/apps/medclick-staging; cd $D
+C="docker compose -f src/backend/deploy/vps/docker-compose.staging.yml --project-directory ."
+SQL='mariadb -u"$MARIADB_USER" -p"$MARIADB_PASSWORD" "$MARIADB_DATABASE" --force'
+$C exec -T db sh -c "$SQL" < src/backend/deploy/vps/sponsors-verification.sql > avant.txt   # partie 2 : erreurs normales
+./deploy.sh <sha_backend> <sha_front_actuel>                                                 # s'arrête sur la migration
+$C exec backend php bin/console doctrine:migrations:migrate -n
+$C exec backend php bin/console doctrine:schema:validate                                     # « in sync »
+$C exec -T db sh -c "$SQL" < src/backend/deploy/vps/sponsors-verification.sql > apres.txt
+diff <(grep -E '^(marketing|partner)' avant.txt) <(grep -E '^(marketing|partner)' apres.txt) && echo "EMPREINTES IDENTIQUES"
+# Test du retour arrière, puis remontée :
+$C exec backend php bin/console doctrine:migrations:migrate prev -n
+$C exec -T db sh -c "$SQL" < src/backend/deploy/vps/sponsors-verification.sql > descente.txt
+diff <(grep -E '^(marketing|partner)' avant.txt) <(grep -E '^(marketing|partner)' descente.txt) && echo "RETOUR ARRIÈRE IDENTIQUE"
+$C exec backend php bin/console doctrine:migrations:migrate -n
+./deploy.sh <sha_backend> <sha_front>
+```
+
+Attendu dans `apres.txt` : une seule ligne `["login_interstitial"] 5 0 0 <nombre de campagnes>` et
+une seule ligne `legacy_view login_interstitial <nombre de vues> 0`. Puis contrôles manuels :
+campagnes existantes visibles et modifiables dans l'administration, plein écran toujours affiché
+à la connexion, `GET /api/marketing/slots` en 200, statistiques : « vues historiques » séparées.
+
 Ordre (procédure `docs/DEPLOIEMENT-VPS.md`) :
 
 1. **Sauvegarde** de production (`backup.sh`) juste avant, et contrôle de son SHA-256.
