@@ -46,7 +46,7 @@ class MarketingImageStore
     /** Visuels internes (URL /api/marketing/image/…) d'une campagne. @return list<string> */
     public function pathsOf(Marketing $marketing): array
     {
-        return array_values(array_filter(self::formatValues($marketing), static fn ($value) => is_string($value) && preg_match(MarketingImage::PATH_PATTERN, $value)));
+        return array_values(array_filter(self::imageValues($marketing), static fn ($value) => is_string($value) && preg_match(MarketingImage::PATH_PATTERN, $value)));
     }
 
     /** Empreintes SHA-256 utilisées par au moins une campagne. @return array<string, true> */
@@ -109,7 +109,7 @@ class MarketingImageStore
         return $this->images->deleteByIds($ids);
     }
 
-    /** @return array<string, ?string> */
+    /** Formats plein écran (champs *_format historiques). @return array<string, ?string> */
     public static function formatValues(Marketing $marketing): array
     {
         return [
@@ -118,6 +118,15 @@ class MarketingImageStore
             'tablet_landscape_format' => $marketing->getTabletLandscapeFormat(),
             'screen_14_inch_format' => $marketing->getScreen14InchFormat(),
             'large_screen_format' => $marketing->getLargeScreenFormat(),
+        ];
+    }
+
+    /** Tous les visuels d'une campagne : formats plein écran et bannières. @return array<string, ?string> */
+    public static function imageValues(Marketing $marketing): array
+    {
+        return self::formatValues($marketing) + [
+            'banner_desktop' => $marketing->getBannerDesktop(),
+            'banner_mobile' => $marketing->getBannerMobile(),
         ];
     }
 }

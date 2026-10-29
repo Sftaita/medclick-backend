@@ -27,6 +27,7 @@ class PublicEndpointRateLimiter implements EventSubscriberInterface
         #[Target('password_reset.limiter')] RateLimiterFactoryInterface $passwordResetLimiter,
         #[Target('client_errors.limiter')] RateLimiterFactoryInterface $clientErrorsLimiter,
         #[Target('marketing_click.limiter')] RateLimiterFactoryInterface $marketingClickLimiter,
+        #[Target('marketing_event.limiter')] RateLimiterFactoryInterface $marketingEventLimiter,
     )
     {
         $this->limiters = [
@@ -35,6 +36,7 @@ class PublicEndpointRateLimiter implements EventSubscriberInterface
             'reset_password' => $passwordResetLimiter,
             'client_errors' => $clientErrorsLimiter,
             'increment_campaign_click' => $marketingClickLimiter,
+            'marketing_event' => $marketingEventLimiter,
         ];
     }
 

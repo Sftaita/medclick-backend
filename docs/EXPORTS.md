@@ -220,6 +220,13 @@ exports » du front (`/admin/exports`). Aucun accès aux fichiers.
   chaque cellule (valeur, type, formule, style résolu), fusions, dimensions, mise en page et
   impression, volets, protections, validations, mises en forme conditionnelles, filtres, liens,
   commentaires, dessins, noms définis, propriétés. `php tests/Excel/bin/compare-xlsx.php a.xlsx b.xlsx`.
+- Images (`xl/media`) : PhpSpreadsheet les nomme `md5(chemin du gabarit)`, chemin absolu du projet
+  compris. Les références ayant été produites dans `C:\wamp64\www\medclick-backend-export`, la
+  comparaison échouait dans tout autre dossier (autre poste, CI, conteneur : CI rouge depuis la
+  fusion 3.2.0, `ExportLifecycleTest::testSuccessfulExportFromRequestToConfirmedDownload` et les cas
+  de `ExcelReferenceTest`). Le comparateur renomme désormais ces images d'après leur contenu (et
+  leurs références dans les `.rels`) : le contenu reste comparé à l'octet ; le fichier produit, lui,
+  n'a jamais été en cause (nom interne seulement).
 - `ExcelReferenceTest` : le fichier produit est comparé à la référence de chacun des 30 cas ;
   `--group excel-volume` pour les volumes. Les alias synchrones servent le même fichier
   (`tests/Export/ExportLifecycleTest.php`).

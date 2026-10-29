@@ -14,6 +14,23 @@ class Marketing
     public const MIN_DURATION = 1;
     public const MAX_DURATION = 60;
 
+    // Emplacements vendus séparément. « login_interstitial » = publicité plein écran à la
+    // connexion (format historique, conservé pour les campagnes existantes).
+    public const PLACEMENT_LOGIN = 'login';
+    public const PLACEMENT_DASHBOARD_DESKTOP = 'dashboard_desktop';
+    public const PLACEMENT_DASHBOARD_MOBILE = 'dashboard_mobile';
+    public const PLACEMENT_LOGIN_INTERSTITIAL = 'login_interstitial';
+    public const PLACEMENTS = [self::PLACEMENT_LOGIN, self::PLACEMENT_DASHBOARD_DESKTOP, self::PLACEMENT_DASHBOARD_MOBILE, self::PLACEMENT_LOGIN_INTERSTITIAL];
+    /** Emplacements en carte (visuel bannière), par opposition au plein écran. */
+    public const CARD_PLACEMENTS = [self::PLACEMENT_LOGIN, self::PLACEMENT_DASHBOARD_DESKTOP, self::PLACEMENT_DASHBOARD_MOBILE];
+
+    // Offres commerciales (libellé des rapports ; les emplacements restent choisis librement).
+    public const OFFERS = ['premium', 'login', 'secondary'];
+
+    public const MIN_PRIORITY = 1;
+    public const MAX_PRIORITY = 10;
+    public const DEFAULT_PRIORITY = 5;
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
@@ -61,6 +78,47 @@ class Marketing
 
     #[ORM\Column(type: 'string', length: 500, nullable: true)]
     private $redirectUrl;
+
+    /** Annonceur (regroupement des statistiques et des rapports). */
+    #[ORM\Column(type: 'string', length: 120, nullable: true)]
+    private ?string $sponsorName = null;
+
+    #[ORM\Column(type: 'string', length: 20, nullable: true)]
+    private ?string $offer = null;
+
+    #[ORM\Column(type: 'string', length: 120, nullable: true)]
+    private ?string $title = null;
+
+    #[ORM\Column(type: 'string', length: 280, nullable: true)]
+    private ?string $description = null;
+
+    /** Logo : nom de fichier d'un logo envoyé comme ceux des partenaires (<sha256>.png|svg). */
+    #[ORM\Column(type: 'string', length: 80, nullable: true)]
+    private ?string $logo = null;
+
+    /** Visuel bannière ordinateur (16:9) : URL d'un visuel importé ou URL http(s). */
+    #[ORM\Column(type: 'string', length: 500, nullable: true)]
+    private ?string $bannerDesktop = null;
+
+    /** Visuel bannière mobile et connexion (2:1). */
+    #[ORM\Column(type: 'string', length: 500, nullable: true)]
+    private ?string $bannerMobile = null;
+
+    /** Bouton « Découvrir le partenaire » sous le visuel. */
+    #[ORM\Column(type: 'boolean', options: ['default' => false])]
+    private bool $showCta = false;
+
+    /** @var list<string> sous-ensemble de PLACEMENTS */
+    #[ORM\Column(type: 'json')]
+    private array $placements = [self::PLACEMENT_LOGIN_INTERSTITIAL];
+
+    /** Priorité commerciale (1 à 10) : ordre et poids dans la rotation. */
+    #[ORM\Column(type: 'smallint', options: ['default' => 5])]
+    private int $priority = self::DEFAULT_PRIORITY;
+
+    /** Exclusive : seule campagne affichée sur ses emplacements pendant sa période. */
+    #[ORM\Column(type: 'boolean', options: ['default' => false])]
+    private bool $exclusive = false;
 
     public function __construct()
     {
@@ -257,5 +315,151 @@ class Marketing
 
         return $this;
     }
-    
+
+    public function getSponsorName(): ?string
+    {
+        return $this->sponsorName;
+    }
+
+    public function setSponsorName(?string $sponsorName): self
+    {
+        $this->sponsorName = $sponsorName;
+
+        return $this;
+    }
+
+    public function getOffer(): ?string
+    {
+        return $this->offer;
+    }
+
+    public function setOffer(?string $offer): self
+    {
+        $this->offer = $offer;
+
+        return $this;
+    }
+
+    public function getTitle(): ?string
+    {
+        return $this->title;
+    }
+
+    public function setTitle(?string $title): self
+    {
+        $this->title = $title;
+
+        return $this;
+    }
+
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    public function setDescription(?string $description): self
+    {
+        $this->description = $description;
+
+        return $this;
+    }
+
+    public function getLogo(): ?string
+    {
+        return $this->logo;
+    }
+
+    public function setLogo(?string $logo): self
+    {
+        $this->logo = $logo;
+
+        return $this;
+    }
+
+    public function getBannerDesktop(): ?string
+    {
+        return $this->bannerDesktop;
+    }
+
+    public function setBannerDesktop(?string $bannerDesktop): self
+    {
+        $this->bannerDesktop = $bannerDesktop;
+
+        return $this;
+    }
+
+    public function getBannerMobile(): ?string
+    {
+        return $this->bannerMobile;
+    }
+
+    public function setBannerMobile(?string $bannerMobile): self
+    {
+        $this->bannerMobile = $bannerMobile;
+
+        return $this;
+    }
+
+    public function hasCta(): bool
+    {
+        return $this->showCta;
+    }
+
+    public function setShowCta(bool $showCta): self
+    {
+        $this->showCta = $showCta;
+
+        return $this;
+    }
+
+    /** @return list<string> */
+    public function getPlacements(): array
+    {
+        return $this->placements;
+    }
+
+    /** @param list<string> $placements */
+    public function setPlacements(array $placements): self
+    {
+        $this->placements = array_values(array_intersect(self::PLACEMENTS, $placements));
+
+        return $this;
+    }
+
+    public function hasPlacement(string $placement): bool
+    {
+        return in_array($placement, $this->placements, true);
+    }
+
+    public function getPriority(): int
+    {
+        return $this->priority;
+    }
+
+    public function setPriority(int $priority): self
+    {
+        $this->priority = $priority;
+
+        return $this;
+    }
+
+    public function isExclusive(): bool
+    {
+        return $this->exclusive;
+    }
+
+    public function setExclusive(bool $exclusive): self
+    {
+        $this->exclusive = $exclusive;
+
+        return $this;
+    }
+
+    /** Diffusée ce jour-là (AAAA-MM-JJ) : statut actif, dates de début et de fin incluses. */
+    public function isLiveOn(string $day): bool
+    {
+        return $this->status === 'active'
+            && $this->start_date !== null && $this->start_date->format('Y-m-d') <= $day
+            && ($this->end_date === null || $this->end_date->format('Y-m-d') >= $day);
+    }
 }

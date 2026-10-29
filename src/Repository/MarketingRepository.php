@@ -70,6 +70,25 @@ class MarketingRepository extends ServiceEntityRepository
 
 
     /**
+     * Campagnes diffusées ce jour (AAAA-MM-JJ, dates incluses). Emplacements filtrés par l'appelant
+     * (colonne JSON, requêtes non portables entre MySQL et SQLite).
+     *
+     * @return list<Marketing>
+     */
+    public function findLiveOn(string $day): array
+    {
+        return $this->createQueryBuilder('m')
+            ->where('m.status = :status')
+            ->andWhere('m.start_date <= :day')
+            ->andWhere('m.end_date IS NULL OR m.end_date >= :day')
+            ->setParameter('status', 'active')
+            ->setParameter('day', new \DateTime($day), Types::DATE_MUTABLE)
+            ->orderBy('m.id')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
     * @return Marketing[] Returns an array of Marketing objects
     */
     public function findAllCampaign()

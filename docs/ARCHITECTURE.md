@@ -110,7 +110,9 @@ Points notables :
 | POST | `/api/resetPassword` | public | Reset du mot de passe |
 | GET | `/api/terms-conditions` | public | Dernières CGU |
 | PUT | `/api/acceptTerms` | user | Acceptation des CGU |
-| GET | `/api/marketing/active` | public | Campagne active aléatoire (+1 vue) |
+| GET | `/api/marketing/active` | public | Campagne plein écran aléatoire (lecture seule, docs/SPONSORS.md) |
+| GET | `/api/marketing/slots` | public | Campagnes par emplacement (connexion, tableau de bord) |
+| POST | `/api/marketing/events` | public, limité | Impression réellement vue ou clic (dédoublonné) |
 | GET | `/api/partner/active` | public | Partenaire affiché aujourd'hui (204 sinon) |
 | GET | `/api/partner/logo/{sha256}.{png\|svg}` | public | Logo du partenaire (CSP sans script, cache immuable) |
 | GET | `/api/marketing/image/{sha256}.webp` | public | Visuel importé d'une campagne (CSP sans script, cache immuable) |
@@ -132,7 +134,8 @@ Points notables :
 | GET | `/api/admin/fetchUserById/{id}` | admin | Profil + années d'un user |
 | GET | `/api/admin/history/quick` | admin | Tableau de bord des connexions |
 | GET/POST/PUT | `/api/admin/nomenclature…` | admin | CRUD nomenclature, type, sous-type |
-| GET/POST/PUT/DELETE | `/api/admin/marketing…` | admin | CRUD campagnes, statut |
+| GET/POST/PUT/DELETE | `/api/admin/marketing…` | admin | CRUD campagnes, statut, emplacements, exclusivité |
+| GET | `/api/admin/marketing-stats`, `….csv` | admin | Statistiques publicitaires, export CSV (docs/SPONSORS.md) |
 | POST/DELETE | `/api/admin/marketing-images…` | admin | Import d'un visuel (multipart `file`, PNG/JPEG/WebP 5 Mo) ; suppression d'un import abandonné (409 s'il est utilisé) |
 | GET/POST/PUT/DELETE | `/api/admin/partners…` | admin | Partenaire : brouillon, publication, `withdraw`, `reschedule`, historique |
 | POST | `/api/admin/partner-logos` | admin | Envoi d'un logo (multipart `file`, PNG ≥ 512 px ou SVG sûr, 1 Mo) |

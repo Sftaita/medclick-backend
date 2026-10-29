@@ -6,6 +6,8 @@ use App\Entity\Marketing;
 use App\Entity\MarketingImage;
 use App\Repository\MarketingImageRepository;
 use App\Repository\MarketingRepository;
+use App\Repository\PartnerLogoRepository;
+use App\Service\SponsorStats;
 use App\Service\MarketingImageStore;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,6 +25,8 @@ class MarketingController extends AbstractController
         EntityManagerInterface $entityManager,
         private readonly MarketingImageRepository $images,
         private readonly MarketingImageStore $imageStore,
+        private readonly PartnerLogoRepository $logos,
+        private readonly SponsorStats $stats,
     ) {
         $this->entityManager = $entityManager;
     }
@@ -30,30 +34,8 @@ class MarketingController extends AbstractController
    #[Route('/marketing', name: 'index', methods: ['GET'])]
     public function index(MarketingRepository $marketingRepository): Response
     {
-        $marketings = $marketingRepository->findAll();
-
-        // Vérification et structuration des données pour chaque campagne
-        $campaigns = [];
-        foreach ($marketings as $marketing) {
-            $campaigns[] = [
-                'id' => $marketing->getId(),
-                'campaign_name' => $marketing->getCampaignName(),
-                'status' => $marketing->getStatus(),
-                'start_date' => $marketing->getStartDate() ? $marketing->getStartDate()->format('Y-m-d') : null,
-                'end_date' => $marketing->getEndDate() ? $marketing->getEndDate()->format('Y-m-d') : null,
-                'views' => $marketing->getViews(),
-                'clicks' => $marketing->getClicks(),
-                'duration' => $marketing->getDuration(), // Ajout de la durée
-                'redirect_url' => $marketing->getRedirectUrl(), // Ajout de l'URL de redirection
-                'formats' => [
-                    'smartphone' => $marketing->getSmartphoneFormat(),
-                    'tablet_portrait' => $marketing->getTabletPortraitFormat(),
-                    'tablet_landscape' => $marketing->getTabletLandscapeFormat(),
-                    'screen_14_inch' => $marketing->getScreen14InchFormat(),
-                    'large_screen' => $marketing->getLargeScreenFormat(),
-                ]
-            ];
-        }
+        $totals = $this->stats->totalsByCampaign();
+        $campaigns = array_map(fn (Marketing $m) => $this->serialize($m, $totals[$m->getId()] ?? []), $marketingRepository->findAll());
 
         return new JsonResponse($campaigns);
     }
@@ -62,8 +44,21 @@ class MarketingController extends AbstractController
     #[Route('/marketing/{id}', name: 'get_campaign', methods: ['GET'])]
     public function getCampaignById(Marketing $marketing): Response
     {
-        // Structure les données de la campagne pour la réponse JSON
-        $campaignData = [
+        $totals = $this->stats->totalsByCampaign()[$marketing->getId()] ?? [];
+
+        return new JsonResponse($this->serialize($marketing, $totals));
+    }
+
+    /**
+     * Format de l'administration. Clés historiques conservées (formats regroupés comme dans la
+     * liste, et à plat comme dans le détail) ; views / clicks = compteurs historiques, impressions
+     * et tracked_clicks = mesure réelle (docs/SPONSORS.md).
+     */
+    private function serialize(Marketing $marketing, array $totals): array
+    {
+        $metrics = SponsorStats::metrics($totals);
+
+        return [
             'id' => $marketing->getId(),
             'campaign_name' => $marketing->getCampaignName(),
             'status' => $marketing->getStatus(),
@@ -71,19 +66,36 @@ class MarketingController extends AbstractController
             'end_date' => $marketing->getEndDate() ? $marketing->getEndDate()->format('Y-m-d') : null,
             'views' => $marketing->getViews(),
             'clicks' => $marketing->getClicks(),
-            'duration' => $marketing->getDuration(), // Ajout de la durée
-            'redirect_url' => $marketing->getRedirectUrl(), // Ajout de l'URL de redirection
+            'impressions' => $metrics['impressions'],
+            'tracked_clicks' => $metrics['clicks'],
+            'ctr' => $metrics['ctr'],
+            'duration' => $marketing->getDuration(),
+            'redirect_url' => $marketing->getRedirectUrl(),
+            'sponsor_name' => $marketing->getSponsorName(),
+            'offer' => $marketing->getOffer(),
+            'title' => $marketing->getTitle(),
+            'description' => $marketing->getDescription(),
+            'logo' => $marketing->getLogo(),
+            'banner_desktop' => $marketing->getBannerDesktop(),
+            'banner_mobile' => $marketing->getBannerMobile(),
+            'show_cta' => $marketing->hasCta(),
+            'placements' => $marketing->getPlacements(),
+            'priority' => $marketing->getPriority(),
+            'exclusive' => $marketing->isExclusive(),
+            'formats' => [
+                'smartphone' => $marketing->getSmartphoneFormat(),
+                'tablet_portrait' => $marketing->getTabletPortraitFormat(),
+                'tablet_landscape' => $marketing->getTabletLandscapeFormat(),
+                'screen_14_inch' => $marketing->getScreen14InchFormat(),
+                'large_screen' => $marketing->getLargeScreenFormat(),
+            ],
             'smartphone_format' => $marketing->getSmartphoneFormat(),
             'tablet_portrait_format' => $marketing->getTabletPortraitFormat(),
             'tablet_landscape_format' => $marketing->getTabletLandscapeFormat(),
             'screen_14_inch_format' => $marketing->getScreen14InchFormat(),
             'large_screen_format' => $marketing->getLargeScreenFormat(),
         ];
-
-        return new JsonResponse($campaignData);
     }
-
-
 
 
    #[Route('/marketing', name: 'create', methods: ['POST'])]
@@ -139,6 +151,20 @@ class MarketingController extends AbstractController
         $marketing->setTabletLandscapeFormat(empty($data['tablet_landscape_format']) ? null : $data['tablet_landscape_format']);
         $marketing->setScreen14InchFormat(empty($data['screen_14_inch_format']) ? null : $data['screen_14_inch_format']);
         $marketing->setLargeScreenFormat(empty($data['large_screen_format']) ? null : $data['large_screen_format']);
+        // Champs des espaces sponsors : absents (ancienne administration) = valeurs par défaut,
+        // campagne plein écran à la connexion comme avant.
+        $text = static fn (string $key) => is_string($data[$key] ?? null) && trim($data[$key]) !== '' ? trim($data[$key]) : null;
+        $marketing->setSponsorName($text('sponsor_name'));
+        $marketing->setOffer($text('offer'));
+        $marketing->setTitle($text('title'));
+        $marketing->setDescription($text('description'));
+        $marketing->setLogo($text('logo'));
+        $marketing->setBannerDesktop($text('banner_desktop'));
+        $marketing->setBannerMobile($text('banner_mobile'));
+        $marketing->setShowCta((bool) ($data['show_cta'] ?? false));
+        $marketing->setPlacements($data['placements'] ?? [Marketing::PLACEMENT_LOGIN_INTERSTITIAL]);
+        $marketing->setPriority((int) ($data['priority'] ?? Marketing::DEFAULT_PRIORITY));
+        $marketing->setExclusive((bool) ($data['exclusive'] ?? false));
     }
 
     private const STATUSES = ['active', 'inactive'];
@@ -149,6 +175,17 @@ class MarketingController extends AbstractController
         'tablet_landscape_format' => 'Visuel tablette paysage',
         'screen_14_inch_format' => 'Visuel ordinateur',
         'large_screen_format' => 'Image principale',
+    ];
+
+    private const BANNERS = [
+        'banner_desktop' => 'Bannière ordinateur',
+        'banner_mobile' => 'Bannière mobile',
+    ];
+
+    private const TEXTS = [
+        'sponsor_name' => ['Annonceur', 120],
+        'title' => ['Titre', 120],
+        'description' => ['Description', 280],
     ];
 
     /**
@@ -199,14 +236,47 @@ class MarketingController extends AbstractController
         if (!empty($data['redirect_url']) && !self::isHttpUrl($data['redirect_url'])) {
             return $fail("L'URL de redirection doit commencer par https:// ou http:// (500 caractères maximum).");
         }
-        $stored = $current !== null ? MarketingImageStore::formatValues($current) : [];
+        foreach (self::TEXTS as $key => [$label, $max]) {
+            if (isset($data[$key]) && (!is_string($data[$key]) || mb_strlen(trim($data[$key])) > $max)) {
+                return $fail(sprintf('%s : %d caractères au maximum.', $label, $max));
+            }
+        }
+        if (!empty($data['offer']) && !in_array($data['offer'], Marketing::OFFERS, true)) {
+            return $fail('Offre inconnue.');
+        }
+        $placements = $data['placements'] ?? [Marketing::PLACEMENT_LOGIN_INTERSTITIAL];
+        if (!is_array($placements) || $placements === [] || array_diff($placements, Marketing::PLACEMENTS) !== []) {
+            return $fail("Choisissez au moins un emplacement d'affichage.");
+        }
+        $priority = $data['priority'] ?? Marketing::DEFAULT_PRIORITY;
+        if (filter_var($priority, FILTER_VALIDATE_INT, ['options' => ['min_range' => Marketing::MIN_PRIORITY, 'max_range' => Marketing::MAX_PRIORITY]]) === false) {
+            return $fail(sprintf('La priorité doit être un nombre entier de %d à %d.', Marketing::MIN_PRIORITY, Marketing::MAX_PRIORITY));
+        }
+        foreach (['show_cta', 'exclusive'] as $key) {
+            if (isset($data[$key]) && !is_bool($data[$key])) {
+                return $fail('Valeur oui / non attendue.');
+            }
+        }
+        if (!empty($data['show_cta']) && empty($data['redirect_url'])) {
+            return $fail("Indiquez le site de l'annonceur pour afficher le bouton « Découvrir le partenaire ».");
+        }
+        if (!empty($data['logo']) && (!is_string($data['logo']) || $this->logos->findByFileName($data['logo']) === null)) {
+            return $fail('Logo introuvable : envoyez-le de nouveau.');
+        }
+
+        $stored = $current !== null ? MarketingImageStore::imageValues($current) : [];
         $hasVisual = false;
-        foreach (self::FORMATS as $key => $label) {
+        $hasBanner = false;
+        foreach (self::FORMATS + self::BANNERS as $key => $label) {
             if (empty($data[$key])) {
                 continue;
             }
             $value = $data[$key];
-            $hasVisual = true;
+            if (isset(self::BANNERS[$key])) {
+                $hasBanner = true;
+            } else {
+                $hasVisual = true;
+            }
             if (isset($stored[$key]) && $value === $stored[$key]) {
                 continue;
             }
@@ -220,8 +290,43 @@ class MarketingController extends AbstractController
                 return $fail(sprintf("%s : importez une image PNG, JPEG ou WebP (ou indiquez l'URL https:// d'une image hébergée ; pas d'image collée).", $label));
             }
         }
-        if (!$hasVisual) {
+        if (in_array(Marketing::PLACEMENT_LOGIN_INTERSTITIAL, $placements, true) && !$hasVisual) {
             return $fail('Importez au moins un visuel (image principale).');
+        }
+        if (array_intersect(Marketing::CARD_PLACEMENTS, $placements) !== [] && !$hasBanner) {
+            return $fail('Importez au moins une bannière (ordinateur ou mobile).');
+        }
+        if (!empty($data['exclusive']) && ($data['status'] ?? null) === 'active') {
+            return $this->exclusivityConflict($placements, $start, empty($data['end_date']) ? null : self::date($data['end_date']), $current);
+        }
+
+        return null;
+    }
+
+    /**
+     * Deux campagnes exclusives actives ne peuvent pas partager un emplacement sur des périodes
+     * qui se chevauchent (une seule serait affichée) : refus avec le nom de l'autre campagne.
+     *
+     * @param list<string> $placements
+     */
+    private function exclusivityConflict(array $placements, \DateTimeImmutable $start, ?\DateTimeImmutable $end, ?Marketing $current): ?JsonResponse
+    {
+        $others = $this->entityManager->getRepository(Marketing::class)->findBy(['status' => 'active', 'exclusive' => true]);
+        foreach ($others as $other) {
+            if ($current !== null && $other->getId() === $current->getId()) {
+                continue;
+            }
+            $shared = array_intersect($placements, $other->getPlacements());
+            $otherEnd = $other->getEndDate()?->format('Y-m-d');
+            $overlaps = ($end === null || $other->getStartDate()->format('Y-m-d') <= $end->format('Y-m-d'))
+                && ($otherEnd === null || $otherEnd >= $start->format('Y-m-d'));
+            if ($shared !== [] && $overlaps) {
+                return new JsonResponse(['message' => sprintf(
+                    'Exclusivité impossible : « %s » est déjà exclusive sur %s pendant cette période. Modifiez les dates ou les emplacements.',
+                    $other->getCampaignName(),
+                    implode(', ', array_map(static fn (string $p) => SponsorStats::PLACEMENT_LABELS[$p], $shared)),
+                )], Response::HTTP_BAD_REQUEST);
+            }
         }
 
         return null;

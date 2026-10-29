@@ -53,6 +53,10 @@ security:
     - { path: ^/api/marketing/active, roles: PUBLIC_ACCESS }
     # Clic sur la publicité depuis la page de connexion (limité en débit).
     - { path: ^/api/marketing/incrementCampaign/\d+$, roles: PUBLIC_ACCESS, methods: [PUT] }
+    # Campagnes par emplacement (connexion, tableau de bord) et mesure des impressions et des
+    # clics (aussi avant connexion ; limitée en débit, docs/SPONSORS.md).
+    - { path: ^/api/marketing/slots$, roles: PUBLIC_ACCESS, methods: [GET] }
+    - { path: ^/api/marketing/events$, roles: PUBLIC_ACCESS, methods: [POST] }
     # Visuels importés des campagnes (publicité de la page de connexion).
     - { path: '^/api/marketing/image/[a-f0-9]{64}\.webp$', roles: PUBLIC_ACCESS, methods: [GET] }
     # Partenaire affiché et son logo (écran de connexion, avant toute session).

@@ -3,8 +3,11 @@
 namespace App\Controller\Marketing;
 
 use DateTime;
+use App\Entity\Marketing;
 use App\Entity\MarketingImage;
 use App\Entity\MarketingView;
+use App\Service\SponsorDelivery;
+use Symfony\Component\HttpFoundation\Request;
 use App\Repository\MarketingImageRepository;
 use App\Repository\MarketingRepository;
 use Symfony\Component\HttpFoundation\Response;
@@ -23,14 +26,13 @@ class GeneralMarketingController extends AbstractController
     }
 
     #[Route('/api/marketing/active', name: 'get_active_campaign', methods: ['GET'])]
-    public function getActiveCampaign(MarketingRepository $marketingRepository): JsonResponse
+    public function getActiveCampaign(MarketingRepository $marketingRepository, SponsorDelivery $delivery): JsonResponse
     {
-        // Jour courant à minuit : colonnes DATE, date de début et date de fin incluses (avec l'heure,
-        // la campagne disparaissait dès minuit le jour de sa date de fin).
-        $currentDate = new DateTime('today');
-
-        // Utiliser la méthode du repository pour trouver les campagnes actives
-        $campaigns = $marketingRepository->findActiveCampaigns($currentDate);
+        // Campagnes plein écran à la connexion uniquement (les autres emplacements : /slots).
+        $campaigns = array_values(array_filter(
+            $marketingRepository->findLiveOn($delivery->today()),
+            static fn (Marketing $m) => $m->hasPlacement(Marketing::PLACEMENT_LOGIN_INTERSTITIAL) && SponsorDelivery::hasVisualFor($m, Marketing::PLACEMENT_LOGIN_INTERSTITIAL),
+        ));
 
         // Si aucune campagne active n'est trouvée
         if (!$campaigns) {
@@ -40,19 +42,8 @@ class GeneralMarketingController extends AbstractController
         // Sélectionner une campagne au hasard
         $randomCampaign = $campaigns[array_rand($campaigns)];
 
-        // Incrémenter les vues de la campagne sélectionnée
-        $randomCampaign->setViews($randomCampaign->getViews() + 1);
-
-        // Enregistrer une nouvelle vue dans la table MarketingView
-        $view = new MarketingView();
-        $view->setMarketing($randomCampaign);
-        $view->setViewedAt(new DateTime()); // Date et heure actuelles
-
-        // Sauvegarder les modifications dans la base de données
-        $entityManager = $this->doctrine->getManager();  
-        $entityManager->persist($randomCampaign);
-        $entityManager->persist($view);
-        $entityManager->flush();
+        // Plus aucun comptage ici : le front précharge la campagne sans l'afficher. Les impressions
+        // réellement vues arrivent par POST /api/marketing/events (docs/SPONSORS.md).
 
         // Déterminer la durée avec une valeur par défaut de 5
         $duration = $randomCampaign->getDuration();
@@ -64,7 +55,7 @@ class GeneralMarketingController extends AbstractController
             'status' => $randomCampaign->getStatus(),
             'start_date' => $randomCampaign->getStartDate()->format('Y-m-d'),
             'end_date' => $randomCampaign->getEndDate() ? $randomCampaign->getEndDate()->format('Y-m-d') : null,
-            'views' => $randomCampaign->getViews(), // Après l'incrémentation
+            'views' => $randomCampaign->getViews(), // Compteur historique (figé)
             'clicks' => $randomCampaign->getClicks(),
             'duration' => $duration, // Inclure la durée
             'formats' => [
@@ -78,6 +69,63 @@ class GeneralMarketingController extends AbstractController
         ];
 
         return new JsonResponse($campaignData, JsonResponse::HTTP_OK);
+    }
+
+    /**
+     * Campagnes affichées aujourd'hui sur chaque emplacement en carte (connexion, tableau de bord
+     * ordinateur et mobile), MAX_ROTATION au plus. Public (page de connexion), lecture seule :
+     * l'appel ne compte aucune impression.
+     */
+    #[Route('/api/marketing/slots', name: 'marketing_slots', methods: ['GET'])]
+    public function slots(SponsorDelivery $delivery): JsonResponse
+    {
+        $slots = array_map(
+            static fn (array $campaigns) => array_map($delivery->toPublicArray(...), $campaigns),
+            $delivery->slots(),
+        );
+
+        return new JsonResponse($slots, JsonResponse::HTTP_OK, ['Cache-Control' => 'no-cache']);
+    }
+
+    /**
+     * Impression réellement vue (au moins 50 % visible pendant 1 s) ou clic, envoyé par le front :
+     * { campaign, placement, type: impression|click, visitor }. visitor : identifiant aléatoire du
+     * navigateur (16 à 64 caractères), ignoré si l'utilisateur est connecté. Doublons du même
+     * visiteur ignorés sur 30 minutes (recorded: false). Public, limité en débit par IP.
+     */
+    #[Route('/api/marketing/events', name: 'marketing_event', methods: ['POST'])]
+    public function event(Request $request, MarketingRepository $marketingRepository, SponsorDelivery $delivery): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+        $fail = static fn (string $message) => new JsonResponse(['message' => $message], JsonResponse::HTTP_BAD_REQUEST);
+        if (!is_array($data)) {
+            return $fail('Requête invalide.');
+        }
+        $kinds = ['impression' => MarketingView::KIND_IMPRESSION, 'click' => MarketingView::KIND_CLICK];
+        $kind = $kinds[$data['type'] ?? null] ?? null;
+        if ($kind === null) {
+            return $fail("Type d'événement inconnu.");
+        }
+        $placement = $data['placement'] ?? null;
+        if (!is_string($placement) || !in_array($placement, Marketing::PLACEMENTS, true)) {
+            return $fail('Emplacement inconnu.');
+        }
+        $user = $this->getUser();
+        if ($user !== null && method_exists($user, 'getId')) {
+            $viewer = 'u:' . $user->getId();
+        } elseif (is_string($data['visitor'] ?? null) && preg_match('/^[A-Za-z0-9-]{16,64}$/', $data['visitor'])) {
+            $viewer = 'a:' . $data['visitor'];
+        } else {
+            return $fail('Identifiant de visiteur invalide.');
+        }
+
+        $campaign = filter_var($data['campaign'] ?? null, FILTER_VALIDATE_INT) ? $marketingRepository->find((int) $data['campaign']) : null;
+        // Campagne inconnue, terminée ou pas diffusée sur cet emplacement : rien n'est compté.
+        if ($campaign === null || !$delivery->isServable($campaign, $placement)) {
+            return new JsonResponse(['recorded' => false], JsonResponse::HTTP_ACCEPTED);
+        }
+
+        return new JsonResponse(['recorded' => $delivery->record($campaign, $placement, $kind, $viewer)], JsonResponse::HTTP_ACCEPTED);
     }
 
     /**
