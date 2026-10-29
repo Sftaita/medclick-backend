@@ -5,8 +5,10 @@ namespace App\Service;
 use App\Entity\Marketing;
 use App\Entity\MarketingView;
 use App\Repository\MarketingRepository;
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Clock\ClockInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
@@ -23,8 +25,9 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
  *
  * Mesure : une impression = publicité visible à au moins 50 % pendant 1 seconde (contrôlé par le
  * front) ; un même visiteur n'est compté qu'une fois par campagne, emplacement et type
- * d'événement sur DEDUP_WINDOW. Visiteur = empreinte HMAC quotidienne (utilisateur connecté ou
- * identifiant aléatoire du navigateur), effacée après 24 h : aucune donnée nominative, aucune IP.
+ * d'événement sur DEDUP_WINDOW, y compris de part et d'autre de minuit. Visiteur = empreinte HMAC
+ * quotidienne (utilisateur connecté ou identifiant aléatoire du navigateur), effacée après 24 h :
+ * aucune donnée nominative, aucune IP.
  */
 class SponsorDelivery
 {
@@ -38,15 +41,22 @@ class SponsorDelivery
     public function __construct(
         private readonly MarketingRepository $campaigns,
         private readonly EntityManagerInterface $em,
+        private readonly ClockInterface $clock,
         #[Autowire('%kernel.secret%')] private readonly string $secret,
         ?\Closure $random = null,
     ) {
         $this->random = $random ?? static fn (): float => random_int(1, PHP_INT_MAX) / PHP_INT_MAX;
     }
 
+    /** Heure de Belgique (jours de diffusion, dédoublonnage). */
+    public function now(): \DateTimeImmutable
+    {
+        return \DateTimeImmutable::createFromInterface($this->clock->now())->setTimezone(new \DateTimeZone(PartnerManager::TIMEZONE));
+    }
+
     public function today(): string
     {
-        return (new \DateTimeImmutable('now', new \DateTimeZone(PartnerManager::TIMEZONE)))->format('Y-m-d');
+        return $this->now()->format('Y-m-d');
     }
 
     /** @return array<string, list<Marketing>> campagnes affichées, par emplacement de carte */
@@ -101,8 +111,14 @@ class SponsorDelivery
      */
     public function record(Marketing $campaign, string $placement, string $kind, string $viewer): bool
     {
-        $now = new \DateTimeImmutable('now', new \DateTimeZone(PartnerManager::TIMEZONE));
-        $hash = hash_hmac('sha256', $viewer . '|' . $now->format('Y-m-d'), $this->secret);
+        $now = $this->now();
+        $since = $now->sub(new \DateInterval(self::DEDUP_WINDOW));
+        // L'empreinte change chaque jour : juste après minuit, la fenêtre couvre aussi la veille.
+        $hashes = array_values(array_unique(array_map(
+            fn (string $day) => hash_hmac('sha256', $viewer . '|' . $day, $this->secret),
+            [$now->format('Y-m-d'), $since->format('Y-m-d')],
+        )));
+        $hash = $hashes[0];
         $local = \DateTime::createFromFormat('Y-m-d H:i:s', $now->format('Y-m-d H:i:s'));
 
         $connection = $this->em->getConnection();
@@ -113,9 +129,9 @@ class SponsorDelivery
             [Types::DATETIME_MUTABLE],
         );
         $duplicate = $connection->fetchOne(
-            'SELECT 1 FROM marketing_view WHERE marketing_id = ? AND placement = ? AND kind = ? AND viewer_hash = ? AND viewed_at >= ?',
-            [$campaign->getId(), $placement, $kind, $hash, (clone $local)->sub(new \DateInterval(self::DEDUP_WINDOW))],
-            [Types::INTEGER, Types::STRING, Types::STRING, Types::STRING, Types::DATETIME_MUTABLE],
+            'SELECT 1 FROM marketing_view WHERE marketing_id = ? AND placement = ? AND kind = ? AND viewer_hash IN (?) AND viewed_at >= ?',
+            [$campaign->getId(), $placement, $kind, $hashes, \DateTime::createFromFormat('Y-m-d H:i:s', $since->format('Y-m-d H:i:s'))],
+            [Types::INTEGER, Types::STRING, Types::STRING, ArrayParameterType::STRING, Types::DATETIME_MUTABLE],
         );
         if ($duplicate !== false) {
             return false;

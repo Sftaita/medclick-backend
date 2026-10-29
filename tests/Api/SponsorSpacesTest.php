@@ -10,6 +10,7 @@ use App\Service\MarketingImageStore;
 use App\Tests\ApiTestBase;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
+use Symfony\Component\Clock\Test\ClockSensitiveTrait;
 
 /**
  * Espaces sponsors (docs/SPONSORS.md) : campagnes par emplacement, exclusivité, rotation,
@@ -17,6 +18,8 @@ use PHPUnit\Framework\Attributes\DataProvider;
  */
 class SponsorSpacesTest extends ApiTestBase
 {
+    use ClockSensitiveTrait;
+
     private const CARD = [
         'campaign_name' => 'Implants – automne',
         'sponsor_name' => 'OrthoLab',
@@ -203,6 +206,46 @@ class SponsorSpacesTest extends ApiTestBase
         // Fenêtre écoulée : de nouveau comptée.
         $this->freshEm()->getConnection()->executeStatement("UPDATE marketing_view SET viewed_at = '2026-01-01 08:00:00'");
         $this->assertTrue($this->event($id, 'dashboard_mobile', 'impression'));
+    }
+
+    /** Heure de Belgique simulée (l'empreinte du visiteur change à minuit, heure belge). */
+    private static function at(string $time): void
+    {
+        self::mockTime(new \DateTimeImmutable($time, new \DateTimeZone('Europe/Brussels')));
+    }
+
+    public function testDuplicatesAreIgnoredForThirtyMinutesAcrossMidnight(): void
+    {
+        self::at('2026-10-28 12:00:00');
+        $id = $this->create(self::CARD);
+
+        self::at('2026-10-28 23:50:00');
+        $this->assertTrue($this->event($id, 'dashboard_mobile', 'impression'));
+        $this->assertTrue($this->event($id, 'dashboard_mobile', 'click'));
+        // Le lendemain, 20 minutes plus tard : même visiteur, autre empreinte du jour, toujours un doublon.
+        self::at('2026-10-29 00:10:00');
+        $this->assertFalse($this->event($id, 'dashboard_mobile', 'impression'), 'impression en double après minuit');
+        $this->assertFalse($this->event($id, 'dashboard_mobile', 'click'), 'clic en double après minuit');
+        $this->assertTrue($this->event($id, 'dashboard_mobile', 'impression', 'autre-visiteur-0123456789'), 'autre visiteur compté');
+        // Plus de 30 minutes après le premier événement : de nouveau compté.
+        self::at('2026-10-29 00:21:00');
+        $this->assertTrue($this->event($id, 'dashboard_mobile', 'impression'));
+        $this->assertTrue($this->event($id, 'dashboard_mobile', 'click'));
+
+        $this->assertSame(5, $this->freshEm()->getRepository(MarketingView::class)->count([]));
+    }
+
+    public function testConnectedUserIsDeduplicatedAcrossMidnight(): void
+    {
+        self::at('2026-10-28 12:00:00');
+        $id = $this->create(self::CARD);
+        $client = $this->clientFor($this->createUser('nuit@test.be'));
+        $send = fn (string $visitor) => $client->request('POST', '/api/marketing/events', ['json' => ['campaign' => $id, 'placement' => 'dashboard_desktop', 'type' => 'impression', 'visitor' => $visitor]])->toArray()['recorded'];
+
+        self::at('2026-10-28 23:59:30');
+        $this->assertTrue($send('onglet-a-000000000001'));
+        self::at('2026-10-29 00:00:30');
+        $this->assertFalse($send('onglet-b-000000000002'));
     }
 
     public function testEventsForAPlacementNotServedAreIgnored(): void
