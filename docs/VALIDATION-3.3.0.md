@@ -1,7 +1,7 @@
 # Validation de MedClick 3.3.0 — espaces sponsors
 
-Recette du 29/10/2026 avant mise en production. **Version non déployée en production** : fusion et
-déploiement soumis à accord.
+Recette du 29/10/2026 en préproduction, puis **mise en production le 29/10/2026** (voir la dernière
+section).
 
 | | Backend | Frontend |
 |---|---|---|
@@ -80,3 +80,27 @@ Retour arrière : frontend précédent d'abord ; puis export CSV, désactivation
 format, `migrate prev`, `./deploy.sh 3df788f7b7ae27988dcc3c1c76d56feb977508eb 7b4b4a23f5b461e117f70f220c674bdb02d8b6d4`
 (3.2.0 actuellement en production) ; en dernier
 recours, restauration de la sauvegarde de l'étape 1.
+
+## Mise en production (29/10/2026)
+
+| Étape (UTC) | Résultat |
+|---|---|
+| PR | backend #3 fusionnée (`afd2767`), frontend #3 fusionnée (`2cb80fd`) ; arbres identiques aux commits validés (`ce0c8c0`, `2299970`), code backend identique à `bb7b38c` testé en préproduction |
+| Version précédente (relevée sur le serveur) | backend `3df788f`, frontend `7b4b4a2` |
+| 07:05 sauvegarde | `medclick-prod-20261029T070538Z.sql.gz.gpg`, SHA-256 OK, copie hors VPS vérifiée |
+| Empreinte avant | identique à celle de la préproduction |
+| 07:08:05 backend `afd2767` puis migration | `deploy.sh` arrêté sur la migration, migration lancée dans la même seconde ; fenêtre réduite au redémarrage du backend |
+| Contrôles | empreintes identiques ; seul écart de schéma : l'index préexistant ; `/api/marketing/slots` 200, `/active` 404 (campagne inactive), API protégée 401 sans jeton |
+| Frontend 3.3.0 `2cb80fd` | `deploy.sh` code 0, assets de la 3.2.0 repris, `legacy-apex-sw` intact |
+| Correctif connexion `abcd632` (PR frontend #4) | partenaire BOSI en grand sur la photo, emplacement unique du sponsor ; préproduction puis production, vérifié dans Chrome (1213 × 599 en local, 1225 × 669 en préproduction, 1361 × 744 en production) |
+
+Contrôles en production, sans modifier de donnée médicale : version 3.3.0 affichée ; ancienne PWA
+mise à jour automatiquement (navigateur resté en 3.2.0) ; administration des campagnes, statistiques,
+CSV, partenaires, carnets, interventions et historique des exports en 200 (lecture seule) ; connexion
+(401 pour un compte inexistant), inscription et encodage (validation 422/400, rien créé) ; export
+Excel réel du compte administrateur (293 lignes, 3,9 s, fichier valide, téléchargement confirmé) ;
+événement publicitaire sur une campagne inactive ignoré (`recorded: false`, rien écrit) ; journaux
+sans erreur, aucune nouvelle erreur serveur ; première connexion réelle d'un utilisateur réussie.
+
+Restent à constater avec le trafic réel : encodage d'interventions par les utilisateurs et
+comptage d'impressions dès la première campagne publicitaire active (validés en préproduction).

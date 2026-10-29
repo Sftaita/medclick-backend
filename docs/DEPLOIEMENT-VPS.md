@@ -2,7 +2,7 @@
 
 Procédure en vigueur : la production tourne sur le VPS depuis la bascule des 23 et 24/10/2026
 (`docs/RUNBOOK-BASCULE.md`) ; `docs/DEPLOIEMENT.md` (Hostinger mutualisé) n'est plus qu'historique.
-Version en production : MedClick 3.2.0 (28/10/2026, `docs/PLAN-MEP-EXPORTS.md`). Règles de
+Version en production : MedClick 3.3.0 (29/10/2026, `docs/VALIDATION-3.3.0.md` ; espaces sponsors : `docs/SPONSORS.md`). Règles de
 déploiement : ADR-207 de `docs/DECISIONS.md`. **Aucun secret dans ce document.**
 
 ## Architecture
