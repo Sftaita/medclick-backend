@@ -7,10 +7,16 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * Partenaire (sponsor) affiché dans l'application : écran de connexion, tableau de bord,
- * barre latérale et page « Nos partenaires ». Administration : /api/admin/partners.
+ * Firme partenaire : nom, logo, accroche, texte, engagements, site et visuel. Depuis novembre
+ * 2026, son affichage est décidé emplacement par emplacement par les affectations
+ * (PartnerPlacementAssignment, /api/admin/partner-placements) ; les fiches se gèrent par
+ * /api/admin/partner-firms.
  *
- * Statuts : brouillon (jamais affiché), publié (affiché pendant sa période : programmé avant
+ * Période et statut ci-dessous : ancien modèle « un seul partenaire à la fois »
+ * (/api/admin/partners), conservé pour les anciens clients et le retour arrière. Ils ne
+ * décident plus de l'affichage.
+ *
+ * Anciens statuts : brouillon (jamais affiché), publié (affiché pendant sa période : programmé avant
  * la date de début, en ligne pendant, terminé après), retiré (publication arrêtée à la main).
  * Un seul partenaire est affiché à la fois : les périodes des partenaires publiés ne se
  * chevauchent jamais (contrôlé à la publication). Le partenaire affiché est calculé à chaque
@@ -52,6 +58,10 @@ class Partner
     #[ORM\ManyToOne(targetEntity: PartnerLogo::class)]
     #[ORM\JoinColumn(name: 'logo_id', nullable: true)]
     private ?PartnerLogo $logo = null;
+
+    /** Visuel de présentation 16:9 (/api/marketing/image/<sha256>.webp) : page de la firme. */
+    #[ORM\Column(type: Types::STRING, length: 500, nullable: true)]
+    private ?string $coverImage = null;
 
     #[ORM\Column(type: Types::DATE_IMMUTABLE, nullable: true)]
     private ?\DateTimeImmutable $startsOn = null;
@@ -110,6 +120,7 @@ class Partner
         $copy->about = $this->about;
         $copy->commitments = $this->commitments;
         $copy->logo = $this->logo;
+        $copy->coverImage = $this->coverImage;
 
         return $copy;
     }
@@ -189,6 +200,18 @@ class Partner
     public function setLogo(?PartnerLogo $logo): self
     {
         $this->logo = $logo;
+
+        return $this;
+    }
+
+    public function getCoverImage(): ?string
+    {
+        return $this->coverImage;
+    }
+
+    public function setCoverImage(?string $coverImage): self
+    {
+        $this->coverImage = $coverImage;
 
         return $this;
     }

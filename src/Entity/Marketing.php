@@ -120,6 +120,13 @@ class Marketing
     #[ORM\Column(type: 'boolean', options: ['default' => false])]
     private bool $exclusive = false;
 
+    /**
+     * Réservée aux professionnels (publicité pour un dispositif médical, par exemple) : jamais
+     * envoyée à un visiteur non connecté, donc jamais sur la page de connexion.
+     */
+    #[ORM\Column(type: 'boolean', options: ['default' => false])]
+    private bool $professionalsOnly = false;
+
     public function __construct()
     {
         $this->viewedAt = new ArrayCollection();
@@ -451,6 +458,18 @@ class Marketing
     public function setExclusive(bool $exclusive): self
     {
         $this->exclusive = $exclusive;
+
+        return $this;
+    }
+
+    public function isProfessionalsOnly(): bool
+    {
+        return $this->professionalsOnly;
+    }
+
+    public function setProfessionalsOnly(bool $professionalsOnly): self
+    {
+        $this->professionalsOnly = $professionalsOnly;
 
         return $this;
     }

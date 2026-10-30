@@ -70,7 +70,7 @@ class MarketingAdminTest extends ApiTestBase
         $this->admin()->request('POST', '/api/admin/marketing', ['json' => array_merge(self::VALID, ['duration' => $duration, 'start_date' => (new \DateTime('-1 day'))->format('Y-m-d'), 'end_date' => null])]);
 
         $this->assertResponseStatusCodeSame(201);
-        $this->assertSame($duration, static::createClient()->request('GET', '/api/marketing/active')->toArray()['duration']);
+        $this->assertSame($duration, $this->doctor()->request('GET', '/api/marketing/active')->toArray()['duration']);
     }
 
     public static function displayDurations(): iterable
@@ -146,11 +146,12 @@ class MarketingAdminTest extends ApiTestBase
         $this->assertSame(0, $this->freshEm()->getRepository(Marketing::class)->count([]));
     }
 
-    public function testActiveCampaignIsPublic(): void
+    public function testActiveCampaignIsReservedToConnectedUsers(): void
     {
         $this->admin()->request('POST', '/api/admin/marketing', ['json' => array_merge(self::VALID, ['start_date' => (new \DateTime('-1 day'))->format('Y-m-d'), 'end_date' => null])]);
+        $this->assertSame(401, static::createClient()->request('GET', '/api/marketing/active')->getStatusCode());
 
-        $response = static::createClient()->request('GET', '/api/marketing/active');
+        $response = $this->doctor()->request('GET', '/api/marketing/active');
 
         $this->assertResponseIsSuccessful();
         $this->assertSame('https://cdn.exemple.be/sponsor-mobile.jpg', $response->toArray()['formats']['smartphone']);
@@ -161,7 +162,7 @@ class MarketingAdminTest extends ApiTestBase
         $today = (new \DateTime())->format('Y-m-d');
         $this->admin()->request('POST', '/api/admin/marketing', ['json' => array_merge(self::VALID, ['start_date' => '2026-01-01', 'end_date' => $today])]);
 
-        static::createClient()->request('GET', '/api/marketing/active');
+        $this->doctor()->request('GET', '/api/marketing/active');
 
         $this->assertResponseIsSuccessful();
     }
@@ -173,7 +174,7 @@ class MarketingAdminTest extends ApiTestBase
         $admin->request('POST', '/api/admin/marketing', ['json' => array_merge(self::VALID, ['start_date' => '2026-01-01', 'end_date' => $yesterday])]);
         $admin->request('POST', '/api/admin/marketing', ['json' => array_merge(self::VALID, ['status' => 'inactive', 'start_date' => '2026-01-01', 'end_date' => null])]);
 
-        static::createClient()->request('GET', '/api/marketing/active');
+        $this->doctor()->request('GET', '/api/marketing/active');
 
         $this->assertResponseStatusCodeSame(404);
     }
@@ -211,4 +212,11 @@ class MarketingAdminTest extends ApiTestBase
 
         return $em;
     }
+
+    /** Plein écran : réservé aux utilisateurs connectés (affiché après la connexion). */
+    private function doctor()
+    {
+        return $this->clientFor($this->createUser('medecin-' . bin2hex(random_bytes(4)) . '@test.be'));
+    }
+
 }

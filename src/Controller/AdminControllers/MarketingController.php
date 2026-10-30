@@ -82,6 +82,7 @@ class MarketingController extends AbstractController
             'placements' => $marketing->getPlacements(),
             'priority' => $marketing->getPriority(),
             'exclusive' => $marketing->isExclusive(),
+            'professionals_only' => $marketing->isProfessionalsOnly(),
             'formats' => [
                 'smartphone' => $marketing->getSmartphoneFormat(),
                 'tablet_portrait' => $marketing->getTabletPortraitFormat(),
@@ -165,6 +166,7 @@ class MarketingController extends AbstractController
         $marketing->setPlacements($data['placements'] ?? [Marketing::PLACEMENT_LOGIN_INTERSTITIAL]);
         $marketing->setPriority((int) ($data['priority'] ?? Marketing::DEFAULT_PRIORITY));
         $marketing->setExclusive((bool) ($data['exclusive'] ?? false));
+        $marketing->setProfessionalsOnly((bool) ($data['professionals_only'] ?? false));
     }
 
     private const STATUSES = ['active', 'inactive'];
@@ -252,10 +254,14 @@ class MarketingController extends AbstractController
         if (filter_var($priority, FILTER_VALIDATE_INT, ['options' => ['min_range' => Marketing::MIN_PRIORITY, 'max_range' => Marketing::MAX_PRIORITY]]) === false) {
             return $fail(sprintf('La priorité doit être un nombre entier de %d à %d.', Marketing::MIN_PRIORITY, Marketing::MAX_PRIORITY));
         }
-        foreach (['show_cta', 'exclusive'] as $key) {
+        foreach (['show_cta', 'exclusive', 'professionals_only'] as $key) {
             if (isset($data[$key]) && !is_bool($data[$key])) {
                 return $fail('Valeur oui / non attendue.');
             }
+        }
+        // Page de connexion : vue par des visiteurs non connectés.
+        if (!empty($data['professionals_only']) && in_array(Marketing::PLACEMENT_LOGIN, $placements, true)) {
+            return $fail("Publicité réservée aux professionnels : la page de connexion est publique. Choisissez l'Accueil ou le plein écran (affiché après la connexion).");
         }
         if (!empty($data['show_cta']) && empty($data['redirect_url'])) {
             return $fail("Indiquez le site de l'annonceur pour afficher le bouton « Découvrir le partenaire ».");
@@ -379,6 +385,19 @@ class MarketingController extends AbstractController
         }
         if (!in_array($data['status'], self::STATUSES, true)) {
             return new JsonResponse(['message' => 'Le statut doit être « active » ou « inactive ».'], Response::HTTP_BAD_REQUEST);
+        }
+
+        // Activation d'une campagne exclusive : mêmes contrôles que l'enregistrement complet.
+        if ($data['status'] === 'active' && $marketing->isExclusive() && $marketing->getStartDate() !== null) {
+            $conflict = $this->exclusivityConflict(
+                $marketing->getPlacements(),
+                \DateTimeImmutable::createFromInterface($marketing->getStartDate()),
+                $marketing->getEndDate() !== null ? \DateTimeImmutable::createFromInterface($marketing->getEndDate()) : null,
+                $marketing,
+            );
+            if ($conflict !== null) {
+                return $conflict;
+            }
         }
 
         // Met à jour le statut de la campagne

@@ -19,6 +19,11 @@ framework:
             policy: sliding_window
             limit: 60
             interval: '1 minute'
+        # Impressions et clics des emplacements partenaires (barre latérale sur chaque page).
+        partner_event:
+            policy: sliding_window
+            limit: 60
+            interval: '1 minute'
         # Demandes d'export Excel, par utilisateur (App\Controller\ExportController).
         export_request:
             policy: sliding_window

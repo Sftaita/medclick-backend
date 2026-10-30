@@ -7,8 +7,10 @@ use App\Tests\ApiTestBase;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 /**
- * Module partenaire : logo (contrôles PNG/SVG), brouillon, publication, programmation,
- * chevauchements, passage automatique, retrait, reprogrammation, droits.
+ * Ancienne administration du partenaire (/api/admin/partners, conservée pour les anciens
+ * clients) : logo (contrôles PNG/SVG), brouillon, publication, programmation, chevauchements,
+ * retrait, reprogrammation, droits. Depuis les emplacements partenaires, l'affichage ne dépend
+ * que des affectations (PartnerPlacementTest) : une publication ici n'affiche rien à elle seule.
  */
 class PartnerTest extends ApiTestBase
 {
@@ -100,14 +102,17 @@ class PartnerTest extends ApiTestBase
         $this->assertSame(0, $this->em->getRepository(Partner::class)->count([]));
     }
 
-    public function testPublishedPartnerIsShownEverywhereWithItsLogo(): void
+    public function testLegacyPublicationAloneShowsNothingAndAnAssignmentShowsTheFirm(): void
     {
         $logo = $this->logo();
         $partner = $this->post($this->valid(['logo' => $logo, 'startsOn' => $this->day(0), 'publish' => true]));
 
         $this->assertResponseStatusCodeSame(201);
         $this->assertSame(['published', 'live'], [$partner['status'], $partner['state']]);
+        // Aucun privilège : sans affectation, aucun emplacement n'affiche la firme.
+        $this->assertActiveIsEmpty();
 
+        $this->assignEverywhere($partner['id']);
         $active = static::createClient()->request('GET', '/api/partner/active')->toArray();
         $this->assertSame([
             'id' => $partner['id'],
@@ -117,8 +122,7 @@ class PartnerTest extends ApiTestBase
             'about' => 'Un partenaire engagé aux côtés des médecins assistants.',
             'commitments' => ['Solutions innovantes', 'Formation continue'],
             'logo' => $logo,
-            'startsOn' => $this->day(0),
-            'endsOn' => null,
+            'coverImage' => null,
         ], $active);
     }
 
@@ -166,7 +170,6 @@ class PartnerTest extends ApiTestBase
     {
         $first = $this->post($this->valid(['name' => 'Premier', 'startsOn' => $this->day(0), 'endsOn' => $this->day(0), 'publish' => true]));
         $second = $this->post($this->valid(['name' => 'Second', 'startsOn' => $this->day(1), 'publish' => true]));
-        $this->assertSame('Premier', $this->active()['name']);
 
         // Le lendemain (simulé en décalant les périodes d'un jour) : le second, sans action.
         foreach ([$first['id'] => [-1, -1], $second['id'] => [0, null]] as $id => [$start, $end]) {
@@ -175,7 +178,6 @@ class PartnerTest extends ApiTestBase
         }
         $this->em->flush();
 
-        $this->assertSame('Second', $this->active()['name']);
         $states = array_column($this->admin->request('GET', '/api/admin/partners')->toArray()['partners'], 'state', 'name');
         $this->assertSame(['Second' => 'live', 'Premier' => 'ended'], $states);
     }
@@ -224,13 +226,13 @@ class PartnerTest extends ApiTestBase
 
         $this->admin->request('PUT', "/api/admin/partners/{$live['id']}", ['json' => $this->valid(['name' => 'OrthoNova 2', 'logo' => $live['logo'], 'startsOn' => $this->day(0), 'endsOn' => $this->day(10)])]);
         $this->assertResponseIsSuccessful();
-        $this->assertSame('OrthoNova 2', $this->active()['name']);
+        $this->assertSame('OrthoNova 2', $this->active($live['id'])['name']);
 
         // Prolonger sur la période du suivant : refusé, rien n'est enregistré.
         $this->admin->request('PUT', "/api/admin/partners/{$live['id']}", ['json' => $this->valid(['name' => 'Modifié', 'logo' => $live['logo'], 'startsOn' => $this->day(0), 'endsOn' => $this->day(20)])]);
         $this->assertBadRequest('chevauche celle de « Suivant »');
-        $this->assertSame('OrthoNova 2', $this->active()['name']);
-        $this->assertSame($this->day(10), $this->active()['endsOn']);
+        $this->assertSame('OrthoNova 2', $this->active($live['id'])['name']);
+        $this->assertSame($this->day(10), $this->active($live['id'])['endsOn']);
         $this->assertNotNull($next['id']);
     }
 
@@ -286,7 +288,7 @@ class PartnerTest extends ApiTestBase
     public function testPublicRoutesNeedNoSession(): void
     {
         $logo = $this->logo();
-        $this->post($this->valid(['logo' => $logo, 'startsOn' => $this->day(0), 'publish' => true]));
+        $this->assignEverywhere($this->post($this->valid(['logo' => $logo]))['id']);
 
         $visitor = static::createClient();
         $this->assertSame('OrthoNova', $visitor->request('GET', '/api/partner/active')->toArray()['name']);
@@ -335,11 +337,21 @@ class PartnerTest extends ApiTestBase
         ])->toArray(false);
     }
 
-    // Lu avec le client admin : static::createClient() remplacerait le client que vérifient les
-    // assertions assertResponse*. L'accès anonyme est testé à part (testPublicRoutesNeedNoSession).
-    private function active(): array
+    /** Firme affichée sur les six emplacements dès aujourd'hui (nouvelle administration). */
+    private function assignEverywhere(int $partnerId): void
     {
-        return $this->admin->request('GET', '/api/partner/active')->toArray();
+        $this->admin->request('POST', '/api/admin/partner-placements', ['json' => [
+            'placements' => ['login_fallback', 'dashboard_partner', 'sidebar', 'mobile_menu', 'partners_page', 'public_home'],
+            'partnerId' => $partnerId,
+            'startsOn' => $this->day(0),
+            'publish' => true,
+        ]]);
+        $this->assertResponseStatusCodeSame(201);
+    }
+
+    private function active(int $id): array
+    {
+        return $this->admin->request('GET', "/api/admin/partners/$id")->toArray();
     }
 
     private function assertActiveIsEmpty(): void
