@@ -61,6 +61,8 @@ security:
     - { path: '^/api/marketing/image/[a-f0-9]{64}\.webp$', roles: PUBLIC_ACCESS, methods: [GET] }
     # Partenaire affiché et son logo (écran de connexion, avant toute session).
     - { path: ^/api/partner/active$, roles: PUBLIC_ACCESS, methods: [GET] }
+    # Attribution actuelle des six emplacements (compatible avec le partenaire historique).
+    - { path: ^/api/partner/placements$, roles: PUBLIC_ACCESS, methods: [GET] }
     - { path: '^/api/partner/logo/[a-f0-9]{64}\.(png|svg)$', roles: PUBLIC_ACCESS, methods: [GET] }
 
     - { path: ^/api/admin, roles: ROLE_ADMIN }
