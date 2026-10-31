@@ -26,21 +26,16 @@ class GeneralMarketingController extends AbstractController
     }
 
     #[Route('/api/marketing/active', name: 'get_active_campaign', methods: ['GET'])]
-    public function getActiveCampaign(MarketingRepository $marketingRepository, SponsorDelivery $delivery): JsonResponse
+    public function getActiveCampaign(SponsorDelivery $delivery): JsonResponse
     {
-        // Campagnes plein écran à la connexion uniquement (les autres emplacements : /slots).
-        $campaigns = array_values(array_filter(
-            $marketingRepository->findLiveOn($delivery->today()),
-            static fn (Marketing $m) => $m->hasPlacement(Marketing::PLACEMENT_LOGIN_INTERSTITIAL) && SponsorDelivery::hasVisualFor($m, Marketing::PLACEMENT_LOGIN_INTERSTITIAL),
-        ));
+        // Plein écran, affiché après une connexion réussie (route réservée aux utilisateurs
+        // connectés, security.yaml) : exclusivité et priorité respectées (SponsorDelivery).
+        $randomCampaign = $delivery->interstitial();
 
         // Si aucune campagne active n'est trouvée
-        if (!$campaigns) {
-            return new JsonResponse(['message' => 'No active campaign found'], JsonResponse::HTTP_NOT_FOUND);
+        if ($randomCampaign === null) {
+            return new JsonResponse(['message' => 'No active campaign found'], JsonResponse::HTTP_NOT_FOUND, ['Cache-Control' => 'no-store']);
         }
-
-        // Sélectionner une campagne au hasard
-        $randomCampaign = $campaigns[array_rand($campaigns)];
 
         // Plus aucun comptage ici : le front précharge la campagne sans l'afficher. Les impressions
         // réellement vues arrivent par POST /api/marketing/events (docs/SPONSORS.md).
@@ -68,7 +63,7 @@ class GeneralMarketingController extends AbstractController
             'redirect_url' => $randomCampaign->getRedirectUrl(), // Inclure l'URL de redirection
         ];
 
-        return new JsonResponse($campaignData, JsonResponse::HTTP_OK);
+        return new JsonResponse($campaignData, JsonResponse::HTTP_OK, ['Cache-Control' => 'no-store']);
     }
 
     /**
@@ -81,7 +76,7 @@ class GeneralMarketingController extends AbstractController
     {
         $slots = array_map(
             static fn (array $campaigns) => array_map($delivery->toPublicArray(...), $campaigns),
-            $delivery->slots(),
+            $delivery->slots($this->getUser() !== null),
         );
 
         return new JsonResponse($slots, JsonResponse::HTTP_OK, ['Cache-Control' => 'no-cache']);
@@ -121,7 +116,7 @@ class GeneralMarketingController extends AbstractController
 
         $campaign = filter_var($data['campaign'] ?? null, FILTER_VALIDATE_INT) ? $marketingRepository->find((int) $data['campaign']) : null;
         // Campagne inconnue, terminée ou pas diffusée sur cet emplacement : rien n'est compté.
-        if ($campaign === null || !$delivery->isServable($campaign, $placement)) {
+        if ($campaign === null || !$delivery->isServable($campaign, $placement, $user !== null)) {
             return new JsonResponse(['recorded' => false], JsonResponse::HTTP_ACCEPTED);
         }
 

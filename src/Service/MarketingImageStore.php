@@ -4,6 +4,7 @@ namespace App\Service;
 
 use App\Entity\Marketing;
 use App\Entity\MarketingImage;
+use App\Entity\Partner;
 use App\Repository\MarketingImageRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -49,13 +50,19 @@ class MarketingImageStore
         return array_values(array_filter(self::imageValues($marketing), static fn ($value) => is_string($value) && preg_match(MarketingImage::PATH_PATTERN, $value)));
     }
 
-    /** Empreintes SHA-256 utilisées par au moins une campagne. @return array<string, true> */
+    /** Empreintes SHA-256 utilisées par au moins une campagne ou une fiche partenaire. @return array<string, true> */
     public function usedHashes(): array
     {
         $used = [];
         foreach ($this->em->getRepository(Marketing::class)->findAll() as $marketing) {
             foreach ($this->pathsOf($marketing) as $path) {
                 preg_match(MarketingImage::PATH_PATTERN, $path, $match);
+                $used[$match[1]] = true;
+            }
+        }
+        // Visuels des fiches partenaires (même stockage).
+        foreach ($this->em->getRepository(Partner::class)->findAll() as $partner) {
+            if (preg_match(MarketingImage::PATH_PATTERN, (string) $partner->getCoverImage(), $match)) {
                 $used[$match[1]] = true;
             }
         }

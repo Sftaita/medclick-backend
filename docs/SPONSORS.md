@@ -19,6 +19,19 @@ quand aucune campagne n'est diffusée.
 Une bannière absente est remplacée par l'autre format (recadrage centré, jamais de déformation).
 Les campagnes existantes ont reçu `login_interstitial` à la migration : leur affichage n'a pas changé.
 
+**Depuis la PR « partenaires par emplacement »** :
+
+- `login` : 16:9 dès 768 px (même palier que le tableau de bord), 2:1 en dessous.
+- `login_interstitial` : `GET /api/marketing/active` est réservé aux utilisateurs connectés ; le
+  front le demande juste après une connexion réussie (jamais depuis un cache), au plus une fois
+  par jour et par campagne. Sélection par `SponsorDelivery::interstitial()` : une exclusive
+  l'emporte, sinon tirage pondéré par la priorité.
+- `professionals_only` : campagne jamais servie à un visiteur non connecté (`/slots`, mesure) et
+  refusée sur `login` (page publique).
+- L'activation par `PUT /api/admin/marketing/{id}/status` contrôle aussi les exclusivités.
+- Champ public `exclusive` : le front masque la firme de la barre latérale quand une campagne
+  exclusive est affichée (exclusivité d'écran). Firmes partenaires : docs/PARTENAIRES.md.
+
 ## Diffusion (`App\Service\SponsorDelivery`)
 
 Campagne diffusée = statut `active`, date de début atteinte, date de fin non dépassée (jours entiers,

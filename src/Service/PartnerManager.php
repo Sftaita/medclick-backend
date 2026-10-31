@@ -41,6 +41,24 @@ class PartnerManager
      */
     public function apply(Partner $partner, mixed $data): void
     {
+        $this->applyProfile($partner, $data);
+
+        $startsOn = self::date($data['startsOn'] ?? null, 'Date de début');
+        $endsOn = self::date($data['endsOn'] ?? null, 'Date de fin');
+        if ($startsOn !== null && $endsOn !== null && $endsOn->format('Y-m-d') < $startsOn->format('Y-m-d')) {
+            throw new \InvalidArgumentException('La date de fin doit suivre la date de début.');
+        }
+        $partner->setStartsOn($startsOn)->setEndsOn($endsOn);
+    }
+
+    /**
+     * Fiche de la firme seulement (nom, site, accroche, texte, engagements, logo, visuel) : la
+     * période et le statut de l'ancien modèle ne sont pas touchés.
+     *
+     * @throws \InvalidArgumentException message lisible
+     */
+    public function applyProfile(Partner $partner, mixed $data): void
+    {
         if (!is_array($data)) {
             throw new \InvalidArgumentException('Requête invalide.');
         }
@@ -94,10 +112,9 @@ class PartnerManager
             }
         }
 
-        $startsOn = self::date($data['startsOn'] ?? null, 'Date de début');
-        $endsOn = self::date($data['endsOn'] ?? null, 'Date de fin');
-        if ($startsOn !== null && $endsOn !== null && $endsOn->format('Y-m-d') < $startsOn->format('Y-m-d')) {
-            throw new \InvalidArgumentException('La date de fin doit suivre la date de début.');
+        // Visuel : absent de la requête (ancienne administration) = inchangé.
+        if (array_key_exists('coverImage', $data)) {
+            $partner->setCoverImage(PartnerPlacementManager::coverImage($data['coverImage']));
         }
 
         $partner->setName($name)
@@ -106,8 +123,6 @@ class PartnerManager
             ->setAbout($text('about', 1000, 'Texte « À propos »'))
             ->setCommitments($commitments)
             ->setLogo($logo)
-            ->setStartsOn($startsOn)
-            ->setEndsOn($endsOn)
             ->touch();
     }
 
@@ -153,6 +168,7 @@ class PartnerManager
             'commitments' => $partner->getCommitments(),
             // Nom de fichier : le front le sert via <API>/partner/logo/<logo>.
             'logo' => $partner->getLogo()?->getFileName(),
+            'coverImage' => $partner->getCoverImage(),
             'startsOn' => $partner->getStartsOn()?->format('Y-m-d'),
             'endsOn' => $partner->getEndsOn()?->format('Y-m-d'),
         ];

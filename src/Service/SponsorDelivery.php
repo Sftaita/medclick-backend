@@ -59,10 +59,15 @@ class SponsorDelivery
         return $this->now()->format('Y-m-d');
     }
 
-    /** @return array<string, list<Marketing>> campagnes affichées, par emplacement de carte */
-    public function slots(): array
+    /**
+     * Campagnes affichées, par emplacement de carte. Visiteur non connecté : jamais de campagne
+     * réservée aux professionnels.
+     *
+     * @return array<string, list<Marketing>>
+     */
+    public function slots(bool $authenticated = false): array
     {
-        $live = $this->campaigns->findLiveOn($this->today());
+        $live = $this->audience($this->campaigns->findLiveOn($this->today()), $authenticated);
         $slots = [];
         foreach (Marketing::CARD_PLACEMENTS as $placement) {
             $slots[$placement] = $this->select($live, $placement);
@@ -93,11 +98,46 @@ class SponsorDelivery
     }
 
     /**
-     * Campagne pouvant s'afficher sur l'emplacement aujourd'hui (événement accepté).
+     * Plein écran après la connexion : mêmes règles que les carrousels (une exclusive l'emporte,
+     * sinon tirage pondéré par la priorité), une seule campagne.
      */
-    public function isServable(Marketing $campaign, string $placement): bool
+    public function interstitial(): ?Marketing
+    {
+        $placement = Marketing::PLACEMENT_LOGIN_INTERSTITIAL;
+        $candidates = array_values(array_filter($this->campaigns->findLiveOn($this->today()), fn (Marketing $m) => $m->hasPlacement($placement) && self::hasVisualFor($m, $placement)));
+        $exclusive = array_values(array_filter($candidates, fn (Marketing $m) => $m->isExclusive()));
+        if ($exclusive !== []) {
+            return self::byPriority($exclusive)[0];
+        }
+        $best = null;
+        $bestKey = -1.0;
+        foreach ($candidates as $campaign) {
+            $key = ($this->random)() ** (1 / max(1, $campaign->getPriority()));
+            if ($key > $bestKey) {
+                [$best, $bestKey] = [$campaign, $key];
+            }
+        }
+
+        return $best;
+    }
+
+    /**
+     * @param list<Marketing> $campaigns
+     * @return list<Marketing>
+     */
+    private function audience(array $campaigns, bool $authenticated): array
+    {
+        return $authenticated ? $campaigns : array_values(array_filter($campaigns, static fn (Marketing $m) => !$m->isProfessionalsOnly()));
+    }
+
+    /**
+     * Campagne pouvant s'afficher sur l'emplacement aujourd'hui (événement accepté). Visiteur
+     * non connecté : jamais une campagne réservée aux professionnels.
+     */
+    public function isServable(Marketing $campaign, string $placement, bool $authenticated = true): bool
     {
         return in_array($placement, Marketing::PLACEMENTS, true)
+            && ($authenticated || !$campaign->isProfessionalsOnly())
             && $campaign->isLiveOn($this->today())
             && $campaign->hasPlacement($placement)
             && self::hasVisualFor($campaign, $placement);
@@ -163,6 +203,8 @@ class SponsorDelivery
             'imageMobile' => $campaign->getBannerMobile(),
             'url' => $campaign->getRedirectUrl(),
             'cta' => $campaign->hasCta() && $campaign->getRedirectUrl() !== null,
+            // Exclusive : le front masque aussi le partenaire de la barre latérale sur cet écran.
+            'exclusive' => $campaign->isExclusive(),
         ];
     }
 

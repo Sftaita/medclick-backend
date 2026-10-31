@@ -53,7 +53,7 @@ class SponsorSpacesTest extends ApiTestBase
         $this->assertSame(['login_interstitial'], $campaign->getPlacements());
         $this->assertSame(5, $campaign->getPriority());
         $this->assertFalse($campaign->isExclusive());
-        static::createClient()->request('GET', '/api/marketing/active');
+        $this->doctor()->request('GET', '/api/marketing/active');
         $this->assertResponseIsSuccessful();
         $this->assertSame(['login' => [], 'dashboard_desktop' => [], 'dashboard_mobile' => []], $this->slots());
     }
@@ -68,11 +68,11 @@ class SponsorSpacesTest extends ApiTestBase
         $this->assertCount(1, $slots['dashboard_desktop']);
         $this->assertSame($slots['dashboard_desktop'], $slots['dashboard_mobile']);
         $served = $slots['dashboard_desktop'][0];
-        $this->assertSame(['id', 'sponsor', 'title', 'description', 'logo', 'imageDesktop', 'imageMobile', 'url', 'cta'], array_keys($served));
+        $this->assertSame(['id', 'sponsor', 'title', 'description', 'logo', 'imageDesktop', 'imageMobile', 'url', 'cta', 'exclusive'], array_keys($served));
         $this->assertSame('OrthoLab', $served['sponsor']);
         $this->assertTrue($served['cta']);
         // Carte uniquement : la campagne n'apparaît pas en plein écran à la connexion.
-        static::createClient()->request('GET', '/api/marketing/active');
+        $this->doctor()->request('GET', '/api/marketing/active');
         $this->assertResponseStatusCodeSame(404);
     }
 
@@ -430,4 +430,11 @@ class SponsorSpacesTest extends ApiTestBase
 
         return $em;
     }
+
+    /** Plein écran : réservé aux utilisateurs connectés (affiché après la connexion). */
+    private function doctor()
+    {
+        return $this->clientFor($this->createUser('medecin-' . bin2hex(random_bytes(4)) . '@test.be'));
+    }
+
 }

@@ -50,7 +50,8 @@ security:
     # Rapports d'erreurs des fronts (aussi avant connexion ; limité en débit).
     - { path: ^/api/client-errors$, roles: PUBLIC_ACCESS, methods: [POST] }
     - { path: ^/api/terms-conditions, roles: PUBLIC_ACCESS, methods: [GET] }
-    - { path: ^/api/marketing/active, roles: PUBLIC_ACCESS }
+    # Plein écran (/api/marketing/active) : réservé aux utilisateurs connectés, affiché après
+    # une connexion réussie (règle générale ^/api ci-dessous).
     # Clic sur la publicité depuis la page de connexion (limité en débit).
     - { path: ^/api/marketing/incrementCampaign/\d+$, roles: PUBLIC_ACCESS, methods: [PUT] }
     # Campagnes par emplacement (connexion, tableau de bord) et mesure des impressions et des
@@ -61,6 +62,10 @@ security:
     - { path: '^/api/marketing/image/[a-f0-9]{64}\.webp$', roles: PUBLIC_ACCESS, methods: [GET] }
     # Partenaire affiché et son logo (écran de connexion, avant toute session).
     - { path: ^/api/partner/active$, roles: PUBLIC_ACCESS, methods: [GET] }
+    # Firme de chaque emplacement partenaire, fiche d'une firme diffusée, mesure (limitée en débit).
+    - { path: ^/api/partner/placements$, roles: PUBLIC_ACCESS, methods: [GET] }
+    - { path: ^/api/partner/\d+$, roles: PUBLIC_ACCESS, methods: [GET] }
+    - { path: ^/api/partner/events$, roles: PUBLIC_ACCESS, methods: [POST] }
     - { path: '^/api/partner/logo/[a-f0-9]{64}\.(png|svg)$', roles: PUBLIC_ACCESS, methods: [GET] }
 
     - { path: ^/api/admin, roles: ROLE_ADMIN }

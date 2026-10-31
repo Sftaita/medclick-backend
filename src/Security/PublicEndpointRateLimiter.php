@@ -28,6 +28,7 @@ class PublicEndpointRateLimiter implements EventSubscriberInterface
         #[Target('client_errors.limiter')] RateLimiterFactoryInterface $clientErrorsLimiter,
         #[Target('marketing_click.limiter')] RateLimiterFactoryInterface $marketingClickLimiter,
         #[Target('marketing_event.limiter')] RateLimiterFactoryInterface $marketingEventLimiter,
+        #[Target('partner_event.limiter')] RateLimiterFactoryInterface $partnerEventLimiter,
     )
     {
         $this->limiters = [
@@ -37,6 +38,7 @@ class PublicEndpointRateLimiter implements EventSubscriberInterface
             'client_errors' => $clientErrorsLimiter,
             'increment_campaign_click' => $marketingClickLimiter,
             'marketing_event' => $marketingEventLimiter,
+            'partner_event' => $partnerEventLimiter,
         ];
     }
 

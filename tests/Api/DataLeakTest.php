@@ -188,8 +188,9 @@ class DataLeakTest extends ApiTestBase
     {
         return [
             'cgu' => ['GET', '/api/terms-conditions'],
-            'marketing' => ['GET', '/api/marketing/active'],
+            'campagnes' => ['GET', '/api/marketing/slots'],
             'partenaire' => ['GET', '/api/partner/active'],
+            'emplacements partenaires' => ['GET', '/api/partner/placements'],
             'inscription' => ['POST', '/api/users'],
         ];
     }
