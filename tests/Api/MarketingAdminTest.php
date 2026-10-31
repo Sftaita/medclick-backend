@@ -146,10 +146,12 @@ class MarketingAdminTest extends ApiTestBase
         $this->assertSame(0, $this->freshEm()->getRepository(Marketing::class)->count([]));
     }
 
-    public function testActiveCampaignIsReservedToConnectedUsers(): void
+    public function testActiveCampaignIsServedBeforeAndAfterLogin(): void
     {
         $this->admin()->request('POST', '/api/admin/marketing', ['json' => array_merge(self::VALID, ['start_date' => (new \DateTime('-1 day'))->format('Y-m-d'), 'end_date' => null])]);
-        $this->assertSame(401, static::createClient()->request('GET', '/api/marketing/active')->getStatusCode());
+        $visitor = static::createClient()->request('GET', '/api/marketing/active');
+        $this->assertSame(200, $visitor->getStatusCode());
+        $this->assertSame('https://cdn.exemple.be/sponsor-mobile.jpg', $visitor->toArray()['formats']['smartphone']);
 
         $response = $this->doctor()->request('GET', '/api/marketing/active');
 
