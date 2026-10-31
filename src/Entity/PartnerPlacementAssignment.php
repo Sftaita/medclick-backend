@@ -85,6 +85,13 @@ class PartnerPlacementAssignment
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
     private ?\DateTimeImmutable $withdrawnAt = null;
 
+    /**
+     * Modifications d'une attribution publiée, pas encore publiées : { partnerId, startsOn,
+     * endsOn } ; null : aucune. Jamais lues par la diffusion.
+     */
+    #[ORM\Column(type: Types::JSON, nullable: true)]
+    private ?array $pendingChanges = null;
+
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
@@ -209,6 +216,18 @@ class PartnerPlacementAssignment
     public function touch(): self
     {
         $this->updatedAt = new \DateTimeImmutable();
+
+        return $this;
+    }
+
+    public function getPendingChanges(): ?array
+    {
+        return $this->pendingChanges;
+    }
+
+    public function setPendingChanges(?array $pendingChanges): self
+    {
+        $this->pendingChanges = $pendingChanges === [] ? null : $pendingChanges;
 
         return $this;
     }

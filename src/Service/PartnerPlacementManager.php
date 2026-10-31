@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Service;
 
+use App\Advertising\Emplacements;
 use App\Entity\MarketingImage;
 use App\Entity\Partner;
 use App\Entity\PartnerPlacementAssignment as Assignment;
@@ -27,6 +28,7 @@ final class PartnerPlacementManager
         private readonly PartnerPlacementAssignmentRepository $assignments,
         private readonly PartnerRepository $partners,
         private readonly PartnerManager $partnerManager,
+        private readonly EmplacementSettings $settings,
     ) {
     }
 
@@ -41,7 +43,7 @@ final class PartnerPlacementManager
      *
      * @return array<string, mixed>
      */
-    public function placementsOn(?\DateTimeImmutable $day = null): array
+    public function placementsOn(?\DateTimeImmutable $day = null, bool $ignoreEnabled = false): array
     {
         $result = [];
         foreach (Assignment::PLACEMENTS as $placement) {
@@ -65,6 +67,12 @@ final class PartnerPlacementManager
             if (!isset($seen[$placement])) {
                 $seen[$placement] = true;
                 $result[$placement] = $partner === null ? null : $this->publicPartner($partner);
+            }
+        }
+        // Emplacement désactivé dans l'administration : rien n'y est affiché.
+        foreach (array_keys($result) as $placement) {
+            if (!$ignoreEnabled && !$this->isEnabled($placement)) {
+                $result[$placement] = Assignment::isShared($placement) ? [] : null;
             }
         }
         // Page « Nos partenaires » : ordre alphabétique, stable d'un jour à l'autre.
@@ -97,9 +105,17 @@ final class PartnerPlacementManager
         return $partner !== null && $this->assignments->isPartnerLive($partner, $this->today()) ? $this->publicPartner($partner) : null;
     }
 
+    /** Emplacement de l'administration activé (login_fallback : celui de la page d'identification). */
+    public function isEnabled(string $placement): bool
+    {
+        $emplacement = Emplacements::forPartnerPlacement($placement);
+
+        return $emplacement !== null && $this->settings->isEnabled($emplacement);
+    }
+
     public function isLiveOn(Partner $partner, string $placement): bool
     {
-        return in_array($placement, Assignment::PLACEMENTS, true) && $this->assignments->isPartnerLive($partner, $this->today(), $placement);
+        return in_array($placement, Assignment::PLACEMENTS, true) && $this->isEnabled($placement) && $this->assignments->isPartnerLive($partner, $this->today(), $placement);
     }
 
     /** Données publiques d'une firme (aucun statut ni réglage interne). */
