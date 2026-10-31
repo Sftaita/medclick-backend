@@ -119,7 +119,7 @@ publication, conflits, calendrier), `SponsorDelivery` (publicités), `PartnerPla
    mois, une carte MedClick garde la place du carrousel (pas de saut de mise en page).
 5. **Seule règle entre deux contenus, documentée et affichée dans l'administration** : sur la page
    d'identification, l'encart partenaire et la publicité occupent la **même place** ; l'encart
-   n'apparaît que lorsqu'aucune publicité de cette page n'est en ligne. *À valider.*
+   n'apparaît que lorsqu'aucune publicité de cette page n'est en ligne (décision validée le 31/10).
 6. **Plein écran après connexion.** Demandé **après** une connexion réussie, avec le jeton (plus
    pendant l'authentification). Boutons « Continuer vers MedClick » (ferme, aussi Échap) et
    « Découvrir {entreprise} » (site dans un nouvel onglet, clic mesuré, la publicité reste
@@ -156,10 +156,35 @@ publication, conflits, calendrier), `SponsorDelivery` (publicités), `PartnerPla
 - Rien n'est supprimé : campagnes, visuels, logos, attributions, historiques, `marketing_view`,
   `partner_event`, compteurs historiques.
 
-**Vérifié sur MySQL 8.3** (instance jetable, schéma 3.5.1 + données représentatives : « Arthrex »,
-« arthrex » avec espaces, « bosi » face à deux fiches « BOSI », publicité sans annonceur) : une
-seule entreprise « Arthrex » créée, « bosi » rattaché à la plus ancienne fiche BOSI, rien d'autre
-modifié, `doctrine:schema:validate` en phase ; descente puis remontée sans doublon.
+**Collations de la production (MariaDB 11.8).** `marketing` y est en `utf8mb4_unicode_ci` et
+`partner` en `utf8mb4_uca1400_ai_ci` (tables créées à des époques différentes) : comparer leurs noms
+sans collation explicite échoue (erreur 1267). La migration compare donc les noms en
+`utf8mb4_unicode_ci` des deux côtés. Attention : MariaDB n'annule pas les instructions de structure
+déjà exécutées quand une migration échoue en cours de route ; en cas d'échec, restaurer la
+sauvegarde plutôt que relancer.
+
+**Vérifié** sur une MariaDB 11.8 jetable reproduisant exactement ces collations (et sur MySQL 8.3) :
+la version sans collation explicite échoue comme elle l'aurait fait en production ; la version
+corrigée rattache « Arthrex » et « arthrex » (espaces) à une seule entreprise créée, « bosi » à la
+plus ancienne des deux fiches « BOSI », « Léa Médical » (accents) à sa nouvelle fiche, laisse la
+publicité sans annonceur sans entreprise, ne modifie rien d'autre ; descente puis remontée sans
+doublon.
+
+**Publicités qui resteront sans entreprise** (lecture seule de la copie de préproduction, 31/10) :
+celles dont l'annonceur n'est pas renseigné :
+
+| id | Campagne | Statut | Emplacement |
+|---|---|---|---|
+| 1 | Test Arthrex | inactive (janvier 2025) | plein écran |
+| 11 | BOSI Knee Academy logo | active | carrousel du tableau de bord |
+| 12 | BOSI Knee Academy | active | carrousel du tableau de bord |
+| 13 | BOSI Knee academy2 | active | carrousel du tableau de bord |
+
+Elles restent diffusées à l'identique ; aucune n'est rattachée d'office à BOSI (un rattachement
+d'après le titre serait une supposition). À rattacher dans *Emplacements › … › Modifier ›
+Entreprise*, puis publier ; si une seule bannière existe, cocher « Utiliser le même visuel… ». Les
+campagnes de recette « VitaOrtho » et « PharmaPro » reçoivent chacune une entreprise. La production
+n'a pas été lue (seule sa structure l'a été) : refaire cette liste juste avant la mise en production.
 
 Retour arrière : `doctrine:migrations:migrate prev` (les entreprises créées pour les annonceurs
 restent, sans effet sur la version précédente).
@@ -190,23 +215,21 @@ conflit puis remplacement, désactivation, entreprises, statistiques) ; `AdOverl
 (fréquences) ; `partner.test.jsx` (barre latérale et Partenaire du mois non masqués) ;
 `AppShell.test.jsx` (lien « Nos partenaires »).
 
-## 6. Ce qui reste à valider
+## 6. Décisions et points ouverts
 
-1. **Règle de la page d'identification** (section 3, point 5) : garder l'encart partenaire comme
-   remplaçant de la publicité, ou l'afficher en plus.
-2. **Plein écran : une seule publicité à la fois** (capacité 1) et durée de fermeture automatique
-   conservée en plus du bouton.
-3. **Plein écran après la connexion** au lieu de pendant : la connexion de 3.5.1 (« dès le clic »,
-   sans « Passer ») est volontairement remplacée, conformément à la demande.
-4. **Téléphones réels** (iPhone, Android, portrait) : vérifiés en émulation seulement (Chromium,
-   390 × 844) ; dérouler `docs/recette-preproduction-3.5.0/PROTOCOLE-TELEPHONES.md` sur la
-   page d'identification, le plein écran, le carrousel et les encarts.
-5. **Environnement de test** : la préproduction (staging) porte la recette 3.5.x en cours ; la
-   refonte a été déployée et vérifiée dans un environnement **local isolé** (MySQL jetable,
-   serveurs locaux), pas sur staging. Un environnement VPS dédié (ou un créneau staging après la
-   recette) reste à décider avant la recette de cette version.
-6. **Anciennes routes d'administration** à retirer après la mise en production (section 2).
-7. **Publicités sans entreprise** après migration : à rattacher dans l'onglet Emplacements.
+Décisions validées le 31/10/2026 : emplacements de connexion indépendants ; un seul plein écran à
+la fois ; carrousel de 3 publicités dans l'ordre configuré ; Partenaire du mois indépendant du
+carrousel ; barre latérale jamais masquée ; sur la page d'identification, la publicité en ligne
+remplace l'encart partenaire ; « Nos partenaires » dans la navigation ; bibliothèque d'entreprises
+sans doublon.
+
+Restent ouverts :
+1. **Recette sur téléphones réels** (iPhone, Android, portrait) : vérifié en émulation (Chromium
+   « Pixel 7 », WebKit « iPhone 13 ») sur l'environnement de démonstration.
+2. **Plein écran après la connexion** au lieu de pendant : remplace volontairement le comportement
+   de 3.5.1.
+3. **Anciennes routes d'administration** à retirer après la mise en production (section 2).
+4. **Publicités sans entreprise** à rattacher après la migration (section 4).
 
 ## 7. Captures (base de démonstration, entreprises et visuels fictifs)
 

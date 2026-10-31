@@ -780,7 +780,7 @@ final class EmplacementManager
         return sprintf(
             'Publication impossible : %s (%s). Modifiez les dates, désactivez une publicité ou changez l\'ordre.',
             rtrim($first['message'], '.'),
-            $first['to'] === null ? 'à partir du ' . $first['from'] : 'du ' . $first['from'] . ' au ' . $first['to'],
+            $first['to'] === null ? 'à partir du ' . self::frenchDate($first['from']) : 'du ' . self::frenchDate($first['from']) . ' au ' . self::frenchDate($first['to']),
         );
     }
 
@@ -1327,6 +1327,12 @@ final class EmplacementManager
         });
 
         return $paths;
+    }
+
+    /** 2026-11-12 → 12/11/2026 (messages de l'administration). */
+    public static function frenchDate(string $day): string
+    {
+        return (new \DateTimeImmutable($day))->format('d/m/Y');
     }
 
     private static function date(mixed $value): ?string

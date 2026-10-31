@@ -46,18 +46,20 @@ final class Version20261105090000 extends AbstractMigration
         $this->addSql('ALTER TABLE partner ADD contact_name VARCHAR(120) DEFAULT NULL, ADD contact_email VARCHAR(180) DEFAULT NULL, ADD contact_phone VARCHAR(40) DEFAULT NULL');
 
         // Annonceurs sans entreprise : une entreprise par nom (sans doublon de casse ni d'espaces).
+        // Collation explicite : en production (MariaDB 11.8), marketing est en utf8mb4_unicode_ci et
+        // partner en utf8mb4_uca1400_ai_ci ; sans elle, la comparaison est refusée (erreur 1267).
         $this->addSql(
             "INSERT INTO partner (name, commitments, status, created_at, updated_at)
              SELECT MIN(TRIM(m.sponsor_name)), '[]', 'draft', NOW(), NOW()
              FROM marketing m
              WHERE m.sponsor_name IS NOT NULL AND TRIM(m.sponsor_name) <> ''
-               AND NOT EXISTS (SELECT 1 FROM partner p WHERE LOWER(TRIM(p.name)) = LOWER(TRIM(m.sponsor_name)))
+               AND NOT EXISTS (SELECT 1 FROM partner p WHERE LOWER(TRIM(p.name)) COLLATE utf8mb4_unicode_ci = LOWER(TRIM(m.sponsor_name)) COLLATE utf8mb4_unicode_ci)
              GROUP BY LOWER(TRIM(m.sponsor_name))"
         );
         // Plusieurs fiches du même nom (anciennes reprogrammations) : la plus ancienne.
         $this->addSql(
             "UPDATE marketing m
-             SET m.partner_id = (SELECT MIN(p.id) FROM partner p WHERE LOWER(TRIM(p.name)) = LOWER(TRIM(m.sponsor_name)))
+             SET m.partner_id = (SELECT MIN(p.id) FROM partner p WHERE LOWER(TRIM(p.name)) COLLATE utf8mb4_unicode_ci = LOWER(TRIM(m.sponsor_name)) COLLATE utf8mb4_unicode_ci)
              WHERE m.sponsor_name IS NOT NULL AND TRIM(m.sponsor_name) <> ''"
         );
     }

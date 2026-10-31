@@ -346,7 +346,7 @@ final class PartnerPlacementManager
             '%s : %s %s',
             $c['placementLabel'],
             $c['partnerName'] ?? 'emplacement masqué',
-            $c['endsOn'] === null ? sprintf('depuis le %s, sans fin', $c['startsOn']) : sprintf('du %s au %s', $c['startsOn'], $c['endsOn']),
+            $c['endsOn'] === null ? sprintf('depuis le %s, sans fin', EmplacementManager::frenchDate($c['startsOn'])) : sprintf('du %s au %s', EmplacementManager::frenchDate($c['startsOn']), EmplacementManager::frenchDate($c['endsOn'])),
         ), $conflicts);
 
         return 'Emplacement déjà attribué sur cette période (' . implode(' ; ', $parts) . '). Confirmez le remplacement ou changez les dates.';
