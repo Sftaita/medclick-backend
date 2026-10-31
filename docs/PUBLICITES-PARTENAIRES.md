@@ -231,7 +231,47 @@ Restent ouverts :
 3. **Anciennes routes d'administration** à retirer après la mise en production (section 2).
 4. **Publicités sans entreprise** à rattacher après la migration (section 4).
 
-## 7. Captures (base de démonstration, entreprises et visuels fictifs)
+## 7. Parcours de recette (environnement de démonstration)
+
+Données fictives : MedVue, BOSI, OrthoNova, CardioPlus ; un administrateur et deux résidents
+fictifs. Liens des annonceurs : `https://example.com/...`. Téléphone : en portrait.
+
+**Côté utilisateur (téléphone puis ordinateur), sans être connecté**
+1. *Page d'identification — Publicité* : publicité MedVue sous le formulaire ; « Découvrir »
+   entier et visible, ouvre `example.com/medvue` dans un nouvel onglet.
+2. *Accueil public — Sponsor* : page d'accueil, encart « Application sponsorisée par BOSI ».
+3. *Page « Nos partenaires »* : depuis l'encart de l'accueil public ; trois entreprises.
+
+**Connexion avec un résident**
+4. *Après connexion — Publicité plein écran* : OrthoNova en plein écran (réglée « à chaque
+   connexion ») ; « Découvrir OrthoNova » ouvre le site sans fermer la publicité ;
+   « Continuer vers MedClick » mène au tableau de bord.
+5. *Tableau de bord — Carrousel publicitaire* : MedVue et CardioPlus ; sur chaque diapositive,
+   « Découvrir » ouvre le site de cette publicité.
+6. *Tableau de bord — Partenaire du mois* : BOSI, affiché en même temps que le carrousel.
+7. *Navigation mobile — Menu* (☰) : encart BOSI et lien « Nos partenaires ».
+8. *Navigation ordinateur — Barre latérale* (ordinateur ou tablette) : « Avec le soutien de BOSI »,
+   présent même avec le carrousel, et lien « Nos partenaires ».
+
+**Connexion avec l'administrateur : Administration › Publicités & partenaires**
+9. *Emplacements* : huit cartes ; le carrousel signale « 1 modification à publier » (brouillon
+   BOSI). L'ouvrir : comparer « Actuellement en ligne » et « Mes modifications », ordinateur et
+   mobile ; choisir un jour dans le calendrier (après le 10 : OrthoNova apparaît).
+10. Publier le brouillon BOSI, puis le vérifier sur le tableau de bord d'un résident.
+11. Ajouter au carrousel une publicité avec des dates qui chevauchent les trois autres (au-delà du
+    10e jour) : le conflit s'affiche, « Publier » est refusé ; la supprimer.
+12. Réordonner (flèches ou glisser-déposer), publier, vérifier l'ordre côté résident.
+13. *Entreprises* : créer une entreprise avec son logo ; *Page d'identification* : lui ajouter une
+    publicité (deux visuels importés), constater qu'elle n'est pas en ligne, publier, vérifier
+    côté visiteur.
+14. Modifier une publicité en ligne (lien) : l'ancien lien reste en ligne jusqu'à la publication.
+    Puis « Désactiver maintenant » : retirée aussitôt.
+15. *Après connexion* : désactiver l'emplacement → connexion directe au tableau de bord, page
+    d'identification inchangée ; changer la fréquence.
+16. *Statistiques* : les clics des étapes 1, 4 et 5 apparaissent sur leurs emplacements ;
+    filtres par emplacement et par entreprise.
+
+## 8. Captures (base de démonstration, entreprises et visuels fictifs)
 
 Chromium, ordinateur 1440 × 900, mobile 390 × 844 (émulation).
 
