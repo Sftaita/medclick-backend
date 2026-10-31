@@ -28,13 +28,20 @@ class GeneralMarketingController extends AbstractController
     #[Route('/api/marketing/active', name: 'get_active_campaign', methods: ['GET'])]
     public function getActiveCampaign(SponsorDelivery $delivery): JsonResponse
     {
-        // Plein écran, affiché après une connexion réussie (route réservée aux utilisateurs
-        // connectés, security.yaml) : exclusivité et priorité respectées (SponsorDelivery).
+        // Plein écran de la connexion : exclusivité et priorité respectées (SponsorDelivery), le
+        // tirage portant sur toutes les campagnes, réservées aux professionnels comprises.
+        // Public : le front le demande avant l'authentification pour l'afficher dès le clic sur
+        // « Se connecter ». Visiteur non connecté et campagne tirée réservée aux professionnels :
+        // rien de son contenu, seulement after_login (le front la redemande une fois connecté).
         $randomCampaign = $delivery->interstitial();
+        $authenticated = $this->getUser() !== null;
 
         // Si aucune campagne active n'est trouvée
         if ($randomCampaign === null) {
             return new JsonResponse(['message' => 'No active campaign found'], JsonResponse::HTTP_NOT_FOUND, ['Cache-Control' => 'no-store']);
+        }
+        if (!$authenticated && $randomCampaign->isProfessionalsOnly()) {
+            return new JsonResponse(['after_login' => true], JsonResponse::HTTP_OK, ['Cache-Control' => 'no-store']);
         }
 
         // Plus aucun comptage ici : le front précharge la campagne sans l'afficher. Les impressions
@@ -62,6 +69,10 @@ class GeneralMarketingController extends AbstractController
             ],
             'redirect_url' => $randomCampaign->getRedirectUrl(), // Inclure l'URL de redirection
         ];
+        if (!$authenticated) {
+            // Compteurs de l'administration : jamais exposés à un visiteur.
+            unset($campaignData['views'], $campaignData['clicks']);
+        }
 
         return new JsonResponse($campaignData, JsonResponse::HTTP_OK, ['Cache-Control' => 'no-store']);
     }

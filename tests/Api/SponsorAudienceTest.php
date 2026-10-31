@@ -75,18 +75,46 @@ final class SponsorAudienceTest extends ApiTestBase
         $this->assertTrue($doctor->request('GET', '/api/admin/marketing/' . $pro->getId())->getStatusCode() === 403);
     }
 
-    public function testInterstitialRespectsExclusivityAndIsReservedToConnectedUsers(): void
+    public function testInterstitialRespectsExclusivityForVisitorsAndConnectedUsers(): void
     {
         $this->create(array_merge(self::INTERSTITIAL, ['campaign_name' => 'Prioritaire', 'priority' => 10]));
         $this->create(array_merge(self::INTERSTITIAL, ['campaign_name' => 'Exclusive', 'priority' => 1, 'exclusive' => true]));
 
-        $this->assertSame(401, static::createClient()->request('GET', '/api/marketing/active')->getStatusCode());
+        // Avant la connexion (affichée dès le clic sur « Se connecter ») : sans les compteurs.
+        $visitor = static::createClient()->request('GET', '/api/marketing/active');
+        $this->assertSame('Exclusive', $visitor->toArray()['campaign_name']);
+        $this->assertArrayNotHasKey('views', $visitor->toArray());
+        $this->assertArrayNotHasKey('clicks', $visitor->toArray());
+        $this->assertStringContainsString('no-store', $visitor->getHeaders()['cache-control'][0]);
         $doctor = $this->clientFor($this->createUser('medecin-plein@test.be'));
         for ($i = 0; $i < 5; ++$i) {
             $active = $doctor->request('GET', '/api/marketing/active');
             $this->assertSame('Exclusive', $active->toArray()['campaign_name']);
             $this->assertStringContainsString('no-store', $active->getHeaders()['cache-control'][0]);
         }
+    }
+
+    public function testProfessionalInterstitialIsNeverDisclosedBeforeLogin(): void
+    {
+        // Exclusive réservée aux professionnels : un visiteur ne reçoit ni elle (contenu), ni la
+        // campagne publique à sa place (l'exclusivité serait contournée).
+        $this->create(array_merge(self::INTERSTITIAL, ['campaign_name' => 'Publique', 'priority' => 10]));
+        $this->create(array_merge(self::INTERSTITIAL, ['campaign_name' => 'Réglementée', 'exclusive' => true, 'professionals_only' => true]));
+
+        for ($i = 0; $i < 5; ++$i) {
+            $visitor = static::createClient()->request('GET', '/api/marketing/active');
+            $this->assertSame(200, $visitor->getStatusCode());
+            $this->assertSame(['after_login' => true], $visitor->toArray());
+        }
+        $doctor = $this->clientFor($this->createUser('medecin-reglemente@test.be'));
+        $this->assertSame('Réglementée', $doctor->request('GET', '/api/marketing/active')->toArray()['campaign_name']);
+    }
+
+    public function testVisitorGetsNotFoundWithoutLiveInterstitial(): void
+    {
+        $this->create(array_merge(self::INTERSTITIAL, ['status' => 'inactive']));
+
+        $this->assertSame(404, static::createClient()->request('GET', '/api/marketing/active')->getStatusCode());
     }
 
     public function testInterstitialRotationIsWeightedByPriority(): void

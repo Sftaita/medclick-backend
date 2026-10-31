@@ -50,8 +50,9 @@ security:
     # Rapports d'erreurs des fronts (aussi avant connexion ; limité en débit).
     - { path: ^/api/client-errors$, roles: PUBLIC_ACCESS, methods: [POST] }
     - { path: ^/api/terms-conditions, roles: PUBLIC_ACCESS, methods: [GET] }
-    # Plein écran (/api/marketing/active) : réservé aux utilisateurs connectés, affiché après
-    # une connexion réussie (règle générale ^/api ci-dessous).
+    # Plein écran de la connexion, demandé avant l'authentification : campagnes réservées aux
+    # professionnels jamais servies à un visiteur (GeneralMarketingController::getActiveCampaign).
+    - { path: ^/api/marketing/active$, roles: PUBLIC_ACCESS, methods: [GET] }
     # Clic sur la publicité depuis la page de connexion (limité en débit).
     - { path: ^/api/marketing/incrementCampaign/\d+$, roles: PUBLIC_ACCESS, methods: [PUT] }
     # Campagnes par emplacement (connexion, tableau de bord) et mesure des impressions et des

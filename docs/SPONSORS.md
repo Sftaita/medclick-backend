@@ -22,10 +22,14 @@ Les campagnes existantes ont reçu `login_interstitial` à la migration : leur a
 **Depuis la PR « partenaires par emplacement »** :
 
 - `login` : 16:9 dès 768 px (même palier que le tableau de bord), 2:1 en dessous.
-- `login_interstitial` : `GET /api/marketing/active` est réservé aux utilisateurs connectés ; le
-  front le demande juste après une connexion réussie (jamais depuis un cache), au plus une fois
-  par jour et par campagne. Sélection par `SponsorDelivery::interstitial()` : une exclusive
-  l'emporte, sinon tirage pondéré par la priorité.
+- `login_interstitial` : `GET /api/marketing/active` est public. Le front le demande à
+  l'ouverture de la page de connexion (jamais depuis un cache) et affiche la campagne dès le clic
+  sur « Se connecter », pendant l'authentification ; au plus une fois par jour et par campagne.
+  Sélection par `SponsorDelivery::interstitial()` sur toutes les campagnes : une exclusive
+  l'emporte, sinon tirage pondéré par la priorité. Visiteur non connecté et campagne tirée
+  réservée aux professionnels : `{"after_login": true}` sans aucun contenu ; le front la
+  redemande après une connexion réussie. Compteurs `views`/`clicks` absents pour un visiteur.
+  Impression envoyée seulement après une connexion réussie.
 - `professionals_only` : campagne jamais servie à un visiteur non connecté (`/slots`, mesure) et
   refusée sur `login` (page publique).
 - L'activation par `PUT /api/admin/marketing/{id}/status` contrôle aussi les exclusivités.
