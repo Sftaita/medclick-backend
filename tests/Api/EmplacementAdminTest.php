@@ -402,6 +402,20 @@ final class EmplacementAdminTest extends ApiTestBase
         $byCompany = $this->admin->request('GET', '/api/admin/ad-stats?company=' . $medvue->getId())->toArray();
         $this->assertSame(1, $byCompany['totals']['clicks']);
 
+        // Rapport CSV pour l'annonceur : mêmes chiffres, une ligne par jour, emplacement et contenu.
+        $this->admin->request('GET', '/api/admin/ad-stats.csv?company=' . $medvue->getId());
+        $response = $this->admin->getResponse();
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertStringStartsWith('text/csv', $response->getHeaders()['content-type'][0]);
+        $lines = explode("\n", trim($response->getContent()));
+        $this->assertSame("\u{FEFF}Date;Emplacement;Entreprise;Contenu;Impressions;Clics;\"Taux de clics (%)\"", $lines[0]);
+        $this->assertCount(2, $lines);
+        $this->assertStringContainsString(';"Tableau de bord — Carrousel (ordinateur)";MedVue;', $lines[1]);
+        $this->assertStringEndsWith(';1;1;100', $lines[1]);
+        $all = explode("\n", trim($this->admin->request('GET', '/api/admin/ad-stats.csv')->getContent(false)));
+        $this->assertCount(3, $all);
+        $this->assertStringContainsString(';"Tableau de bord — Partenaire du mois";BOSI;"Encart entreprise";1;0;0', implode("\n", $all));
+
         // Statistiques du contenu, dans l'emplacement.
         $this->assertSame(1, $this->detail('dashboard_carousel')['contents'][0]['stats']['clicks']);
         $this->assertSame(1, $this->detail('dashboard_partner')['contents'][0]['stats']['impressions']);
