@@ -79,14 +79,22 @@ cp src/backend/deploy/vps/deploy.sh . && ./deploy.sh <sha_backend> <sha_front>
 `deploy.sh` : sources aux SHA demandés (le frontend est vérifié par `src/pwa/.commit`), build,
 clés JWT générées une seule fois dans le volume (`--skip-if-exists`, privée 600), démarrage avec
 attente des healthchecks (base → backend → frontend), cache Symfony, **arrêt si une migration est
-en attente** (décision humaine), puis frontend.
+en attente** (décision humaine, code 2), worker, puis frontend, et enfin une **vérification finale**
+(code 3 en cas d'échec) : backend, worker et frontend démarrés et sains, image **réellement exécutée**
+par chaque conteneur (identifiant d'image, pas seulement l'étiquette) égale à celle de l'étiquette
+demandée, worker sur la même image que le backend, et code des conteneurs backend/worker identique
+au commit (empreinte de `src/`, `migrations/`, `templates/`, `composer.lock`).
+`./deploy.sh --verify <sha_backend> <sha_front>` refait seulement cette vérification, sans rien
+modifier (contrôle après déploiement ou avant intervention).
 
 ## Mise à jour
 
 Backend seul : `./deploy.sh <nouveau_sha_backend> <sha_front_actuel>`.
 Frontend : livrer la nouvelle archive dans `src/pwa` + `.commit`, puis `./deploy.sh <sha_backend> <nouveau_sha_front>`.
 Retour arrière : relancer `deploy.sh` avec les SHA précédents (images reconstruites ou réutilisées
-depuis le cache) ; en cas de migration, restaurer la sauvegarde prise juste avant.
+depuis le cache) ; en cas de migration, restaurer la sauvegarde prise juste avant. Le script
+`deploy.sh` du dossier de l'environnement n'est pas remplacé par un déploiement : après une mise à
+jour du script (`cp src/backend/deploy/vps/deploy.sh .`), garder la copie précédente dans `backups/`.
 
 ## Copie production → préproduction
 
@@ -118,7 +126,10 @@ Restauration :
 
 - Service `worker` des deux Compose : `messenger:consume exports scheduler_exports_monitor`
   (génération des exports et surveillance chaque minute), cache préchauffé au démarrage.
-- `deploy.sh` le (re)crée après le contrôle des migrations ; la première mise en service exige les
+- `deploy.sh` le (re)crée après le contrôle des migrations (`up -d --no-deps --wait worker`, recréation
+  forcée si son image diffère encore de celle du backend, puis vérification finale) ; avant ce
+  correctif, le test `docker compose config --services | grep -qx worker` sous `pipefail` pouvait
+  être faux (SIGPIPE) et laisser le worker sur l'ancienne image. La première mise en service exige les
   migrations `Version20261027090000` (tables `export_job`, `export_job_event`, `messenger_messages`),
   `Version20261028090000` (`export_monitor_state`) et `Version20261029090000` (alerte du gardien).
 - Arrêt propre : `docker compose stop worker` laisse finir la génération en cours (120 s).
