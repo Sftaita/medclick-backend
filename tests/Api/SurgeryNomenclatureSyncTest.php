@@ -174,9 +174,11 @@ class SurgeryNomenclatureSyncTest extends ApiTestBase
         $this->assertSame(['2414152'], $rows);
     }
 
-    // ---------------------------------------------------------------- LOT 2D.3 : « favorites »
+    // ---------------------------------------------------------------- « favorites » (ex-LOT 2D.3)
+    // Étape 3 nomenclature : sans choix d'un autre acte, la spécialité enregistrée « favorites »
+    // n'est plus normalisée au PUT (garantie stricte). Correction : app:repair-surgery-nomenclature.
 
-    public function testPutWithFavoritesSpecialityAndNoSurgeryIdUsesTheNomenclatureSpeciality(): void
+    public function testPutWithFavoritesSpecialityAndNoSurgeryIdKeepsTheRecordedSpeciality(): void
     {
         $surgery = $this->favoritesSurgery($this->appendice);
 
@@ -192,11 +194,14 @@ class SurgeryNomenclatureSyncTest extends ApiTestBase
         $this->assertResponseIsSuccessful();
 
         $updated = $this->reload($surgery);
-        $this->assertSynced($updated, $this->appendice, '2414152');
+        $this->assertSame($this->appendice->getId(), $updated->getNomenclature()?->getId());
+        $this->assertSame('2414152', $updated->getCode());
+        $this->assertSame('Appendicectomie', $updated->getName());
+        $this->assertSame('favorites', $updated->getSpeciality());
         $this->assertSame('2', $updated->getPosition());
     }
 
-    public function testFavoritesSpecialityWithoutNomenclatureIsNotInvented(): void
+    public function testSurgeryWithoutNomenclatureKeepsItsRecordedFields(): void
     {
         $surgery = (new Surgeries())
             ->setYear($this->year)
@@ -207,15 +212,17 @@ class SurgeryNomenclatureSyncTest extends ApiTestBase
         $this->em->persist($surgery);
         $this->em->flush();
 
-        $this->clientFor($this->alice)->request('PUT', '/api/surgeries/' . $surgery->getId(), ['json' => ['speciality' => 'favorites']]);
+        $this->clientFor($this->alice)->request('PUT', '/api/surgeries/' . $surgery->getId(), ['json' => ['speciality' => 'favorites', 'name' => 'Autre nom']]);
         $this->assertResponseIsSuccessful();
 
+        // Ni nomenclature inventée, ni champ d'identité modifié sans choix d'un acte.
         $updated = $this->reload($surgery);
         $this->assertNull($updated->getNomenclature());
-        $this->assertSame('favorites', $updated->getSpeciality());
+        $this->assertSame('ortho', $updated->getSpeciality());
+        $this->assertSame('Saisie libre', $updated->getName());
     }
 
-    public function testFavoritesSurgeryAppearsInTheExcelSummaryOnceNormalized(): void
+    public function testFavoritesSurgeryExportIsUnchangedByAnEditWithoutNewAct(): void
     {
         $surgery = $this->favoritesSurgery($this->appendice);
         $client = $this->clientFor($this->alice);
@@ -226,7 +233,8 @@ class SurgeryNomenclatureSyncTest extends ApiTestBase
         $client->request('PUT', '/api/surgeries/' . $surgery->getId(), ['json' => ['speciality' => 'favorites', 'position' => '1']]);
         $this->assertResponseIsSuccessful();
 
-        $this->assertSame([true, true], $this->exportContains($client, '2414152'));
+        // Inchangé : seule la commande de réparation (--scope=favorites) normalise la spécialité.
+        $this->assertSame([true, false], $this->exportContains($client, '2414152'));
     }
 
     // ---------------------------------------------------------------- Helpers

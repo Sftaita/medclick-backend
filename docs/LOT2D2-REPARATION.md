@@ -70,8 +70,10 @@ Informer ou non les utilisateurs concernés : décision séparée.
 
 `--scope=favorites` traite les interventions dont `speciality = "favorites"` : l'ancien PUT recopiait
 cette valeur (choix « Mes favoris »). Effet : l'intervention figure dans le carnet mais **pas** dans le
-récapitulatif `excel2` (classement par spécialité). Depuis le correctif du processor (2D.3), le PUT
-remplace « favorites » par la spécialité de la nomenclature liée.
+récapitulatif `excel2` (classement par spécialité). Le correctif du processor (2D.3) remplaçait
+« favorites » au PUT ; depuis l'étape 3 nomenclature (garantie stricte des données historiques),
+un PUT sans choix d'un autre acte ne modifie plus la spécialité enregistrée : seule cette commande
+corrige les interventions « favorites ».
 
 | Catégorie | Condition | Action |
 |---|---|---|

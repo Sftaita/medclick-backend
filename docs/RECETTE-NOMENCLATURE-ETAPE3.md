@@ -65,6 +65,7 @@ LIMIT 5;
 | 5 | Rouvrir la liste et choisir **le même** acte, enregistrer | identité inchangée (ancien code conservé) |
 | 6 | Choisir **un autre** acte, enregistrer | `code` = code actuel du nouvel acte ; `name`, `speciality`, `nomenclature_id` du nouvel acte |
 | 7 | Exporter le carnet (Excel) de l'année | les interventions 1 à 5 apparaissent avec leur code historique |
+| 8 | Sur une intervention enregistrée avec `speciality = 'favorites'` : changer la date, enregistrer | `speciality` reste `favorites` ; code, nom, `nomenclature_id` inchangés |
 
 Vérification après chaque scénario :
 

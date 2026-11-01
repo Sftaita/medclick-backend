@@ -15,13 +15,13 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
  *
  * - `surgeryId` désigne un AUTRE acte que celui déjà lié : relation nomenclature, code, nom et
  *   spécialité sont recalculés ensemble, comme à la création (/api/surgeries/addNewSurgery).
- * - `surgeryId` absent, vide ou égal à l'acte déjà lié : l'identité historique de l'intervention
- *   (relation, code, nom, spécialité) est conservée telle qu'enregistrée, même si la nomenclature
- *   a changé depuis et même si le payload contient un autre nom, code ou spécialité. Seuls la
- *   date, l'année, le rôle et les superviseurs sont alors modifiés.
- * - Intervention sans nomenclature (saisie historique libre) et sans `surgeryId` : comportement
- *   inchangé (champs du payload appliqués).
- * - Une spécialité « favorites » est remplacée par celle de la nomenclature liée (LOT 2D.3).
+ * - `surgeryId` absent, vide ou égal à l'acte déjà lié : relation, code, nom et spécialité restent
+ *   rigoureusement identiques aux valeurs enregistrées, même si la nomenclature a changé depuis,
+ *   même si la spécialité enregistrée est « favorites », même sans nomenclature liée, et même si
+ *   le payload contient un autre nom, code ou spécialité. Seuls la date, l'année, le rôle et les
+ *   superviseurs sont alors modifiés.
+ * - Les spécialités « favorites » historiques ne sont plus normalisées au PUT (ancien LOT 2D.3) :
+ *   leur correction relève de `app:repair-surgery-nomenclature --scope=favorites`.
  *
  * `surgeryId` n'est pas une propriété de l'entité : il est lu dans le corps de la requête.
  *
@@ -57,21 +57,17 @@ final class SurgeryNomenclatureProcessor implements ProcessorInterface
         $current = $previous?->getNomenclature();
 
         if ($selected && SurgeryNomenclatureSelection::isAnotherAct($current, $selected)) {
-            // Changement d'acte réellement demandé.
+            // Changement d'acte réellement demandé : les quatre champs suivent l'acte choisi
+            // (la spécialité est celle de la nomenclature, jamais « favorites »).
             SurgeryNomenclatureSelection::applyAct($data, $selected);
-        } elseif ($previous && $current) {
-            // Même acte ou aucun choix : identité historique conservée telle quelle.
+        } elseif ($previous) {
+            // Même acte ou aucun choix : les quatre champs reprennent STRICTEMENT les valeurs
+            // enregistrées (y compris une spécialité « favorites », une nomenclature absente ou
+            // un code différent du référentiel actuel). Aucune normalisation n'est appliquée.
             $data->setNomenclature($current)
                 ->setCode($previous->getCode())
                 ->setName($previous->getName())
                 ->setSpeciality($previous->getSpeciality());
-        }
-
-        // « favorites » n'est pas une spécialité : l'ancien et le nouveau front l'envoient quand
-        // l'intervention vient des favoris. La nomenclature liée reste la source de vérité.
-        $nomenclature = $data->getNomenclature();
-        if ($nomenclature && $data->getSpeciality() === 'favorites' && ($nomenclature->getSpeciality() ?? '') !== '') {
-            $data->setSpeciality($nomenclature->getSpeciality());
         }
 
         return $this->persistProcessor->process($data, $operation, $uriVariables, $context);

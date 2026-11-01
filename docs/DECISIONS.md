@@ -55,7 +55,8 @@ nom/code/spécialité (historique figé si la nomenclature change).
 Conséquences : commandes de rattrapage `app:update-surgeries` / `app:update-favorites`.
 Précision (nomenclature, étape 3) : à la modification d'une intervention, la copie n'est refaite
 que si un **autre** acte est choisi (`SurgeryNomenclatureSelection`) ; renvoyer l'acte lié ou
-n'en envoyer aucun conserve le code INAMI historique, l'intitulé, la spécialité et le lien.
+n'en envoyer aucun conserve strictement le code INAMI historique, l'intitulé, la spécialité
+(y compris « favorites ») et le lien.
 
 ## ADR-008 — Carnet de stage généré depuis un gabarit Excel
 **Statut : Acceptée** — complétée par ADR-202 (générateur unique, format figé par des références).

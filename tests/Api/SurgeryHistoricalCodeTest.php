@@ -282,6 +282,55 @@ class SurgeryHistoricalCodeTest extends ApiTestBase
         }
     }
 
+    // ------------------------------------------------- Interventions historiques « favorites »
+
+    public function testHistoricalFavoritesSurgeryIsStrictlyPreservedWithoutNewAct(): void
+    {
+        $edits = [
+            'date' => fn (Surgeries $s) => $this->put($s, ['date' => '2024-03-15', 'speciality' => 'favorites', 'name' => self::OLD_NAME, 'surgeryId' => '']),
+            'rôle' => fn (Surgeries $s) => $this->put($s, ['position' => '2', 'firstHand' => (string) $this->boss->getId(), 'speciality' => 'favorites']),
+            'superviseur' => fn (Surgeries $s) => $this->put($s, ['secondHand' => (string) $this->other->getId()]),
+            'même acte (chaîne)' => fn (Surgeries $s) => $this->put($s, ['surgeryId' => (string) $this->menisque->getId(), 'speciality' => 'ortho']),
+            'même acte (entier)' => fn (Surgeries $s) => $this->put($s, ['surgeryId' => $this->menisque->getId(), 'speciality' => 'favorites']),
+            'PATCH' => function (Surgeries $s) {
+                $this->clientFor($this->alice)->request('PATCH', '/api/surgeries/' . $s->getId(), [
+                    'headers' => ['Content-Type' => 'application/merge-patch+json'],
+                    'json' => ['date' => '2024-05-02', 'surgeryId' => (string) $this->menisque->getId()],
+                ]);
+                $this->assertResponseIsSuccessful();
+            },
+            'ancienne route, même acte' => function (Surgeries $s) {
+                $this->legacyPut($s, ['surgeryId' => $this->menisque->getId(), 'position' => 1]);
+                $this->assertResponseIsSuccessful();
+            },
+            'ancienne route, sans acte' => function (Surgeries $s) {
+                $this->legacyPut($s, ['position' => 1]);
+                $this->assertResponseIsSuccessful();
+            },
+        ];
+
+        foreach ($edits as $label => $edit) {
+            $surgery = $this->historicalSurgery('3', 'favorites');
+            $edit($surgery);
+
+            $updated = $this->reload($surgery);
+            $this->assertSame($this->menisque->getId(), $updated->getNomenclature()?->getId(), "$label : nomenclature_id");
+            $this->assertSame(self::OLD_CODE, $updated->getCode(), "$label : code");
+            $this->assertSame(self::OLD_NAME, $updated->getName(), "$label : intitulé");
+            $this->assertSame('favorites', $updated->getSpeciality(), "$label : spécialité");
+        }
+    }
+
+    public function testHistoricalFavoritesSurgeryWithAnotherActTakesTheActSpeciality(): void
+    {
+        $surgery = $this->historicalSurgery('1', 'favorites');
+
+        // Choix explicite d'un autre acte (via « Mes favoris », le front envoyait « favorites »).
+        $this->put($surgery, ['surgeryId' => (string) $this->appendice->getId(), 'speciality' => 'favorites']);
+
+        $this->assertIdentity($this->reload($surgery), $this->appendice, '241415N200', 'Appendicectomie', 'dig');
+    }
+
     // ------------------------------------------------- Aucune autre donnée touchée, export
 
     public function testEditingOneSurgeryLeavesAllOtherSurgeriesUntouched(): void
@@ -329,7 +378,7 @@ class SurgeryHistoricalCodeTest extends ApiTestBase
     // ------------------------------------------------- Helpers
 
     /** Intervention enregistrée avec l'ancien code, liée à la ligne de nomenclature renumérotée. */
-    private function historicalSurgery(string $position = '1'): Surgeries
+    private function historicalSurgery(string $position = '1', string $speciality = 'ortho'): Surgeries
     {
         // Références gérées : reload() vide le gestionnaire d'entités entre deux requêtes.
         $surgery = (new Surgeries())
@@ -338,7 +387,7 @@ class SurgeryHistoricalCodeTest extends ApiTestBase
             ->setNomenclature($this->em->getReference(Nomenclature::class, $this->menisque->getId()))
             ->setCode(self::OLD_CODE)
             ->setName(self::OLD_NAME)
-            ->setSpeciality('ortho')
+            ->setSpeciality($speciality)
             ->setPosition($position)
             ->setFirstHand((string) $this->alice->getId())
             ->setSecondHand($position === '3' ? (string) $this->boss->getId() : null)
