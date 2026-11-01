@@ -123,8 +123,11 @@ publication, conflits, calendrier), `SponsorDelivery` (publicités), `PartnerPla
 6. **Plein écran après connexion.** Demandé **après** une connexion réussie, avec le jeton (plus
    pendant l'authentification). Boutons « Continuer vers MedClick » (ferme, aussi Échap) et
    « Découvrir {entreprise} » (site dans un nouvel onglet, clic mesuré, la publicité reste
-   ouverte), distincts ; fermeture automatique après la durée choisie ; boutons pleine largeur en
-   bas sur téléphone, au-dessus des zones système. Fréquence par navigateur : à chaque connexion,
+   ouverte), distincts ; fermeture automatique après la durée choisie. **Deux zones** : le visuel,
+   affiché en entier dans tout l'espace disponible (jamais recadré ni recouvert ; bandes floutées
+   si l'écran est plus étroit que le visuel), puis une barre distincte avec la mention
+   « Publicité », le compte à rebours et les deux boutons (pleine largeur et empilés sur téléphone,
+   au-dessus des zones système ; une ligne sur ordinateur). Fréquence par navigateur : à chaque connexion,
    une fois par jour (valeur reprise de l'existant), une fois par semaine. Sans publicité,
    emplacement désactivé, serveur lent (> 3 s) ou en erreur : tableau de bord directement.
 7. **Bouton « Découvrir ».** Présent dès qu'un lien est configuré, sur chaque diapositive, vrai
@@ -170,21 +173,42 @@ plus ancienne des deux fiches « BOSI », « Léa Médical » (accents) à sa no
 publicité sans annonceur sans entreprise, ne modifie rien d'autre ; descente puis remontée sans
 doublon.
 
-**Publicités qui resteront sans entreprise** (lecture seule de la copie de préproduction, 31/10) :
-celles dont l'annonceur n'est pas renseigné :
+**Publicités qui resteront sans entreprise.** Sur la **copie de la production** du 01/11/2026
+(sauvegarde automatique de 03:50, répétition de la section 9) : **les cinq publicités** n'ont pas
+d'annonceur renseigné, donc aucune n'est rattachée par la migration, et aucune entreprise n'est
+créée :
 
-| id | Campagne | Statut | Emplacement |
-|---|---|---|---|
-| 1 | Test Arthrex | inactive (janvier 2025) | plein écran |
-| 11 | BOSI Knee Academy logo | active | carrousel du tableau de bord |
-| 12 | BOSI Knee Academy | active | carrousel du tableau de bord |
-| 13 | BOSI Knee academy2 | active | carrousel du tableau de bord |
+| id | Publicité | Statut | Emplacements | Lien |
+|---|---|---|---|---|
+| 1 | Test Arthrex | inactive (janvier 2025) | plein écran | — |
+| 2 | MedVue Presentation 1600x900 | active | carrousel du tableau de bord | aucun |
+| 3 | Indisponibilites Mobile | active | carrousel du tableau de bord | aucun |
+| 4 | Planning Ordinateur | active | carrousel du tableau de bord | medvue.be |
+| 5 | MedVue Campagne Desktop 1600x900 | inactive | page d'identification, plein écran | — |
 
-Elles restent diffusées à l'identique ; aucune n'est rattachée d'office à BOSI (un rattachement
-d'après le titre serait une supposition). À rattacher dans *Emplacements › … › Modifier ›
-Entreprise*, puis publier ; si une seule bannière existe, cocher « Utiliser le même visuel… ». Les
-campagnes de recette « VitaOrtho » et « PharmaPro » reçoivent chacune une entreprise. La production
-n'a pas été lue (seule sa structure l'a été) : refaire cette liste juste avant la mise en production.
+Entreprises existantes : BOSI (#1) et « Medvue » (#2). Les publicités 2 à 5 semblent être celles de
+Medvue, mais un rattachement d'après le titre reste une supposition : **à confirmer**. « Test
+Arthrex » reste à examiner. Les publicités « BOSI Knee Academy » (11 à 13) n'existent **qu'en
+préproduction** (créées pendant la recette 3.5.x) : la commande de rattachement les concerne là,
+pas en production.
+
+Rattachement : commande `app:attach-campaigns-to-company`, en **simulation par défaut** (liste des
+publicités, entreprise actuelle, effet visible), écriture seulement avec `--apply`, garde-fou
+`--expect-name`, retour arrière `--detach`. Effet visible : le pied du carrousel affiche le nom et
+le logo de l'entreprise ; visuels, liens, dates, ordre et statistiques inchangés. Répété sur la
+copie de la production (publicités 2 à 5 vers « Medvue ») : simulation, application, affichage
+vérifié, retour arrière.
+
+```
+# Préproduction (BOSI Knee Academy) ou production (Medvue), après confirmation :
+php bin/console app:attach-campaigns-to-company --campaign=11 --campaign=12 --campaign=13 --company=BOSI --expect-name="Knee Academy"          # simulation
+php bin/console app:attach-campaigns-to-company --campaign=11 --campaign=12 --campaign=13 --company=BOSI --expect-name="Knee Academy" --apply  # écriture
+php bin/console app:attach-campaigns-to-company --campaign=11 --campaign=12 --campaign=13 --company=BOSI --detach --apply                       # retour arrière
+```
+
+**Écart de schéma préexistant.** En production, `doctrine:schema:validate` signale un index
+`wdbi_name_191_…` sur `nomenclature`, créé hors Doctrine. Il est présent **avant** la migration et
+identique **après** : la refonte n'ajoute aucun écart.
 
 Retour arrière : `doctrine:migrations:migrate prev` (les entreprises créées pour les annonceurs
 restent, sans effet sur la version précédente).
@@ -207,6 +231,12 @@ d'une entreprise exclusive ; page partagée ; périodes libres ; entreprises san
 jamais public ; « remplacer partout » ; **statistiques séparées par emplacement et entreprise,
 aperçus non comptés** ; **campagne existante conservée**. `RouteIntegrityTest` couvre les nouvelles
 routes. Les 142 tests existants des publicités et partenaires passent sans modification.
+`AttachCampaignsToCompanyCommandTest.php` (5 tests) : simulation sans écriture, application
+idempotente, garde-fous (nom attendu, entreprise ambiguë, publicité d'une autre entreprise),
+retour arrière. Export CSV des statistiques : couvert dans `EmplacementAdminTest`.
+
+Correspondance des 88 tests frontend supprimés avec la nouvelle administration :
+`frontend/docs/publicites-couverture-tests.md` (dépôt frontend).
 
 Frontend : `admin/publicites/Publicites.test.jsx` (cartes, aperçu sans mesure, création, ordre,
 conflit puis remplacement, désactivation, entreprises, statistiques) ; `AdOverlay.test.jsx` et
@@ -229,9 +259,13 @@ Restent ouverts :
 2. **Plein écran après la connexion** au lieu de pendant : remplace volontairement le comportement
    de 3.5.1.
 3. **Anciennes routes d'administration** à retirer après la mise en production (section 2).
-4. **Publicités sans entreprise** à rattacher après la migration (section 4).
+4. **Publicités sans entreprise** (section 4) : les publicités 2 à 5 de la production vers
+   « Medvue », et les trois « BOSI Knee Academy » de la préproduction vers BOSI, **sur
+   confirmation** ; « Test Arthrex » à examiner.
 
 ## 7. Parcours de recette (environnement de démonstration)
+
+*(La procédure de mise en production est en section 9.)*
 
 Données fictives : MedVue, BOSI, OrthoNova, CardioPlus ; un administrateur et deux résidents
 fictifs. Liens des annonceurs : `https://example.com/...`. Téléphone : en portrait.
@@ -296,3 +330,52 @@ Chromium, ordinateur 1440 × 900, mobile 390 × 844 (émulation).
 | ![](refonte-publicites-partenaires/22-tableau-de-bord-ordinateur.jpg) | ![](refonte-publicites-partenaires/22-tableau-de-bord-mobile.jpg) |
 | ![](refonte-publicites-partenaires/24-nos-partenaires-ordinateur.jpg) | ![](refonte-publicites-partenaires/23-menu-mobile.jpg) |
 | ![](refonte-publicites-partenaires/25-accueil-public-sponsor.jpg) | ![](refonte-publicites-partenaires/24-nos-partenaires-mobile.jpg) |
+
+## 9. Mise en production et restauration (répétées sur une copie de la production)
+
+### Répétition (à refaire la veille de la mise en production)
+
+`deploy/vps/rehearse-migration.sh <sauvegarde> <image actuelle> <image nouvelle> <rapport>` restaure
+la dernière sauvegarde chiffrée de la production dans une MariaDB jetable (réseau interne, sans port,
+fichiers de travail supprimés à la fin) et enchaîne : empreinte de toutes les tables, affichage
+public avec la version actuelle, sauvegarde « avant », migration, contrôles, affichage avec la
+nouvelle version, rattachement (simulation, application, retour arrière), puis les deux retours
+arrière. Le rapport ne contient que des comptages, empreintes et données publiques.
+
+Résultat du 01/11/2026 (sauvegarde `medclick-prod-20261101T035002Z`, images `f5d13db` → `0827ca2`) :
+
+| Étape | Résultat | Durée |
+|---|---|---|
+| Restauration de la copie (25 tables, 266 comptes, 5 publicités, 2 entreprises, 10 attributions) | OK | 18 s |
+| Migration `Version20261105090000` | OK ; 8 réglages, 0 entreprise créée, aucun doublon | **2 s** |
+| Affichage public après migration (publicités et entreprises par emplacement) | **identique** à l'actuel | — |
+| Retour arrière A : descente de la migration | OK ; affichage de la version actuelle identique ; **toutes les tables identiques** à l'empreinte d'avant | 2 s |
+| Retour arrière B : restauration de la sauvegarde « avant » dans une base neuve | **empreinte identique** pour toutes les tables | 14 s |
+
+### Procédure (après accord, fenêtre calme)
+
+1. **Fusion** : PR backend puis PR frontend ; noter les SHA `B` et `F`.
+2. **Sauvegarde** (VPS, `/opt/stack/apps/medclick-prod`) :
+   `./backup.sh /opt/stack/apps/medclick-prod prod` (chiffrée, contrôlée, copiée hors VPS) et
+   `cp -a src/pwa src/pwa.<sha actuel>` (sources du frontend en service).
+3. **Répétition** sur cette sauvegarde : `rehearse-migration.sh` (section ci-dessus) ; arrêter si
+   une étape n'est pas « OK » ou si l'affichage diffère.
+4. **Déploiement** : livrer `src/pwa` (`git archive F frontend`), puis `./deploy.sh B F` ; il s'arrête
+   sur « 1 migration(s) en attente » ; exécuter
+   `docker compose exec -T backend php bin/console doctrine:migrations:migrate --no-interaction`,
+   puis relancer `./deploy.sh B F`.
+5. **Contrôles (5 minutes)** : `doctrine:migrations:status` sans migration en attente ;
+   `GET /api/marketing/slots` et `GET /api/partner/placements` : mêmes publicités et entreprises
+   qu'avant ; administration › Publicités & partenaires : huit emplacements, aucun conflit ;
+   connexion avec un compte d'essai : plein écran (s'il y en a un), tableau de bord.
+6. **Rattachements confirmés** : `app:attach-campaigns-to-company` en simulation, puis `--apply`.
+
+### Retour arrière
+
+- **Sans écriture dans la nouvelle administration** : `doctrine:migrations:migrate prev
+  --no-interaction`, puis `./deploy.sh <SHA précédents>` (répété : tables identiques, affichage
+  identique).
+- **Si la migration échoue en cours de route, ou après des écritures** : `./restore.sh into
+  /opt/stack/apps/medclick-prod <sauvegarde de l'étape 2>`, puis `./deploy.sh <SHA précédents>`
+  (répété : restauration complète en 14 s sur la copie, empreinte identique).
+- Frontend : `rm -rf src/pwa && cp -a src/pwa.<sha> src/pwa`.
