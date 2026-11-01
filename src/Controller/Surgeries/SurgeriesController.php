@@ -7,6 +7,7 @@ use App\Repository\NomenclatureRepository;
 use App\Repository\SurgeriesRepository;
 use App\Repository\UserRepository;
 use App\Repository\YearsRepository;
+use App\Service\SurgeryNomenclatureSelection;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -127,7 +128,7 @@ class SurgeriesController extends AbstractController
     }
 
     #[Route('/api/surgeries/update/{id}', name: 'UpdateSurgery', methods: ['PUT'])]
-    public function updateSurgery($id, Request $request, Security $security, UserRepository $userRepository, NomenclatureRepository $nomenclatureRepository, YearsRepository $yearsRepository, SurgeriesRepository $surgeriesRepository)
+    public function updateSurgery($id, Request $request, Security $security, UserRepository $userRepository, YearsRepository $yearsRepository, SurgeriesRepository $surgeriesRepository, SurgeryNomenclatureSelection $selection)
     {
         // Get the current user from the security service.
         $user = $security->getUser();
@@ -160,12 +161,18 @@ class SurgeriesController extends AbstractController
         // Get the POST data and decode it into an associative array.
         $data = json_decode($request->getContent(), true);
 
-        // Find the surgery reference by its ID.
-        $surgeryReference = $nomenclatureRepository->findOneBy(['id' => $data['surgeryId']]);
+        // Acte choisi (surgeryId). Sans surgeryId, une intervention déjà liée garde son acte ; sans
+        // nomenclature liée, un acte reste obligatoire (400, comme avant).
+        try {
+            $surgeryReference = $selection->find($data['surgeryId'] ?? null);
+        } catch (\InvalidArgumentException) {
+            $surgeryReference = false;
+        }
+        $currentReference = $surgery->getNomenclature();
 
-        if(!$surgeryReference){
+        if($surgeryReference === false || (!$surgeryReference && !$currentReference)){
             return new JsonResponse([
-                'message' => "Cette intervention n'est pas retrouvé en base de donnée" 
+                'message' => "Cette intervention n'est pas retrouvé en base de donnée"
             ], JsonResponse::HTTP_BAD_REQUEST, ['Access-Control-Allow-Origin' => $_ENV['CORS_ALLOW_ORIGIN']]);
         }
 
@@ -174,7 +181,7 @@ class SurgeriesController extends AbstractController
 
         if(!$year){
             return new JsonResponse([
-                'message' => "Année non retrouvé" 
+                'message' => "Année non retrouvé"
             ], JsonResponse::HTTP_BAD_REQUEST, ['Access-Control-Allow-Origin' => $_ENV['CORS_ALLOW_ORIGIN']]);
         }
 
@@ -185,16 +192,15 @@ class SurgeriesController extends AbstractController
             ], JsonResponse::HTTP_FORBIDDEN, ['Access-Control-Allow-Origin' => $_ENV['CORS_ALLOW_ORIGIN']]);
         }
 
-        // Code construction
-        $code = $surgeryReference->getCodeHospitalisation().''.$surgeryReference->getN();
+        // Code, nom, spécialité et relation ne sont recopiés que si un AUTRE acte est choisi :
+        // renvoyer l'acte déjà lié conserve l'ancien code INAMI et l'intitulé enregistrés.
+        if ($surgeryReference && SurgeryNomenclatureSelection::isAnotherAct($currentReference, $surgeryReference)) {
+            SurgeryNomenclatureSelection::applyAct($surgery, $surgeryReference);
+        }
 
         // Update the attributes of the existing surgery entity.
         $surgery->setYear($year)
-            ->setNomenclature($surgeryReference)
             ->setDate(new \DateTime($data['date']))
-            ->setSpeciality($surgeryReference->getSpeciality())
-            ->setCode($code)
-            ->setName($surgeryReference->getName())
             ->setPosition($data['position']);
 
         // Depending on the position, set the FirstHand and SecondHand attributes.
