@@ -241,6 +241,8 @@ class SurgeriesController extends AbstractController
         if ($anotherAct) {
             SurgeryNomenclatureSelection::applyAct($surgery, $surgeryReference);
         }
+        // Code historique conservé mais officiellement abrogé à la date : avertissement (étape 5).
+        $warning = $anotherAct ? null : SurgeryNomenclatureSelection::repealWarning($currentReference, $date);
 
         // Update the attributes of the existing surgery entity.
         $surgery->setYear($year)
@@ -268,9 +270,10 @@ class SurgeriesController extends AbstractController
         // Flush the entity manager to commit the changes.
         $entityManager->flush();
 
-        return new JsonResponse([
-                'message' => "ok"
-        ], JsonResponse::HTTP_OK, ['Access-Control-Allow-Origin' =>  $_ENV['CORS_ALLOW_ORIGIN']]);
+        return new JsonResponse(array_filter([
+                'message' => "ok",
+                'warning' => $warning,
+        ]), JsonResponse::HTTP_OK, ['Access-Control-Allow-Origin' =>  $_ENV['CORS_ALLOW_ORIGIN']]);
     }
 
     /** Date d'intervention envoyée (même lecture permissive qu'avant) ; null si absente ou illisible. */

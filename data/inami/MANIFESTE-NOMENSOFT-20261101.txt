@@ -1,0 +1,12 @@
+Source : https://www.inami.fgov.be/fr/nomenclature/tableaux-de-reference
+Publication : date d'application 01.11.2026, date de création 09.10.2026 (vérifiée le 2026-11-02 sur la page)
+Schéma Excel : version 26.11.2025 ; description technique : version 01.04.2020 ; tableaux synoptiques : version 09.10.2026
+Téléchargement : 2026-11-02 13:56 UTC
+
+e8c7c46c0525d3a34178015c78a78d2aaed3f054f461579d703f9ff91d5a7468  64334414  https://www.inami.fgov.be/SiteCollectionDocuments/TXT.zip
+78e8dcae9fe615b2aebd7fcd92da698dcc68ff5f4f924409f977f5dc3dabd29b  121969161  https://www.inami.fgov.be/SiteCollectionDocuments/XML.zip
+87286840bdadfc7f71acec3ed04b8396ce09d054bc681fdd98a0e6265b14e4ea  3197927  https://www.inami.fgov.be/SiteCollectionDocuments/UPD_TXT.zip
+847d92c8d6ebc0101b0b952be22dd7766fe302ea970698631ba526d50de2f027  4412213  https://www.inami.fgov.be/SiteCollectionDocuments/UPD_XML.zip
+1c0f9c3ee91727b5a4c1833a358422dc2d00db3b93e10a87b68a30e444068d05  49699  https://www.inami.fgov.be/SiteCollectionDocuments/NomenSoft_tables_design.xlsx
+1e5906786b64e43fbd2be96f39eeed2de88c56b1152b7ff293208b2762c6d3ad  2585134  https://www.inami.fgov.be/SiteCollectionDocuments/Referencetables_nomensoft_new_F.pdf
+bb833f408a8ac2d9ac46790afc9ca2497c18202661230b8bb92e4a2d421027dc  18779  https://www.inami.fgov.be/SiteCollectionDocuments/SURVEY_N.pdf

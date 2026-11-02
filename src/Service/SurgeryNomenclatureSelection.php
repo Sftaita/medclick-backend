@@ -83,9 +83,31 @@ final class SurgeryNomenclatureSelection
         if ($current === null || $newDate === null || $previousDate?->format('Y-m-d') === $newDate->format('Y-m-d')) {
             return;
         }
-        if ($current->isKnownRepealedOn($newDate)) {
+        // Étape 5 : une intervention DÉJÀ datée dans la période abrogée (saisie avant les règles,
+        // 18 807 en production) reste corrigible, même vers une autre date de cette période : le
+        // code historique est conservé tel quel et un avertissement est renvoyé (repealWarning).
+        // Seul le FRANCHISSEMENT de l'abrogation (date antérieure → date postérieure) est refusé.
+        $wasRepealed = $previousDate !== null && $current->isKnownRepealedOn($previousDate);
+        if (!$wasRepealed && $current->isKnownRepealedOn($newDate)) {
             throw new RepealedOnDateException($current, $newDate);
         }
+    }
+
+    /**
+     * Avertissement (sans refus) : le code historique conservé est officiellement abrogé à la date
+     * de l'intervention. Jamais de recodage automatique.
+     */
+    public static function repealWarning(?Nomenclature $current, ?\DateTimeInterface $date): ?string
+    {
+        if ($current === null || $date === null || !$current->isKnownRepealedOn($date)) {
+            return null;
+        }
+
+        return sprintf(
+            "Le code INAMI %s de cette intervention est officiellement abrogé depuis le %s. Il est conservé tel quel ; choisissez un autre acte pour le remplacer.",
+            $current->getCodeHospitalisation() . $current->getN(),
+            $current->getVerifiedRepealDate()->format('d/m/Y'),
+        );
     }
 
     /** Recopie ensemble la relation, le code, l'intitulé et la spécialité de l'acte choisi. */

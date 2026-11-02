@@ -17,11 +17,13 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(
     operations: [
-        new Get(),
+        // Détail d'une intervention : + date officielle d'abrogation vérifiée de son code (étape 5),
+        // pour l'avertissement du formulaire. Pas dans la liste (évite une requête par ligne).
+        new Get(normalizationContext: ['groups' => ['surgeries_read', 'surgery_item']]),
         new GetCollection(),
         new Post(securityPostDenormalize: "is_granted('OWNER', object)", securityPostDenormalizeMessage: 'Cette ressource ne vous appartient pas.', processor: SurgeryNomenclatureProcessor::class),
-        new Put(securityPostDenormalize: "is_granted('OWNER', object)", securityPostDenormalizeMessage: 'Cette ressource ne vous appartient pas.', processor: SurgeryNomenclatureProcessor::class),
-        new Patch(securityPostDenormalize: "is_granted('OWNER', object)", securityPostDenormalizeMessage: 'Cette ressource ne vous appartient pas.', processor: SurgeryNomenclatureProcessor::class),
+        new Put(securityPostDenormalize: "is_granted('OWNER', object)", securityPostDenormalizeMessage: 'Cette ressource ne vous appartient pas.', processor: SurgeryNomenclatureProcessor::class, normalizationContext: ['groups' => ['surgeries_read', 'surgery_item']]),
+        new Patch(securityPostDenormalize: "is_granted('OWNER', object)", securityPostDenormalizeMessage: 'Cette ressource ne vous appartient pas.', processor: SurgeryNomenclatureProcessor::class, normalizationContext: ['groups' => ['surgeries_read', 'surgery_item']]),
         new Delete(),
     ],
     normalizationContext: ['groups' => ['surgeries_read']],
@@ -184,6 +186,16 @@ class Surgeries
     public function getNomenclature(): ?Nomenclature
     {
         return $this->nomenclature;
+    }
+
+    /**
+     * Date officielle d'abrogation VÉRIFIÉE du code lié (« AAAA-MM-JJ »), sinon null. Lecture seule,
+     * détail d'une intervention : la PWA avertit quand le code conservé est abrogé à la date.
+     */
+    #[Groups(['surgery_item'])]
+    public function getInamiRepealedAt(): ?string
+    {
+        return $this->nomenclature?->getVerifiedRepealDate()?->format('Y-m-d');
     }
 
     public function setNomenclature(?Nomenclature $nomenclature): self
