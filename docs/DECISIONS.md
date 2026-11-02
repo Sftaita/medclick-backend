@@ -241,7 +241,8 @@ Décision :
   non sélectionnables pour une intervention.
 - Administration : `GET /api/admin/nomenclature` (toutes spécialités), `GET …/{speciality}` (statut et
   dates inclus), `GET …/{id}/usage` (interventions et favoris liés), `PUT …/{id}/status`
-  `{active, inamiRepealedAt?}` (journalisé). La désactivation conserve la date technique de la
+  `{active, inamiRepealedAt?}`, tracé sur le canal Monolog `nomenclature` (fichier
+  `var/log/nomenclature-prod-AAAA-MM.log` en production, toujours écrit). La désactivation conserve la date technique de la
   première désactivation ; la réactivation l'efface et garde la date officielle sauf si elle est
   envoyée.
 

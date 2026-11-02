@@ -175,7 +175,8 @@ if [ -n "$MIGRATE_ONLY" ]; then
   echo "migration(s) en attente pour $BACKEND_TAG : ${PENDING:-?}"
   if [ "${PENDING:-}" = "0" ]; then echo "Rien à migrer."; exit 0; fi
   [ -n "${PENDING:-}" ] || { echo "état des migrations illisible : arrêt."; exit 1; }
-  backend_once php bin/console doctrine:migrations:list --no-interaction | grep -E "not migrated|Version" | grep -v "migrated  " || true
+  # Migrations qui vont être exécutées (seules les lignes « not migrated »).
+  backend_once php bin/console doctrine:migrations:list --no-interaction | grep "not migrated" || true
   mkdir -p backups
   DUMP="backups/avant-migration-$BACKEND_TAG-$(date -u +%Y%m%d-%H%M%S).sql.gz"
   ( umask 077

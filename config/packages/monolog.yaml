@@ -1,0 +1,5 @@
+# Canaux applicatifs (tous environnements).
+# - nomenclature : changements de statut des codes INAMI (ADR-210), écrits dans un fichier dédié en
+#   production (voir prod/monolog.yaml) ; le gestionnaire « main » ne les conserve qu'en cas d'erreur.
+monolog:
+    channels: ['nomenclature']

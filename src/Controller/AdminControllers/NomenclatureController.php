@@ -12,6 +12,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use App\Entity\User;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Clock\ClockInterface;
+use Symfony\Component\DependencyInjection\Attribute\Target;
 
 /**
  * Nomenclature INAMI (administration, ROLE_ADMIN via access_control sur /api/admin).
@@ -82,7 +83,8 @@ class NomenclatureController extends AbstractController{
         NomenclatureRepository $nomenclatureRepository,
         EntityManagerInterface $entityManager,
         ClockInterface $clock,
-        LoggerInterface $logger,
+        // Canal « nomenclature » : fichier dédié en production (config/packages/prod/monolog.yaml).
+        #[Target('nomenclature')] LoggerInterface $nomenclatureLogger,
     ): JsonResponse {
         $nomenclature = $nomenclatureRepository->find($id);
         if (!$nomenclature) {
@@ -116,7 +118,7 @@ class NomenclatureController extends AbstractController{
 
         // Trace d'administration (identifiants techniques seulement, aucune donnée personnelle).
         $admin = $this->getUser();
-        $logger->notice('Nomenclature INAMI : statut modifié', [
+        $nomenclatureLogger->notice('Nomenclature INAMI : statut modifié', [
             'nomenclature_id' => $nomenclature->getId(),
             'active' => $nomenclature->isActive(),
             'inami_repealed_at' => $nomenclature->getInamiRepealedAt()?->format('Y-m-d'),

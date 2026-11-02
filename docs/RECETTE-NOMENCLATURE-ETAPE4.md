@@ -63,8 +63,7 @@ cd /opt/stack/apps/medclick-staging
 cp -p deploy.sh backups/deploy.sh-avant-etape4-$TS && git -C src/backend fetch -q origin && git -C src/backend show <sha_backend>:deploy/vps/deploy.sh > deploy.sh
 ./deploy.sh <sha_backend> <sha_front>; echo "code $?"          # attendu : 2, AUCUN service remplacé
 ./deploy.sh --migrate <sha_backend> <sha_front>; echo "code $?"  # sauvegarde + migration, services inchangés
-./deploy.sh --verify f87df67485757a2c9714975e2d4c889c334b4426 a624bfcd44bea335a0cdcd0824f67dfb3370f0cb   # ancienne version : 0
-#   + santé, requêtes de l'ancienne version (lecture, écriture de recette, export), journaux
+#   ancienne version : conteneurs identiques et sains, requêtes (lecture, écriture de recette, export), journaux
 ./deploy.sh <sha_backend> <sha_front>; echo "code $?"          # attendu : 0, « Vérification finale : OK »
 ./deploy.sh --verify <sha_backend> <sha_front>; echo "code $?" # attendu : 0
 ```
@@ -104,7 +103,7 @@ le laisser inactif à la fin.
 | 11 | Admin : Réactiver puis Désactiver de nouveau | réactivé : proposé et favori utilisable ; date technique effacée puis refixée |
 | 12 | `type` / `sub_type` de toute la nomenclature | empreinte nomenclature identique, hors code de recette ajouté |
 | 13 | Empreintes interventions et favoris vs §0 | seules les lignes de recette (créées ou modifiées) diffèrent |
-| 14 | Journaux, `error_log` | aucune erreur ni 5xx ; trace `Nomenclature INAMI : statut modifié` pour chaque changement |
+| 14 | Journaux, `error_log` | aucune erreur ni 5xx ; trace `Nomenclature INAMI : statut modifié` pour chaque changement dans `var/log/nomenclature-prod-AAAA-MM.log` |
 
 ## Retour arrière staging
 

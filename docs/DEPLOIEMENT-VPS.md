@@ -111,8 +111,10 @@ Le nouveau backend n'est **jamais** mis en service avant que la base soit à son
    (`backups/avant-migration-<sha>-<date>.sql.gz` + `.sha256`), puis migrations exécutées par le
    nouveau code dans un conteneur temporaire (`--no-deps`, `traefik.enable=false` : il ne reçoit
    aucun trafic, cache propre au conteneur). Aucun service n'est remplacé ni redémarré.
-4. Contrôle de la version **en service** sur le schéma enrichi : `./deploy.sh --verify <anciens SHA>`
-   (code 0), santé, requêtes de lecture et d'écriture habituelles, journaux sans erreur.
+4. Contrôle de la version **en service** sur le schéma enrichi : conteneurs backend, worker et
+   frontend identiques (identifiants, images) et sains, requêtes de lecture et d'écriture habituelles
+   (dont un export Excel), journaux et `error_log` sans erreur. (`--verify` avec les anciens SHA ne
+   convient pas ici : `src/backend` et `src/pwa` contiennent déjà la nouvelle version.)
 5. `./deploy.sh <sha_backend> <sha_front>` : verrou de schéma franchi, mise en service, puis
    `./deploy.sh --verify` (code 0) et empreintes.
 

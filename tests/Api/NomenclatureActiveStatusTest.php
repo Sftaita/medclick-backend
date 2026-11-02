@@ -10,6 +10,7 @@ use App\Entity\Surgeons;
 use App\Entity\User;
 use App\Entity\Years;
 use App\Tests\ApiTestBase;
+use Monolog\Handler\TestHandler;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
 /**
@@ -349,6 +350,28 @@ class NomenclatureActiveStatusTest extends ApiTestBase
         $this->assertNotNull($this->em->getRepository(Surgeries::class)->find($historical->getId()));
         $this->assertNotNull($this->em->getRepository(Surgeries::class)->find($created));
         $this->assertNotNull($this->em->getRepository(Favorites::class)->find($favorite->getId()));
+    }
+
+    public function testStatusChangeIsTracedOnTheDedicatedNomenclatureChannel(): void
+    {
+        $client = $this->clientFor($this->admin);
+        $client->disableReboot();
+        $client->request('GET', '/api/admin/nomenclature/' . $this->current->getId() . '/usage');
+        $handler = new TestHandler();
+        $client->getContainer()->get('monolog.logger.nomenclature')->pushHandler($handler);
+
+        $client->request('PUT', '/api/admin/nomenclature/' . $this->current->getId() . '/status', ['json' => ['active' => false, 'inamiRepealedAt' => '2026-12-31']]);
+        $this->assertResponseIsSuccessful();
+
+        $this->assertTrue($handler->hasNoticeThatContains('Nomenclature INAMI : statut modifié'));
+        $record = $handler->getRecords()[0];
+        $this->assertSame('nomenclature', $record->channel);
+        $this->assertSame([
+            'nomenclature_id' => $this->current->getId(),
+            'active' => false,
+            'inami_repealed_at' => '2026-12-31',
+            'admin_id' => $this->admin->getId(),
+        ], $record->context);
     }
 
     public function testRepeatedDeactivationKeepsTheFirstTechnicalDateAndReactivationClearsIt(): void
