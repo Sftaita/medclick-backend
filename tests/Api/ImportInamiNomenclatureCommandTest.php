@@ -174,6 +174,37 @@ class ImportInamiNomenclatureCommandTest extends ApiTestBase
         $this->assertNotContains($this->old->getId(), array_column($client->request('GET', '/api/nomenclature/ortho')->toArray(), 'id'));
     }
 
+    /**
+     * Plan 3 livré (compléments des 25 codes en attente) : 20 ajouts valides, le doublon de libellé
+     * « avec réduction » existant reste distinct, deuxième exécution sans effet.
+     */
+    public function testShippedComplementsPlanAddsTwentyDistinctCodes(): void
+    {
+        $twin = (new Nomenclature())->setSpeciality('ortho')->setName('Fracture du col du fémur')->setCodeHospitalisation('298266')
+            ->setCodeAmbulant('298255')->setN('N300')->setType('2')->setSubType('hip');
+        $this->em->persist($twin);
+        $this->em->flush();
+        $twinBefore = $this->row('nomenclature', $twin->getId());
+        $plan = json_decode(file_get_contents(static::getContainer()->getParameter('kernel.project_dir') . '/data/inami/plan-import-inami-20261101-3-complements.json'), true);
+        $this->assertCount(20, $plan['add']);
+        $this->assertSame([], $plan['repeal']);
+
+        $this->assertMatchesRegularExpression('/à ajouter\s+20/', $this->runImport($plan)->getDisplay());
+        $this->assertSame(0, $this->runImport($plan, true)->getStatusCode());
+        $this->em->clear();
+        $repository = $this->em->getRepository(Nomenclature::class);
+        $neck = $repository->findOneBy(['codeHospitalisation' => '298745']);
+        $this->assertSame(['ortho', '298734', 'N130', '2', 'hip', true], [$neck->getSpeciality(), $neck->getCodeAmbulant(), $neck->getN(), $neck->getType(), $neck->getSubType(), $neck->isActive()]);
+        $this->assertStringEndsWith('sans réduction', $neck->getName());
+        $thor = $repository->findOneBy(['codeHospitalisation' => '229482']);
+        $this->assertSame(['thor', null, null], [$thor->getSpeciality(), $thor->getType(), $thor->getSubType()]);
+        $this->assertSame($twinBefore, $this->row('nomenclature', $twin->getId()), 'code « avec réduction » inchangé');
+
+        $before = $this->snapshot();
+        $this->assertMatchesRegularExpression('/déjà présent \(ignoré\)\s+20/', $this->runImport($plan, true)->getDisplay());
+        $this->assertSame($before, $this->snapshot());
+    }
+
     // ------------------------------------------------- Helpers
 
     private function plan(): array
