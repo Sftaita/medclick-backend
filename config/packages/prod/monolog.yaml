@@ -14,6 +14,15 @@ monolog:
             path: "%kernel.logs_dir%/%kernel.environment%.log"
             max_files: 30
             level: debug
+        # Changements de statut des codes INAMI (ADR-210) : toujours écrits, un fichier par mois,
+        # sans limite de conservation (volume des journaux, hors web). Aucune donnée personnelle.
+        nomenclature:
+            type: rotating_file
+            path: "%kernel.logs_dir%/nomenclature-%kernel.environment%.log"
+            date_format: Y-m
+            max_files: 0
+            level: notice
+            channels: [nomenclature]
         console:
             type: console
             process_psr_3_messages: false

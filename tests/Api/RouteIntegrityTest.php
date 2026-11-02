@@ -64,10 +64,11 @@ class RouteIntegrityTest extends ApiTestBase
         $this->em->flush();
         $client = $this->clientFor($alice);
 
-        // Liste (page Favoris, choix « Mes favoris ») : tableau brut, clé « shorcut ».
+        // Liste (page Favoris, choix « Mes favoris ») : tableau brut, clé « shorcut » ; « active » =
+        // statut de la nomenclature liée (étape 4, ADR-210).
         $list = $client->request('GET', '/api/favorites/getMyList')->toArray();
         $this->assertResponseIsSuccessful();
-        $this->assertSame([['id' => $favorite->getId(), 'surgeryId' => $nomenclature->getId(), 'codeHospitalisation' => '2890851', 'name' => $nomenclature->getName(), 'shorcut' => 'PTH', 'speciality' => 'ortho']], $list);
+        $this->assertSame([['id' => $favorite->getId(), 'surgeryId' => $nomenclature->getId(), 'codeHospitalisation' => '2890851', 'name' => $nomenclature->getName(), 'shorcut' => 'PTH', 'speciality' => 'ortho', 'active' => true, 'historicalUntil' => null]], $list);
 
         // Modification (contrôleur personnalisé, pas le PUT d'API Platform).
         $client->request('PUT', '/api/favorites/updateNew', ['json' => [

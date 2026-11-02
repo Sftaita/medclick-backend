@@ -77,13 +77,14 @@ cp src/backend/deploy/vps/deploy.sh . && ./deploy.sh <sha_backend> <sha_front>
 ```
 
 `deploy.sh` : sources aux SHA demandés (le frontend est vérifié par `src/pwa/.commit`), build,
-clés JWT générées une seule fois dans le volume (`--skip-if-exists`, privée 600), démarrage avec
-attente des healthchecks (base → backend → frontend), cache Symfony, **arrêt si une migration est
-en attente** (décision humaine, code 2), worker, puis frontend, et enfin une **vérification finale**
+**verrou de schéma** (voir « Mise à jour avec migration »), clés JWT générées une seule fois dans le
+volume (`--skip-if-exists`, privée 600), démarrage avec attente des healthchecks (base → backend →
+frontend), cache Symfony, worker, puis frontend, et enfin une **vérification finale**
 (code 3 en cas d'échec) : backend, worker et frontend démarrés et sains, image **réellement exécutée**
 par chaque conteneur (identifiant d'image, pas seulement l'étiquette) égale à celle de l'étiquette
 demandée, worker sur la même image que le backend, et code des conteneurs backend/worker identique
-au commit (empreinte de `src/`, `migrations/`, `templates/`, `composer.lock`).
+au commit (empreinte de `src/`, `migrations/`, `templates/`, `composer.lock`), aucune migration en
+attente pour le code en service.
 `./deploy.sh --verify <sha_backend> <sha_front>` refait seulement cette vérification, sans rien
 modifier (contrôle après déploiement ou avant intervention).
 
@@ -92,9 +93,59 @@ modifier (contrôle après déploiement ou avant intervention).
 Backend seul : `./deploy.sh <nouveau_sha_backend> <sha_front_actuel>`.
 Frontend : livrer la nouvelle archive dans `src/pwa` + `.commit`, puis `./deploy.sh <sha_backend> <nouveau_sha_front>`.
 Retour arrière : relancer `deploy.sh` avec les SHA précédents (images reconstruites ou réutilisées
-depuis le cache) ; en cas de migration, restaurer la sauvegarde prise juste avant. Le script
+depuis le cache) ; une migration additive peut rester en place (la version précédente l'ignore),
+sinon restaurer la sauvegarde prise par `--migrate`. Le script
 `deploy.sh` du dossier de l'environnement n'est pas remplacé par un déploiement : après une mise à
 jour du script (`cp src/backend/deploy/vps/deploy.sh .`), garder la copie précédente dans `backups/`.
+
+## Mise à jour avec migration (migration sans interruption)
+
+Le nouveau backend n'est **jamais** mis en service avant que la base soit à son niveau de migration :
+
+1. Sauvegarde et empreintes de contrôle (lecture seule).
+2. `./deploy.sh <sha_backend> <sha_front>` : construit les images puis, dans un **conteneur
+   temporaire** du nouveau code, constate la migration en attente et s'arrête (code 2) **avant** de
+   remplacer un service et avant d'écrire les nouvelles étiquettes dans `.env` : backend, worker et
+   frontend en service restent ceux de la version précédente (un `docker compose up` manuel aussi).
+3. `./deploy.sh --migrate <sha_backend> <sha_front>` : sauvegarde vérifiée
+   (`backups/avant-migration-<sha>-<date>.sql.gz` + `.sha256`), puis migrations exécutées par le
+   nouveau code dans un conteneur temporaire (`--no-deps`, `traefik.enable=false` : il ne reçoit
+   aucun trafic, cache propre au conteneur). Aucun service n'est remplacé ni redémarré.
+4. Contrôle de la version **en service** sur le schéma enrichi : conteneurs backend, worker et
+   frontend identiques (identifiants, images) et sains, requêtes de lecture et d'écriture habituelles
+   (dont un export Excel), journaux et `error_log` sans erreur. (`--verify` avec les anciens SHA ne
+   convient pas ici : `src/backend` et `src/pwa` contiennent déjà la nouvelle version.)
+5. `./deploy.sh <sha_backend> <sha_front>` : verrou de schéma franchi, mise en service, puis
+   `./deploy.sh --verify` (code 0) et empreintes.
+
+Interruption : la migration (étape 3) n'interrompt pas le service ; le remplacement des services
+(étape 5) peut provoquer une courte indisponibilité (recréation du conteneur backend, quelques
+secondes). Plan appliqué à la version 3.6.0 : `docs/MEP-3.6.0.md`.
+
+Condition : la migration doit être **additive** (colonnes avec valeur par défaut, tables, index),
+donc compatible avec la version en service. Une migration destructive exige une autre procédure.
+Les conteneurs temporaires (`docker compose run`) portent `traefik.enable=false` : sans cette
+étiquette, ils reprendraient celles du service backend et Traefik leur enverrait une part du trafic.
+
+## Accès navigateur de recette (préproduction, tunnel SSH)
+
+Quand le poste de recette n'est pas dans la liste d'IP de Traefik (IP changeante), la préproduction
+reste accessible sans l'ouvrir ni modifier Traefik : service `recette-acces` du Compose de
+préproduction (nginx, profil inactif par défaut, `deploy/vps/recette-acces/nginx.conf`), publié
+seulement sur `127.0.0.1:8095` du VPS, sur le réseau privé de la préproduction. Il sert la même
+image de frontend et l'API sous une même origine (l'URL absolue de l'API est réécrite en `/api/`).
+
+```bash
+# VPS, /opt/stack/apps/medclick-staging : démarrer pour la séance de recette
+docker compose --profile recette-acces up -d --no-deps recette-acces
+# poste : tunnel (clé SSH), puis http://localhost:8095 dans un profil de navigateur dédié
+ssh -N -L 8095:127.0.0.1:8095 surgicalhub-prod
+# VPS, fin de séance : arrêter et supprimer le conteneur
+docker compose --profile recette-acces rm -sf recette-acces
+```
+
+Préalable (une fois) : le frontend rejoint le réseau privé de la préproduction (déploiement normal
+avec `deploy.sh`). Aucune exposition publique : seul un compte SSH du VPS peut ouvrir le tunnel.
 
 ## Copie production → préproduction
 

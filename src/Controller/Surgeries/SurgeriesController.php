@@ -7,6 +7,8 @@ use App\Repository\NomenclatureRepository;
 use App\Repository\SurgeriesRepository;
 use App\Repository\UserRepository;
 use App\Repository\YearsRepository;
+use App\Service\InactiveNomenclatureException;
+use App\Service\RepealedOnDateException;
 use App\Service\SurgeryNomenclatureSelection;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Routing\Attribute\Route;
@@ -67,6 +69,25 @@ class SurgeriesController extends AbstractController
             ], JsonResponse::HTTP_BAD_REQUEST, ['Access-Control-Allow-Origin' => $_ENV['CORS_ALLOW_ORIGIN']]);
         }
 
+        // Date de l'intervention (illisible : erreur client, plus une erreur 500).
+        $date = self::parseDate($data['date'] ?? null);
+        if (!$date) {
+            return new JsonResponse([
+                'message' => "Veuillez indiquer une date valide."
+            ], JsonResponse::HTTP_BAD_REQUEST, ['Access-Control-Allow-Origin' => $_ENV['CORS_ALLOW_ORIGIN']]);
+        }
+
+        // Étape 4 (ADR-210) : code utilisable à la DATE DE L'INTERVENTION (actif, ou abrogation
+        // vérifiée postérieure à cette date pour une saisie tardive).
+        try {
+            SurgeryNomenclatureSelection::assertSelectable($surgeryReference, $date);
+        } catch (InactiveNomenclatureException $e) {
+            return new JsonResponse([
+                'message' => $e->getMessage(),
+                'reason' => InactiveNomenclatureException::REASON,
+            ], JsonResponse::HTTP_BAD_REQUEST, ['Access-Control-Allow-Origin' => $_ENV['CORS_ALLOW_ORIGIN']]);
+        }
+
         // Find the current year by ID
         $year = $yearsRepository->findOneBy(['id' => $data['year']]);
 
@@ -92,7 +113,7 @@ class SurgeriesController extends AbstractController
         // Set the attributes of the new surgery entity.
         $surgery->setYear($year)
             ->setNomenclature($surgeryReference)
-            ->setDate(new \DateTime($data['date']))
+            ->setDate($date)
             ->setSpeciality($surgeryReference->getSpeciality())
             ->setCode($code)
             ->setName($surgeryReference->getName())
@@ -192,15 +213,38 @@ class SurgeriesController extends AbstractController
             ], JsonResponse::HTTP_FORBIDDEN, ['Access-Control-Allow-Origin' => $_ENV['CORS_ALLOW_ORIGIN']]);
         }
 
+        $date = self::parseDate($data['date'] ?? null);
+        if (!$date) {
+            return new JsonResponse([
+                'message' => "Veuillez indiquer une date valide."
+            ], JsonResponse::HTTP_BAD_REQUEST, ['Access-Control-Allow-Origin' => $_ENV['CORS_ALLOW_ORIGIN']]);
+        }
+
         // Code, nom, spécialité et relation ne sont recopiés que si un AUTRE acte est choisi :
-        // renvoyer l'acte déjà lié conserve l'ancien code INAMI et l'intitulé enregistrés.
-        if ($surgeryReference && SurgeryNomenclatureSelection::isAnotherAct($currentReference, $surgeryReference)) {
+        // renvoyer l'acte déjà lié conserve l'ancien code INAMI et l'intitulé enregistrés, même
+        // si ce code a été désactivé depuis. Étape 4 (ADR-210) : un AUTRE acte doit être
+        // utilisable à la nouvelle date ; un acte inchangé ne peut pas être déplacé au-delà de
+        // son abrogation vérifiée (refus explicite, jamais de remplacement silencieux du code).
+        $anotherAct = $surgeryReference && SurgeryNomenclatureSelection::isAnotherAct($currentReference, $surgeryReference);
+        try {
+            if ($anotherAct) {
+                SurgeryNomenclatureSelection::assertSelectable($surgeryReference, $date);
+            } else {
+                SurgeryNomenclatureSelection::assertDateKeepsAct($currentReference, $surgery->getDate(), $date);
+            }
+        } catch (InactiveNomenclatureException|RepealedOnDateException $e) {
+            return new JsonResponse([
+                'message' => $e->getMessage(),
+                'reason' => $e instanceof RepealedOnDateException ? RepealedOnDateException::REASON : InactiveNomenclatureException::REASON,
+            ], JsonResponse::HTTP_BAD_REQUEST, ['Access-Control-Allow-Origin' => $_ENV['CORS_ALLOW_ORIGIN']]);
+        }
+        if ($anotherAct) {
             SurgeryNomenclatureSelection::applyAct($surgery, $surgeryReference);
         }
 
         // Update the attributes of the existing surgery entity.
         $surgery->setYear($year)
-            ->setDate(new \DateTime($data['date']))
+            ->setDate($date)
             ->setPosition($data['position']);
 
         // Depending on the position, set the FirstHand and SecondHand attributes.
@@ -229,4 +273,16 @@ class SurgeriesController extends AbstractController
         ], JsonResponse::HTTP_OK, ['Access-Control-Allow-Origin' =>  $_ENV['CORS_ALLOW_ORIGIN']]);
     }
 
+    /** Date d'intervention envoyée (même lecture permissive qu'avant) ; null si absente ou illisible. */
+    private static function parseDate(mixed $value): ?\DateTime
+    {
+        if (!is_string($value) || trim($value) === '') {
+            return null;
+        }
+        try {
+            return new \DateTime($value);
+        } catch (\Exception) {
+            return null;
+        }
+    }
 }

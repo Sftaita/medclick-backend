@@ -15,6 +15,10 @@ use App\Repository\NomenclatureRepository;
  * depuis la nomenclature que si l'utilisateur choisit réellement un AUTRE acte ; renvoyer
  * l'acte déjà lié, ou n'en envoyer aucun, ne doit jamais remplacer un ancien code par le code
  * actuel de la nomenclature.
+ *
+ * Étape 4 (ADR-210) : un acte INACTIF n'est accepté que s'il est déjà lié à l'intervention et
+ * inchangé. Toute nouvelle intervention, tout nouveau favori et tout changement d'acte exigent un
+ * code actif (assertSelectable).
  */
 final class SurgeryNomenclatureSelection
 {
@@ -49,6 +53,39 @@ final class SurgeryNomenclatureSelection
     public static function isAnotherAct(?Nomenclature $current, Nomenclature $selected): bool
     {
         return $current === null || $current->getId() !== $selected->getId();
+    }
+
+    /**
+     * Un acte choisi pour une création ou un changement d'acte doit être utilisable à la date de
+     * l'intervention : actif, ou inactif avec une date officielle d'abrogation VÉRIFIÉE postérieure
+     * à l'intervention (saisie tardive). Sans date : seulement un code actif.
+     *
+     * @throws InactiveNomenclatureException
+     */
+    public static function assertSelectable(Nomenclature $reference, ?\DateTimeInterface $date = null): void
+    {
+        $usable = $date !== null ? $reference->isUsableOn($date) : $reference->isActive();
+        if (!$usable) {
+            throw $date !== null ? InactiveNomenclatureException::forDate($reference, $date) : new InactiveNomenclatureException();
+        }
+    }
+
+    /**
+     * Intervention existante dont l'acte est inchangé : sa nouvelle date ne doit pas franchir
+     * l'abrogation VÉRIFIÉE de son code (le code historique n'est jamais remplacé en silence).
+     * Date inchangée, code actif ou abrogation non vérifiée : aucune restriction (aucune période
+     * de validité supposée, données historiques préservées).
+     *
+     * @throws RepealedOnDateException
+     */
+    public static function assertDateKeepsAct(?Nomenclature $current, ?\DateTimeInterface $previousDate, ?\DateTimeInterface $newDate): void
+    {
+        if ($current === null || $newDate === null || $previousDate?->format('Y-m-d') === $newDate->format('Y-m-d')) {
+            return;
+        }
+        if ($current->isKnownRepealedOn($newDate)) {
+            throw new RepealedOnDateException($current, $newDate);
+        }
     }
 
     /** Recopie ensemble la relation, le code, l'intitulé et la spécialité de l'acte choisi. */

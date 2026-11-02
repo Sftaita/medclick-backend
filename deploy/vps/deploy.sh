@@ -3,9 +3,18 @@
 # L'environnement est déduit du dossier : /opt/stack/apps/medclick-<env> → docker-compose.<env>.yml.
 # Usage (dans /opt/stack/apps/medclick-<env>) :
 #   ./deploy.sh <sha_backend> <sha_frontend>            déploiement complet puis vérification finale
+#   ./deploy.sh --migrate <sha_backend> <sha_frontend>  sauvegarde puis migrations SEULES, exécutées par
+#                                                       le nouveau code dans un conteneur temporaire ;
+#                                                       backend, worker et frontend en service inchangés
 #   ./deploy.sh --verify <sha_backend> <sha_frontend>   vérification finale seule (aucune modification)
-# Étapes : sources aux SHA demandés → build → up → clés JWT (une fois) → cache → migrations → worker
-# → frontend → vérification finale.
+# Étapes : sources aux SHA demandés → build → VERROU DE SCHÉMA (nouveau code, conteneur temporaire)
+# → étiquettes dans .env → clés JWT (une fois) → up → cache → worker → frontend → vérification finale.
+#
+# Verrou de schéma : si le nouveau code a une migration en attente, le script s'arrête (code 2) AVANT
+# de remplacer le moindre service et avant d'enregistrer les nouvelles étiquettes dans .env : le
+# backend et le worker en service restent ceux de la version précédente (un « docker compose up »
+# manuel aussi). Procédure : ./deploy.sh --migrate (migration additive, compatible avec la version
+# en service), contrôle de la version en service, puis ./deploy.sh.
 # Le dépôt du frontend est privé : ses sources sont livrées dans src/pwa par
 #   git archive <sha> frontend | ssh <vps> "tar -x -C .../src/pwa" ; echo <sha> > src/pwa/.commit
 # (docs/DEPLOIEMENT-VPS.md), et le script vérifie que .commit correspond au SHA demandé.
@@ -19,7 +28,11 @@ cd "$(dirname "$0")"
 ENV_NAME=$(basename "$PWD"); ENV_NAME=${ENV_NAME#medclick-}
 
 VERIFY_ONLY=
-if [ "${1:-}" = "--verify" ]; then VERIFY_ONLY=1; shift; fi
+MIGRATE_ONLY=
+case "${1:-}" in
+  --verify) VERIFY_ONLY=1; shift ;;
+  --migrate) MIGRATE_ONLY=1; shift ;;
+esac
 BACKEND_SHA=${1:?SHA backend requis}
 FRONTEND_SHA=${2:?SHA frontend requis}
 BACKEND_REPO=https://github.com/Sftaita/medclick-backend.git
@@ -40,6 +53,21 @@ checkout() { # <dépôt> <dossier> <sha>
 SERVICES=
 load_services() { SERVICES=$(docker compose config --services); }
 has_service() { grep -qx -- "$1" <<< "$SERVICES"; }
+
+# Commande du NOUVEAU code dans un conteneur temporaire (image de BACKEND_TAG, supprimé à la fin) :
+# - --no-deps : aucun autre service démarré ou recréé ;
+# - traefik.enable=false : le conteneur reprend sinon les étiquettes du service backend et Traefik
+#   lui enverrait une part du trafic de l'API (il ne sert pas de HTTP : erreurs 502) ;
+# - cache Symfony propre au conteneur (non partagé avec le backend en service).
+backend_once() {
+  docker compose run --rm --no-deps -T -l traefik.enable=false -e APP_ENV=prod backend "$@"
+}
+
+# Nombre de migrations du code de l'image BACKEND_TAG non encore appliquées à la base.
+pending_migrations() {
+  backend_once php bin/console doctrine:migrations:status --no-interaction \
+    | awk -F'|' '$3 ~ /New/ {gsub(/ /,"",$4); print $4}'
+}
 
 # Identifiant de l'image réellement exécutée par le conteneur d'un service (vide s'il n'existe pas).
 running_image_id() {
@@ -90,6 +118,15 @@ verify_deployment() {
     [ "$(running_image_id worker)" = "$(running_image_id backend)" ] || fail "worker et backend n'exécutent pas la même image."
   fi
   check_service frontend "$FRONTEND_TAG"
+  # Schéma : aucune migration du code en service ne doit rester en attente.
+  local pending
+  pending=$(docker compose exec -T backend php bin/console doctrine:migrations:status --no-interaction \
+    | awk -F'|' '$3 ~ /New/ {gsub(/ /,"",$4); print $4}' || true)
+  if [ "${pending:-?}" = "0" ]; then
+    echo "  schéma    aucune migration en attente"
+  else
+    fail "migration(s) en attente pour le code en service : ${pending:-inconnu}."
+  fi
   if [ "$FAILED" != 0 ]; then
     echo "VÉRIFICATION FINALE ÉCHOUÉE : déploiement incomplet (voir ci-dessus)."
     exit 3
@@ -119,18 +156,66 @@ load_services
 PREVIOUS_FRONTEND_IMAGE=$(docker inspect --format '{{.Config.Image}}' "medclick-$ENV_NAME-frontend" 2>/dev/null || echo nginx:1.29-alpine)
 export PREVIOUS_FRONTEND_IMAGE
 echo "assets précédents repris de : $PREVIOUS_FRONTEND_IMAGE"
-docker compose build
+if [ -n "$MIGRATE_ONLY" ]; then
+  docker compose build backend
+else
+  docker compose build
+fi
+# Base démarrée (déjà en service en général). Mailpit n'existe qu'en préproduction (capture des e-mails).
+docker compose up -d --wait db $(has_service mailpit && echo mailpit || true)
+
+# ---------------------------------------------------------------------------------------------------
+# Migrations seules (--migrate) : sauvegarde vérifiée, puis migrations exécutées par le nouveau code
+# dans un conteneur temporaire. Aucun service applicatif n'est remplacé ni redémarré, et .env garde
+# les étiquettes de la version en service. Les migrations doivent être additives (compatibles avec
+# la version en service) : c'est la condition de ce mode, à vérifier dans la revue de la migration.
+# ---------------------------------------------------------------------------------------------------
+if [ -n "$MIGRATE_ONLY" ]; then
+  PENDING=$(pending_migrations)
+  echo "migration(s) en attente pour $BACKEND_TAG : ${PENDING:-?}"
+  if [ "${PENDING:-}" = "0" ]; then echo "Rien à migrer."; exit 0; fi
+  [ -n "${PENDING:-}" ] || { echo "état des migrations illisible : arrêt."; exit 1; }
+  # Migrations qui vont être exécutées (seules les lignes « not migrated »).
+  backend_once php bin/console doctrine:migrations:list --no-interaction | grep "not migrated" || true
+  mkdir -p backups
+  DUMP="backups/avant-migration-$BACKEND_TAG-$(date -u +%Y%m%d-%H%M%S).sql.gz"
+  ( umask 077
+    docker compose exec -T db sh -c 'MYSQL_PWD="$MARIADB_PASSWORD" mariadb-dump -u"$MARIADB_USER" --single-transaction --no-tablespaces --routines --triggers "$MARIADB_DATABASE"' | gzip > "$DUMP" )
+  gzip -t "$DUMP" && zcat "$DUMP" | tail -n 1 | grep -q "Dump completed" || { echo "sauvegarde invalide : $DUMP — arrêt sans migration."; exit 1; }
+  sha256sum "$DUMP" > "$DUMP.sha256"
+  echo "sauvegarde : $DUMP ($(stat -c %s "$DUMP") octets, gzip et fin de dump vérifiés)"
+  backend_once php bin/console doctrine:migrations:migrate --no-interaction --all-or-nothing
+  PENDING=$(pending_migrations)
+  [ "$PENDING" = "0" ] || { echo "ÉCHEC : ${PENDING:-?} migration(s) encore en attente après exécution."; exit 1; }
+  echo "Migrations appliquées par le code $BACKEND_TAG. Services en service inchangés :"
+  docker compose ps
+  echo "Contrôler la version en service, puis : ./deploy.sh $BACKEND_SHA $FRONTEND_SHA"
+  exit 0
+fi
+
+# ---------------------------------------------------------------------------------------------------
+# VERROU DE SCHÉMA : le nouveau code ne remplace la version en service que si la base est déjà à son
+# niveau de migration. Contrôle fait dans un conteneur temporaire, AVANT tout remplacement de service
+# et avant l'enregistrement des étiquettes dans .env (un « docker compose up » manuel lance alors
+# toujours la version précédente).
+# ---------------------------------------------------------------------------------------------------
+PENDING=$(pending_migrations)
+if [ "${PENDING:-}" != "0" ]; then
+  echo "ARRÊT (aucun service remplacé) : ${PENDING:-état illisible} migration(s) en attente pour $BACKEND_TAG."
+  echo "Sauvegarder, puis : ./deploy.sh --migrate $BACKEND_SHA $FRONTEND_SHA ; contrôler la version en service ; relancer ce déploiement."
+  exit 2
+fi
+echo "verrou de schéma : aucune migration en attente pour $BACKEND_TAG"
+
 # Étiquettes de ce déploiement enregistrées dans .env : une commande docker compose lancée à la main
 # dans ce dossier utilise ces images, jamais une plus ancienne (le Compose refuse une étiquette absente).
 for TAG_VAR in BACKEND_TAG FRONTEND_TAG; do
   sed -i "/^${TAG_VAR}=/d" .env && echo "${TAG_VAR}=${!TAG_VAR}" >> .env
 done
 [ "$(stat -c %a .env)" = "600" ] || { echo ".env doit rester en 600"; exit 1; }
-# Mailpit n'existe qu'en préproduction (capture des e-mails).
-docker compose up -d --wait db $(has_service mailpit && echo mailpit || true)
 
 # Clés JWT de CET environnement (phrase de passe du .env), générées une seule fois dans le volume.
-docker compose run --rm --no-deps -e APP_ENV=prod backend sh -c \
+backend_once sh -c \
   'php bin/console lexik:jwt:generate-keypair --skip-if-exists && chown www-data:www-data config/jwt/*.pem && chmod 600 config/jwt/private.pem && chmod 644 config/jwt/public.pem'
 
 docker compose up -d --wait backend
@@ -138,9 +223,10 @@ docker compose exec -T backend php bin/console cache:clear --no-warmup
 docker compose exec -T backend php bin/console cache:warmup
 docker compose exec -T backend chown -R www-data:www-data var
 
+# Contrôle de sûreté (le verrou de schéma l'a déjà garanti) : toujours aucune migration en attente.
 PENDING=$(docker compose exec -T backend php bin/console doctrine:migrations:status --no-interaction | awk -F'|' '$3 ~ /New/ {gsub(/ /,"",$4); print $4}')
-if [ "${PENDING:-0}" != "0" ]; then
-  echo "ARRÊT : ${PENDING} migration(s) en attente — à examiner avant toute exécution."
+if [ "${PENDING:-?}" != "0" ]; then
+  echo "ARRÊT : ${PENDING:-état illisible} migration(s) en attente après la mise en service — à examiner."
   exit 2
 fi
 
