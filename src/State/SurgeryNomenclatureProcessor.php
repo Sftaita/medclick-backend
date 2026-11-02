@@ -4,11 +4,15 @@ namespace App\State;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
+use ApiPlatform\Validator\Exception\ValidationException;
 use App\Entity\Surgeries;
+use App\Service\InactiveNomenclatureException;
 use App\Service\SurgeryNomenclatureSelection;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\Validator\ConstraintViolation;
+use Symfony\Component\Validator\ConstraintViolationList;
 
 /**
  * Modification d'une intervention (PUT/PATCH API Platform).
@@ -22,6 +26,10 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
  *   superviseurs sont alors modifiés.
  * - Les spécialités « favorites » historiques ne sont plus normalisées au PUT (ancien LOT 2D.3) :
  *   leur correction relève de `app:repair-surgery-nomenclature --scope=favorites`.
+ *
+ * - Étape 4 (ADR-210) : l'acte choisi pour un changement d'acte (ou une création POST
+ *   /api/surgeries avec `surgeryId`) doit être ACTIF, sinon 422 avec une violation sur `name`.
+ *   Un code inactif déjà lié reste accepté tant qu'il n'est pas changé.
  *
  * `surgeryId` n'est pas une propriété de l'entité : il est lu dans le corps de la requête.
  *
@@ -57,8 +65,15 @@ final class SurgeryNomenclatureProcessor implements ProcessorInterface
         $current = $previous?->getNomenclature();
 
         if ($selected && SurgeryNomenclatureSelection::isAnotherAct($current, $selected)) {
-            // Changement d'acte réellement demandé : les quatre champs suivent l'acte choisi
-            // (la spécialité est celle de la nomenclature, jamais « favorites »).
+            // Changement d'acte réellement demandé : l'acte doit être actif, puis les quatre champs
+            // suivent l'acte choisi (la spécialité est celle de la nomenclature, jamais « favorites »).
+            try {
+                SurgeryNomenclatureSelection::assertSelectable($selected);
+            } catch (InactiveNomenclatureException $e) {
+                throw new ValidationException(new ConstraintViolationList([
+                    new ConstraintViolation($e->getMessage(), null, [], $data, 'name', $payload['surgeryId'] ?? null),
+                ]));
+            }
             SurgeryNomenclatureSelection::applyAct($data, $selected);
         } elseif ($previous) {
             // Même acte ou aucun choix : les quatre champs reprennent STRICTEMENT les valeurs

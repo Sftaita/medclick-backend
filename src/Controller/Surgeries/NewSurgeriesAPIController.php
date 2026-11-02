@@ -6,6 +6,7 @@ use App\Entity\Surgeries;
 use App\Repository\NomenclatureRepository;
 use App\Repository\UserRepository;
 use App\Repository\YearsRepository;
+use App\Service\InactiveNomenclatureException;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Routing\Attribute\Route;
@@ -82,6 +83,14 @@ class NewSurgeriesAPIController extends AbstractController
 
         if (!$surgeryReference) {
             return $this->handleMissingData("Cette intervention n'est pas retrouvée en base de données");
+        }
+
+        // Étape 4 (ADR-210) : une nouvelle intervention n'utilise qu'un code INAMI actif.
+        if (!$surgeryReference->isActive()) {
+            return new JsonResponse([
+                'message' => InactiveNomenclatureException::MESSAGE,
+                'reason' => InactiveNomenclatureException::REASON,
+            ], JsonResponse::HTTP_BAD_REQUEST, ['Access-Control-Allow-Origin' => $_ENV['CORS_ALLOW_ORIGIN']]);
         }
 
         // Role during the surgery: 1 (first hand), 2 (second hand), 3 (first hand, assisted).

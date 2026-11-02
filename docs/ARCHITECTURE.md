@@ -79,7 +79,9 @@ Points notables :
   sont copiés depuis la nomenclature (dénormalisation).
 - `Favorites` copie aussi nom/code/spécialité de la nomenclature.
 - `Nomenclature` : `speciality`, `codeAmbulant`, `codeHospitalisation`, `n`, `name`,
-  `type`, `subType`.
+  `type`, `subType`, `active` (code proposé aux nouvelles saisies), `inamiRepealedAt` (date
+  officielle d'abrogation), `deactivatedAt` (date technique de désactivation). Un code obsolète est
+  désactivé, jamais supprimé (ADR-210).
 
 ## 4. Authentification et autorisation
 
@@ -116,13 +118,13 @@ Points notables :
 | GET | `/api/partner/active` | public | Partenaire affiché aujourd'hui (204 sinon) |
 | GET | `/api/partner/logo/{sha256}.{png\|svg}` | public | Logo du partenaire (CSP sans script, cache immuable) |
 | GET | `/api/marketing/image/{sha256}.webp` | public | Visuel importé d'une campagne (CSP sans script, cache immuable) |
-| GET | `/api/nomenclature/{speciality}` | user | Nomenclature d'une spécialité |
+| GET | `/api/nomenclature/{speciality}` | user | Codes **actifs** d'une spécialité (choix d'un acte) |
 | GET | `/api/list/{id}` | propriétaire | Chirurgiens d'une année |
 | POST | `/api/years/create` | user | Création d'année (unicité année/user) |
 | POST | `/api/surgeries/add` | user | Création d'intervention (v1) |
 | POST | `/api/surgeries/addNewSurgery` | user | Création d'intervention (v2, `createdAt`) |
 | PUT | `/api/surgeries/update/{id}` | user | Mise à jour d'intervention |
-| GET | `/api/favorites/getMyList` | user | Favoris du user |
+| GET | `/api/favorites/getMyList` | user | Favoris du user (`active` : statut de la nomenclature liée) |
 | POST | `/api/favorites/addNew` | user | Ajout favori |
 | PUT | `/api/favorites/updateNew` | user | Modification favori |
 | POST/GET | `/api/exports`, `/api/exports/{id}`, `…/download` | propriétaire | **API Excel canonique** : export asynchrone du carnet de stage (docs/EXPORTS.md) |
@@ -133,7 +135,9 @@ Points notables :
 | GET | `/api/admin/users` | admin | Liste des utilisateurs + connexions |
 | GET | `/api/admin/fetchUserById/{id}` | admin | Profil + années d'un user |
 | GET | `/api/admin/history/quick` | admin | Tableau de bord des connexions |
-| GET/POST/PUT | `/api/admin/nomenclature…` | admin | CRUD nomenclature, type, sous-type |
+| GET/POST/PUT | `/api/admin/nomenclature…` | admin | CRUD nomenclature, type, sous-type ; tous les codes (actifs et inactifs) |
+| GET | `/api/admin/nomenclature/{id}/usage` | admin | Interventions et favoris liés à un code |
+| PUT | `/api/admin/nomenclature/{id}/status` | admin | Activation / désactivation `{active, inamiRepealedAt?}` (jamais de suppression) |
 | GET/POST/PUT/DELETE | `/api/admin/marketing…` | admin | CRUD campagnes, statut, emplacements, exclusivité |
 | GET | `/api/admin/marketing-stats`, `….csv` | admin | Statistiques publicitaires, export CSV (docs/SPONSORS.md) |
 | POST/DELETE | `/api/admin/marketing-images…` | admin | Import d'un visuel (multipart `file`, PNG/JPEG/WebP 5 Mo) ; suppression d'un import abandonné (409 s'il est utilisé) |
@@ -163,9 +167,11 @@ Tout `/api` non listé comme public exige un JWT (dernière règle de `access_co
 
 ## 6. Flux « ajouter une intervention » (v2)
 
-1. Le front charge la nomenclature (`/api/nomenclature/{speciality}`) et les favoris.
+1. Le front charge la nomenclature (`/api/nomenclature/{speciality}`, codes actifs) et les favoris
+   (un favori dont le code est inactif est affiché grisé, non sélectionnable).
 2. `POST /api/surgeries/addNewSurgery` `{year, surgeryId, date, position, firstHand?, secondHand?}`.
-3. Le contrôleur copie nom/spécialité/code depuis `Nomenclature`, positionne
+3. Le contrôleur refuse un code inactif (400, `reason: nomenclature_inactive`), copie
+   nom/spécialité/code depuis `Nomenclature`, positionne
    `firstHand`/`secondHand` selon `position`, fixe `createdAt`, persiste.
 
 ## 7. Export Excel (carnet de stage)

@@ -57,6 +57,7 @@ Précision (nomenclature, étape 3) : à la modification d'une intervention, la 
 que si un **autre** acte est choisi (`SurgeryNomenclatureSelection`) ; renvoyer l'acte lié ou
 n'en envoyer aucun conserve strictement le code INAMI historique, l'intitulé, la spécialité
 (y compris « favorites ») et le lien.
+Précision (étape 4) : un code obsolète est désactivé, jamais supprimé (ADR-210).
 
 ## ADR-008 — Carnet de stage généré depuis un gabarit Excel
 **Statut : Acceptée** — complétée par ADR-202 (générateur unique, format figé par des références).
@@ -212,3 +213,38 @@ Les alertes restantes de `npm audit` ne concernent que les outils de développem
 **Statut : Acceptée (28/10/2026)**
 Décision : la version affichée (pied de page) est celle du `package.json` du front ; chaque version
 a une entrée en tête de `frontend/docs/VERSIONS.md` (dépôt front) ; un test vérifie leur concordance.
+
+## ADR-210 — Codes INAMI actifs et inactifs (nomenclature, étape 4)
+**Statut : Proposée (01/11/2026)** — complète ADR-007.
+
+Contexte : des codes INAMI sont abrogés ; ils doivent disparaître des nouvelles saisies sans
+toucher aux carnets existants (≈ 223 900 interventions et 1 646 favoris liés à 1 775 codes).
+
+Décision :
+- `nomenclature.active` (TRUE par défaut), `inami_repealed_at` (date officielle d'abrogation,
+  saisie par l'administrateur, facultative) et `deactivated_at` (date et heure techniques fixées par
+  le serveur) : deux dates distinctes. Migration additive `Version20261103090000`.
+- Un code est **désactivé, jamais supprimé ni renuméroté** ; ses interventions et favoris liés ne
+  sont pas modifiés.
+- Seule la liste de choix `GET /api/nomenclature/{speciality}` filtre sur `active`. **Aucun filtre
+  Doctrine global** : interventions, favoris, statistiques, exports et administration lisent tous
+  les codes.
+- Code actif exigé pour : toute création d'intervention (`/api/surgeries/addNewSurgery`,
+  `/api/surgeries/add`, `POST /api/surgeries`), tout changement d'acte (`PUT`/`PATCH
+  /api/surgeries/{id}`, `PUT /api/surgeries/update/{id}`), tout nouveau favori ou favori redirigé
+  (`/api/favorites/addNew`, `/api/favorites/updateNew`). Un code inactif déjà lié et inchangé reste
+  accepté (modification d'une intervention historique, renommage d'un favori).
+- Refus : contrôleurs custom 400 `{message|error, reason: "nomenclature_inactive"}` ; API Platform
+  422 avec une violation sur `name`.
+- Favoris : `active` (listes `getMyList` et `getById`) est le statut de la nomenclature **liée**,
+  jamais déduit du code copié dans le favori ; la PWA les affiche grisés, « Code INAMI inactif »,
+  non sélectionnables pour une intervention.
+- Administration : `GET /api/admin/nomenclature` (toutes spécialités), `GET …/{speciality}` (statut et
+  dates inclus), `GET …/{id}/usage` (interventions et favoris liés), `PUT …/{id}/status`
+  `{active, inamiRepealedAt?}` (journalisé). La désactivation conserve la date technique de la
+  première désactivation ; la réactivation l'efface et garde la date officielle sauf si elle est
+  envoyée.
+
+Conséquences : aucune désactivation réelle avant validation de la liste officielle ; décisions
+métier ouvertes listées dans `docs/RECETTE-NOMENCLATURE-ETAPE4.md` (saisie tardive d'un acte
+réalisé avant l'abrogation, notamment).

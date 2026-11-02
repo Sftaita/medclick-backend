@@ -9,8 +9,122 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use App\Entity\User;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\Clock\ClockInterface;
 
+/**
+ * Nomenclature INAMI (administration, ROLE_ADMIN via access_control sur /api/admin).
+ *
+ * Étape 4 (ADR-210) : les listes renvoient TOUS les codes, actifs et inactifs, avec leur statut,
+ * la date officielle d'abrogation INAMI et la date technique de désactivation. Un code se
+ * désactive ou se réactive (PUT /api/admin/nomenclature/{id}/status) ; il n'est jamais supprimé
+ * et ses interventions et favoris liés ne sont jamais modifiés.
+ */
 class NomenclatureController extends AbstractController{
+
+    /** Représentation d'un code dans l'administration (listes, changement de statut). */
+    private static function normalize(Nomenclature $nomenclature): array
+    {
+        return [
+            'id' => $nomenclature->getId(),
+            'speciality' => $nomenclature->getSpeciality(),
+            'codeAmbulant' => $nomenclature->getCodeAmbulant(),
+            'codeHospitalisation' => $nomenclature->getCodeHospitalisation(),
+            'n' => $nomenclature->getN(),
+            'name' => $nomenclature->getName(),
+            'type' => $nomenclature->getType(),
+            'subType' => $nomenclature->getSubType(),
+            'active' => $nomenclature->isActive(),
+            // Date officielle (jour) et date technique (heure murale du serveur, comme les autres
+            // dates de l'administration).
+            'inamiRepealedAt' => $nomenclature->getInamiRepealedAt()?->format('Y-m-d'),
+            'deactivatedAt' => $nomenclature->getDeactivatedAt()?->format('Y-m-d H:i:s'),
+        ];
+    }
+
+    /** Tous les codes de toutes les spécialités, actifs et inactifs. */
+    #[Route('/api/admin/nomenclature', name: 'GetAllNomenclature', methods: ['GET'])]
+    public function getAllNomenclature(NomenclatureRepository $nomenclatureRepository): JsonResponse
+    {
+        $nomenclatures = $nomenclatureRepository->findBy([], ['speciality' => 'ASC', 'id' => 'ASC']);
+
+        return $this->json(array_map(self::normalize(...), $nomenclatures));
+    }
+
+    /** Interventions et favoris liés à un code : affichés avant confirmation d'un changement de statut. */
+    #[Route('/api/admin/nomenclature/{id<\d+>}/usage', name: 'GetNomenclatureUsage', methods: ['GET'])]
+    public function getNomenclatureUsage(int $id, NomenclatureRepository $nomenclatureRepository): JsonResponse
+    {
+        $nomenclature = $nomenclatureRepository->find($id);
+        if (!$nomenclature) {
+            return new JsonResponse(['error' => 'Nomenclature not found'], 404);
+        }
+
+        return $this->json($nomenclatureRepository->countUsage($nomenclature));
+    }
+
+    /**
+     * Active ou désactive un code. Corps : { active: bool, inamiRepealedAt?: "AAAA-MM-JJ" | null }.
+     *
+     * - désactivation : la date technique est fixée par le serveur (la première désactivation est
+     *   conservée si le code l'était déjà) ;
+     * - réactivation : la date technique est effacée ;
+     * - inamiRepealedAt (date officielle) n'est modifiée que si la clé est envoyée.
+     *
+     * Seule la ligne de nomenclature change : ni suppression, ni modification des interventions et
+     * des favoris liés (qui conservent code, intitulé, spécialité et relation).
+     */
+    #[Route('/api/admin/nomenclature/{id<\d+>}/status', name: 'UpdateNomenclatureStatus', methods: ['PUT'])]
+    public function updateNomenclatureStatus(
+        int $id,
+        Request $request,
+        NomenclatureRepository $nomenclatureRepository,
+        EntityManagerInterface $entityManager,
+        ClockInterface $clock,
+        LoggerInterface $logger,
+    ): JsonResponse {
+        $nomenclature = $nomenclatureRepository->find($id);
+        if (!$nomenclature) {
+            return new JsonResponse(['error' => 'Nomenclature not found'], 404);
+        }
+
+        $data = json_decode($request->getContent(), true);
+        if (!is_array($data) || !isset($data['active']) || !is_bool($data['active'])) {
+            return new JsonResponse(['error' => 'Le statut « active » (booléen) est requis.'], 400);
+        }
+
+        if (array_key_exists('inamiRepealedAt', $data)) {
+            $value = $data['inamiRepealedAt'];
+            $repealedAt = null;
+            if ($value !== null && $value !== '') {
+                $repealedAt = is_string($value) ? \DateTimeImmutable::createFromFormat('!Y-m-d', $value) : false;
+                if (!$repealedAt || $repealedAt->format('Y-m-d') !== $value) {
+                    return new JsonResponse(['error' => "Date officielle d'abrogation invalide (format AAAA-MM-JJ)."], 400);
+                }
+            }
+            $nomenclature->setInamiRepealedAt($repealedAt);
+        }
+
+        if ($data['active']) {
+            $nomenclature->activate();
+        } else {
+            $nomenclature->deactivate($clock->now());
+        }
+
+        $entityManager->flush();
+
+        // Trace d'administration (identifiants techniques seulement, aucune donnée personnelle).
+        $admin = $this->getUser();
+        $logger->notice('Nomenclature INAMI : statut modifié', [
+            'nomenclature_id' => $nomenclature->getId(),
+            'active' => $nomenclature->isActive(),
+            'inami_repealed_at' => $nomenclature->getInamiRepealedAt()?->format('Y-m-d'),
+            'admin_id' => $admin instanceof User ? $admin->getId() : null,
+        ]);
+
+        return $this->json(self::normalize($nomenclature));
+    }
 
     #[Route('/api/admin/nomenclature/{speciality}', name: 'GetListOfNomenclature', methods: ['GET'])]
     public function getNomenclature($speciality, NomenclatureRepository $nomenclatureRepository): JsonResponse
@@ -19,21 +133,10 @@ class NomenclatureController extends AbstractController{
             return new JsonResponse(['error' => 'Invalid speciality'], 400);
         }
 
+        // Codes actifs ET inactifs de la spécialité (statut et dates inclus).
         $nomenclatures = $nomenclatureRepository->findBy(['speciality' => $speciality]);
 
-        $data = array();
-        foreach($nomenclatures as $nomenclature){
-            $data[] = [
-                'id' => $nomenclature->getId(),
-                'speciality' => $nomenclature->getSpeciality(),
-                'codeAmbulant' => $nomenclature->getCodeAmbulant(),
-                'codeHospitalisation' => $nomenclature->getCodeHospitalisation(),
-                'n' => $nomenclature->getN(),
-                'name' => $nomenclature->getName(),
-                'type' => $nomenclature->getType(),
-                'subType' => $nomenclature->getSubType(),
-            ];
-        }
+        $data = array_map(self::normalize(...), $nomenclatures);
 
         return $this->json($data, 200, ['Access-Control-Allow-Origin' => $_ENV['CORS_ALLOW_ORIGIN']]);
     }

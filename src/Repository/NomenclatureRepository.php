@@ -20,20 +20,43 @@ class NomenclatureRepository extends ServiceEntityRepository
     }
 
     /**
-     * Permet de récupéré la liste nomenclature par spécialitée.
+     * Codes ACTIFS d'une spécialité : liste proposée pour choisir l'acte d'une nouvelle
+     * intervention ou d'un favori (GET /api/nomenclature/{speciality}).
      *
-     * @param [type] $speciality
-     * @return void
+     * Seule requête filtrée sur `active` (ADR-210) : les interventions historiques, les favoris,
+     * les statistiques, les exports et l'administration lisent tous les codes, actifs ou non.
+     *
+     * @param string $speciality
+     * @return array<int, array<string, mixed>>
      */
     public function fetchBySpeciality($speciality)
     {
         return $this->createQueryBuilder('u')
             ->andWhere('u.speciality = :val')
+            ->andWhere('u.active = :active')
             ->setParameter('val', $speciality)
+            ->setParameter('active', true)
             ->select('u.id, u.codeAmbulant, u.codeHospitalisation, u.codeHospitalisation, u.name, u.n, u.type, u.subType ')
             ->getQuery()
             ->getResult()
         ;
+    }
+
+    /**
+     * Nombre d'interventions et de favoris liés à un code (affiché avant d'en changer le statut).
+     *
+     * @return array{surgeries: int, favorites: int}
+     */
+    public function countUsage(Nomenclature $nomenclature): array
+    {
+        $em = $this->getEntityManager();
+
+        return [
+            'surgeries' => (int) $em->createQuery('SELECT COUNT(s.id) FROM App\Entity\Surgeries s WHERE s.nomenclature = :n')
+                ->setParameter('n', $nomenclature)->getSingleScalarResult(),
+            'favorites' => (int) $em->createQuery('SELECT COUNT(f.id) FROM App\Entity\Favorites f WHERE f.surgery = :n')
+                ->setParameter('n', $nomenclature)->getSingleScalarResult(),
+        ];
     }
 
     /**

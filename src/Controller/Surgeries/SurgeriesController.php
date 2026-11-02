@@ -7,6 +7,7 @@ use App\Repository\NomenclatureRepository;
 use App\Repository\SurgeriesRepository;
 use App\Repository\UserRepository;
 use App\Repository\YearsRepository;
+use App\Service\InactiveNomenclatureException;
 use App\Service\SurgeryNomenclatureSelection;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Routing\Attribute\Route;
@@ -64,6 +65,14 @@ class SurgeriesController extends AbstractController
         if(!$surgeryReference){
             return new JsonResponse([
                 'message' => "Cette intervention n'est pas retrouvé en base de donnée" 
+            ], JsonResponse::HTTP_BAD_REQUEST, ['Access-Control-Allow-Origin' => $_ENV['CORS_ALLOW_ORIGIN']]);
+        }
+
+        // Étape 4 (ADR-210) : une nouvelle intervention n'utilise qu'un code INAMI actif.
+        if (!$surgeryReference->isActive()) {
+            return new JsonResponse([
+                'message' => InactiveNomenclatureException::MESSAGE,
+                'reason' => InactiveNomenclatureException::REASON,
             ], JsonResponse::HTTP_BAD_REQUEST, ['Access-Control-Allow-Origin' => $_ENV['CORS_ALLOW_ORIGIN']]);
         }
 
@@ -193,8 +202,16 @@ class SurgeriesController extends AbstractController
         }
 
         // Code, nom, spécialité et relation ne sont recopiés que si un AUTRE acte est choisi :
-        // renvoyer l'acte déjà lié conserve l'ancien code INAMI et l'intitulé enregistrés.
-        if ($surgeryReference && SurgeryNomenclatureSelection::isAnotherAct($currentReference, $surgeryReference)) {
+        // renvoyer l'acte déjà lié conserve l'ancien code INAMI et l'intitulé enregistrés, même
+        // si ce code a été désactivé depuis. Un AUTRE acte doit être actif (étape 4, ADR-210).
+        $anotherAct = $surgeryReference && SurgeryNomenclatureSelection::isAnotherAct($currentReference, $surgeryReference);
+        if ($anotherAct && !$surgeryReference->isActive()) {
+            return new JsonResponse([
+                'message' => InactiveNomenclatureException::MESSAGE,
+                'reason' => InactiveNomenclatureException::REASON,
+            ], JsonResponse::HTTP_BAD_REQUEST, ['Access-Control-Allow-Origin' => $_ENV['CORS_ALLOW_ORIGIN']]);
+        }
+        if ($anotherAct) {
             SurgeryNomenclatureSelection::applyAct($surgery, $surgeryReference);
         }
 

@@ -15,6 +15,10 @@ use App\Repository\NomenclatureRepository;
  * depuis la nomenclature que si l'utilisateur choisit réellement un AUTRE acte ; renvoyer
  * l'acte déjà lié, ou n'en envoyer aucun, ne doit jamais remplacer un ancien code par le code
  * actuel de la nomenclature.
+ *
+ * Étape 4 (ADR-210) : un acte INACTIF n'est accepté que s'il est déjà lié à l'intervention et
+ * inchangé. Toute nouvelle intervention, tout nouveau favori et tout changement d'acte exigent un
+ * code actif (assertSelectable).
  */
 final class SurgeryNomenclatureSelection
 {
@@ -49,6 +53,18 @@ final class SurgeryNomenclatureSelection
     public static function isAnotherAct(?Nomenclature $current, Nomenclature $selected): bool
     {
         return $current === null || $current->getId() !== $selected->getId();
+    }
+
+    /**
+     * Un acte choisi pour une création ou un changement d'acte doit être actif.
+     *
+     * @throws InactiveNomenclatureException
+     */
+    public static function assertSelectable(Nomenclature $reference): void
+    {
+        if (!$reference->isActive()) {
+            throw new InactiveNomenclatureException();
+        }
     }
 
     /** Recopie ensemble la relation, le code, l'intitulé et la spécialité de l'acte choisi. */

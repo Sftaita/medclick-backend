@@ -6,6 +6,7 @@ use App\Entity\Favorites;
 use App\Repository\FavoritesRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use App\Repository\NomenclatureRepository;
+use App\Service\InactiveNomenclatureException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Routing\Attribute\Route;
@@ -13,7 +14,12 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 /**
- * 
+ * Favoris d'intervention (raccourcis vers un acte de la nomenclature).
+ *
+ * Étape 4 (ADR-210) : le statut d'un favori (`active`) est celui de la nomenclature LIÉE, jamais
+ * déduit du code copié dans le favori. Un favori dont le code est désactivé reste enregistré et
+ * listé ; il ne peut plus servir à créer une intervention (refus de /api/surgeries/addNewSurgery)
+ * et un favori ne peut être créé ou redirigé que vers un code actif.
  */
 class FavoritesController extends AbstractController
 {
@@ -37,11 +43,13 @@ class FavoritesController extends AbstractController
         foreach($favorites as $favorite){
             $data[] =[
                 'id' => $favorite->getId(),
-                'surgeryId' => $favorite->getSurgery()->getId(),
+                'surgeryId' => $favorite->getSurgery()?->getId(),
                 'codeHospitalisation'=> $favorite->getCodeHospitalisation(),
                 'name' => $favorite->getSurgeryName(),
                 'shorcut' => $favorite->getShortcut(),
                 'speciality' => $favorite->getSpeciality(),
+                // Statut de la nomenclature liée (sans nomenclature : inutilisable).
+                'active' => $favorite->getSurgery()?->isActive() ?? false,
             ];
         }
 
@@ -69,6 +77,7 @@ class FavoritesController extends AbstractController
             'codeHospitalisation' => $favorite->getCodeHospitalisation(),
             'speciality' => $favorite->getSpeciality(),
             'surgeryId' => $favorite->getSurgery()?->getId(),
+            'active' => $favorite->getSurgery()?->isActive() ?? false,
         ]);
     }
 
@@ -95,6 +104,14 @@ class FavoritesController extends AbstractController
 
         if (!$surgery) {
             return new JsonResponse(['error' => 'Surgery not found.'], 404);
+        }
+
+        // Étape 4 (ADR-210) : un nouveau favori n'utilise qu'un code INAMI actif.
+        if (!$surgery->isActive()) {
+            return new JsonResponse([
+                'error' => InactiveNomenclatureException::MESSAGE,
+                'reason' => InactiveNomenclatureException::REASON,
+            ], 400);
         }
 
         $favorite = new Favorites;
@@ -153,13 +170,21 @@ class FavoritesController extends AbstractController
             return new JsonResponse(['error' => 'Favorite not found.'], 404);
         }
 
-        // Check if the surgeryId has changed
-        if ($data['surgeryId'] !== $favorite->getSurgery()->getId()) {
+        // Check if the surgeryId has changed (un favori sans nomenclature liée doit en recevoir une)
+        if ($data['surgeryId'] !== $favorite->getSurgery()?->getId()) {
             // Search in nomenclature table the surgery by id
             $surgery = $nomenclatureRepository->findOneBy(['id' => $data['surgeryId']]);
 
             if (!$surgery) {
                 return new JsonResponse(['error' => 'Surgery not found.'], 404);
+            }
+
+            // Étape 4 (ADR-210) : un nouveau favori n'utilise qu'un code INAMI actif.
+            if (!$surgery->isActive()) {
+                return new JsonResponse([
+                    'error' => InactiveNomenclatureException::MESSAGE,
+                    'reason' => InactiveNomenclatureException::REASON,
+                ], 400);
             }
 
             // Update favorite with new surgery information
@@ -169,7 +194,8 @@ class FavoritesController extends AbstractController
                 ->setSpeciality($surgery->getSpeciality())
                 ->setSurgery($surgery);
         } else {
-            // Update only the shortcut if surgery hasn't changed
+            // Update only the shortcut if surgery hasn't changed (même si son code est devenu inactif :
+            // le favori reste enregistré, seul son nom est modifié)
             $favorite->setShortcut($data['shortcut']);
         }
 
