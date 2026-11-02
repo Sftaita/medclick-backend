@@ -1,0 +1,2723 @@
+{
+ "source": {
+  "label": "INAMI NomenSoft — tableaux de référence applicables au 01/11/2026 (création 09/10/2026)",
+  "url": "https://www.inami.fgov.be/SiteCollectionDocuments/TXT.zip",
+  "sha256": "e8c7c46c0525d3a34178015c78a78d2aaed3f054f461579d703f9ff91d5a7468",
+  "page": "https://www.inami.fgov.be/fr/nomenclature/tableaux-de-reference",
+  "generated": "2026-11-02T14:15:13+00:00"
+ },
+ "add": [
+  {
+   "speciality": "uro",
+   "codeHospitalisation": "262625",
+   "codeAmbulant": "262614",
+   "n": "K75",
+   "name": "Circoncision chez un enfant de moins de 6 ans",
+   "type": null,
+   "subType": null,
+   "officialStart": "2026-06-01",
+   "reference": "INAMI NomenSoft 01.11.2026 — KB2026003268 (publ. 30-04-2026) création au 01/06/2026 : Arrêté royal modifiant l’article 14, j), de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d’assurance ob"
+  },
+  {
+   "speciality": "ortho",
+   "codeHospitalisation": "286720",
+   "codeAmbulant": "286716",
+   "n": "N440",
+   "name": "Remplacement complet d’une prothèse totale de l'articulation trapézo-métacarpienne",
+   "type": "1",
+   "subType": "wristhand",
+   "officialStart": "2024-10-01",
+   "reference": "INAMI NomenSoft 01.11.2026 — KB2024007896 (publ. 12-08-2024) création au 01/10/2024 : Arrêté royal modifiant l'article 14, k), de l'annexe à l'arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d'assurance ob"
+  }
+ ],
+ "repeal": [
+  {
+   "id": 5046,
+   "codeHospitalisation": "275225",
+   "repealedAt": "2022-09-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2022032632 (publ. 15-07-2022) suppression au 01/09/2022 : Arrêté royal modifiant l'annexe à l'arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d'assurance obligatoire soins de"
+  },
+  {
+   "id": 5268,
+   "codeHospitalisation": "280184",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5269,
+   "codeHospitalisation": "280206",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5270,
+   "codeHospitalisation": "280221",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5271,
+   "codeHospitalisation": "280243",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5272,
+   "codeHospitalisation": "280265",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5273,
+   "codeHospitalisation": "280280",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5274,
+   "codeHospitalisation": "280302",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5277,
+   "codeHospitalisation": "280560",
+   "repealedAt": "2023-07-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2023042265 (publ. 16-05-2023) suppression au 01/07/2023 : Arrêté royal modifiant l'article 14, k), de l'annexe à l'arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d'assurance"
+  },
+  {
+   "id": 5289,
+   "codeHospitalisation": "280803",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5290,
+   "codeHospitalisation": "280825",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5291,
+   "codeHospitalisation": "281024",
+   "repealedAt": "2022-09-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2022032632 (publ. 15-07-2022) suppression au 01/09/2022 : Arrêté royal modifiant l'annexe à l'arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d'assurance obligatoire soins de"
+  },
+  {
+   "id": 5292,
+   "codeHospitalisation": "281046",
+   "repealedAt": "2022-09-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2022032632 (publ. 15-07-2022) suppression au 01/09/2022 : Arrêté royal modifiant l'annexe à l'arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d'assurance obligatoire soins de"
+  },
+  {
+   "id": 5293,
+   "codeHospitalisation": "281061",
+   "repealedAt": "2022-09-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2022032632 (publ. 15-07-2022) suppression au 01/09/2022 : Arrêté royal modifiant l'annexe à l'arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d'assurance obligatoire soins de"
+  },
+  {
+   "id": 5294,
+   "codeHospitalisation": "281083",
+   "repealedAt": "2022-09-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2022032632 (publ. 15-07-2022) suppression au 01/09/2022 : Arrêté royal modifiant l'annexe à l'arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d'assurance obligatoire soins de"
+  },
+  {
+   "id": 5295,
+   "codeHospitalisation": "281105",
+   "repealedAt": "2022-09-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2022032632 (publ. 15-07-2022) suppression au 01/09/2022 : Arrêté royal modifiant l'annexe à l'arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d'assurance obligatoire soins de"
+  },
+  {
+   "id": 5296,
+   "codeHospitalisation": "281120",
+   "repealedAt": "2022-09-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2022032632 (publ. 15-07-2022) suppression au 01/09/2022 : Arrêté royal modifiant l'annexe à l'arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d'assurance obligatoire soins de"
+  },
+  {
+   "id": 5299,
+   "codeHospitalisation": "281186",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5300,
+   "codeHospitalisation": "281201",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5301,
+   "codeHospitalisation": "281223",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5302,
+   "codeHospitalisation": "281245",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5303,
+   "codeHospitalisation": "281260",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5304,
+   "codeHospitalisation": "281282",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5305,
+   "codeHospitalisation": "281525",
+   "repealedAt": "2022-09-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2022032632 (publ. 15-07-2022) suppression au 01/09/2022 : Arrêté royal modifiant l'annexe à l'arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d'assurance obligatoire soins de"
+  },
+  {
+   "id": 5306,
+   "codeHospitalisation": "281540",
+   "repealedAt": "2022-09-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2022032632 (publ. 15-07-2022) suppression au 01/09/2022 : Arrêté royal modifiant l'annexe à l'arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d'assurance obligatoire soins de"
+  },
+  {
+   "id": 5307,
+   "codeHospitalisation": "281562",
+   "repealedAt": "2022-09-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2022032632 (publ. 15-07-2022) suppression au 01/09/2022 : Arrêté royal modifiant l'annexe à l'arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d'assurance obligatoire soins de"
+  },
+  {
+   "id": 5308,
+   "codeHospitalisation": "281584",
+   "repealedAt": "2022-09-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2022032632 (publ. 15-07-2022) suppression au 01/09/2022 : Arrêté royal modifiant l'annexe à l'arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d'assurance obligatoire soins de"
+  },
+  {
+   "id": 5309,
+   "codeHospitalisation": "281606",
+   "repealedAt": "2022-09-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2022032632 (publ. 15-07-2022) suppression au 01/09/2022 : Arrêté royal modifiant l'annexe à l'arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d'assurance obligatoire soins de"
+  },
+  {
+   "id": 5310,
+   "codeHospitalisation": "281621",
+   "repealedAt": "2022-09-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2022032632 (publ. 15-07-2022) suppression au 01/09/2022 : Arrêté royal modifiant l'annexe à l'arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d'assurance obligatoire soins de"
+  },
+  {
+   "id": 5311,
+   "codeHospitalisation": "281643",
+   "repealedAt": "2022-09-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2022032632 (publ. 15-07-2022) suppression au 01/09/2022 : Arrêté royal modifiant l'annexe à l'arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d'assurance obligatoire soins de"
+  },
+  {
+   "id": 5312,
+   "codeHospitalisation": "281665",
+   "repealedAt": "2022-09-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2022032632 (publ. 15-07-2022) suppression au 01/09/2022 : Arrêté royal modifiant l'annexe à l'arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d'assurance obligatoire soins de"
+  },
+  {
+   "id": 5313,
+   "codeHospitalisation": "281680",
+   "repealedAt": "2022-09-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2022032632 (publ. 15-07-2022) suppression au 01/09/2022 : Arrêté royal modifiant l'annexe à l'arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d'assurance obligatoire soins de"
+  },
+  {
+   "id": 5314,
+   "codeHospitalisation": "281702",
+   "repealedAt": "2022-09-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2022032632 (publ. 15-07-2022) suppression au 01/09/2022 : Arrêté royal modifiant l'annexe à l'arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d'assurance obligatoire soins de"
+  },
+  {
+   "id": 5315,
+   "codeHospitalisation": "281724",
+   "repealedAt": "2022-09-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2022032632 (publ. 15-07-2022) suppression au 01/09/2022 : Arrêté royal modifiant l'annexe à l'arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d'assurance obligatoire soins de"
+  },
+  {
+   "id": 5316,
+   "codeHospitalisation": "281746",
+   "repealedAt": "2022-09-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2022032632 (publ. 15-07-2022) suppression au 01/09/2022 : Arrêté royal modifiant l'annexe à l'arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d'assurance obligatoire soins de"
+  },
+  {
+   "id": 5317,
+   "codeHospitalisation": "281761",
+   "repealedAt": "2022-09-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2022032632 (publ. 15-07-2022) suppression au 01/09/2022 : Arrêté royal modifiant l'annexe à l'arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d'assurance obligatoire soins de"
+  },
+  {
+   "id": 5318,
+   "codeHospitalisation": "281783",
+   "repealedAt": "2022-09-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2022032632 (publ. 15-07-2022) suppression au 01/09/2022 : Arrêté royal modifiant l'annexe à l'arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d'assurance obligatoire soins de"
+  },
+  {
+   "id": 5319,
+   "codeHospitalisation": "281805",
+   "repealedAt": "2022-09-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2022032632 (publ. 15-07-2022) suppression au 01/09/2022 : Arrêté royal modifiant l'annexe à l'arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d'assurance obligatoire soins de"
+  },
+  {
+   "id": 5320,
+   "codeHospitalisation": "281820",
+   "repealedAt": "2022-09-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2022032632 (publ. 15-07-2022) suppression au 01/09/2022 : Arrêté royal modifiant l'annexe à l'arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d'assurance obligatoire soins de"
+  },
+  {
+   "id": 5321,
+   "codeHospitalisation": "281842",
+   "repealedAt": "2022-09-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2022032632 (publ. 15-07-2022) suppression au 01/09/2022 : Arrêté royal modifiant l'annexe à l'arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d'assurance obligatoire soins de"
+  },
+  {
+   "id": 5322,
+   "codeHospitalisation": "281864",
+   "repealedAt": "2022-09-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2022032632 (publ. 15-07-2022) suppression au 01/09/2022 : Arrêté royal modifiant l'annexe à l'arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d'assurance obligatoire soins de"
+  },
+  {
+   "id": 5323,
+   "codeHospitalisation": "281886",
+   "repealedAt": "2022-09-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2022032632 (publ. 15-07-2022) suppression au 01/09/2022 : Arrêté royal modifiant l'annexe à l'arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d'assurance obligatoire soins de"
+  },
+  {
+   "id": 5324,
+   "codeHospitalisation": "281901",
+   "repealedAt": "2022-09-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2022032632 (publ. 15-07-2022) suppression au 01/09/2022 : Arrêté royal modifiant l'annexe à l'arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d'assurance obligatoire soins de"
+  },
+  {
+   "id": 5325,
+   "codeHospitalisation": "281923",
+   "repealedAt": "2022-09-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2022032632 (publ. 15-07-2022) suppression au 01/09/2022 : Arrêté royal modifiant l'annexe à l'arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d'assurance obligatoire soins de"
+  },
+  {
+   "id": 5326,
+   "codeHospitalisation": "281945",
+   "repealedAt": "2022-09-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2022032632 (publ. 15-07-2022) suppression au 01/09/2022 : Arrêté royal modifiant l'annexe à l'arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d'assurance obligatoire soins de"
+  },
+  {
+   "id": 5327,
+   "codeHospitalisation": "281960",
+   "repealedAt": "2022-09-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2022032632 (publ. 15-07-2022) suppression au 01/09/2022 : Arrêté royal modifiant l'annexe à l'arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d'assurance obligatoire soins de"
+  },
+  {
+   "id": 5328,
+   "codeHospitalisation": "281982",
+   "repealedAt": "2022-09-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2022032632 (publ. 15-07-2022) suppression au 01/09/2022 : Arrêté royal modifiant l'annexe à l'arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d'assurance obligatoire soins de"
+  },
+  {
+   "id": 5329,
+   "codeHospitalisation": "282004",
+   "repealedAt": "2022-09-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2022032632 (publ. 15-07-2022) suppression au 01/09/2022 : Arrêté royal modifiant l'annexe à l'arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d'assurance obligatoire soins de"
+  },
+  {
+   "id": 5330,
+   "codeHospitalisation": "282026",
+   "repealedAt": "2022-09-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2022032632 (publ. 15-07-2022) suppression au 01/09/2022 : Arrêté royal modifiant l'annexe à l'arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d'assurance obligatoire soins de"
+  },
+  {
+   "id": 5331,
+   "codeHospitalisation": "282041",
+   "repealedAt": "2022-09-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2022032632 (publ. 15-07-2022) suppression au 01/09/2022 : Arrêté royal modifiant l'annexe à l'arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d'assurance obligatoire soins de"
+  },
+  {
+   "id": 5332,
+   "codeHospitalisation": "282063",
+   "repealedAt": "2022-09-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2022032632 (publ. 15-07-2022) suppression au 01/09/2022 : Arrêté royal modifiant l'annexe à l'arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d'assurance obligatoire soins de"
+  },
+  {
+   "id": 5333,
+   "codeHospitalisation": "282085",
+   "repealedAt": "2022-09-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2022032632 (publ. 15-07-2022) suppression au 01/09/2022 : Arrêté royal modifiant l'annexe à l'arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d'assurance obligatoire soins de"
+  },
+  {
+   "id": 5334,
+   "codeHospitalisation": "282100",
+   "repealedAt": "2022-09-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2022032632 (publ. 15-07-2022) suppression au 01/09/2022 : Arrêté royal modifiant l'annexe à l'arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d'assurance obligatoire soins de"
+  },
+  {
+   "id": 5335,
+   "codeHospitalisation": "282225",
+   "repealedAt": "1988-08-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB1988001383 (publ. 30-07-1988) suppression au 01/08/1988 : Arrêté royal modifiant l’annexe de l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d’assurance obligatoire soins d"
+  },
+  {
+   "id": 5336,
+   "codeHospitalisation": "282240",
+   "repealedAt": "2022-09-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2022032632 (publ. 15-07-2022) suppression au 01/09/2022 : Arrêté royal modifiant l'annexe à l'arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d'assurance obligatoire soins de"
+  },
+  {
+   "id": 5337,
+   "codeHospitalisation": "282262",
+   "repealedAt": "2022-09-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2022032632 (publ. 15-07-2022) suppression au 01/09/2022 : Arrêté royal modifiant l'annexe à l'arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d'assurance obligatoire soins de"
+  },
+  {
+   "id": 5338,
+   "codeHospitalisation": "282284",
+   "repealedAt": "2022-09-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2022032632 (publ. 15-07-2022) suppression au 01/09/2022 : Arrêté royal modifiant l'annexe à l'arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d'assurance obligatoire soins de"
+  },
+  {
+   "id": 5339,
+   "codeHospitalisation": "282306",
+   "repealedAt": "2022-09-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2022032632 (publ. 15-07-2022) suppression au 01/09/2022 : Arrêté royal modifiant l'annexe à l'arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d'assurance obligatoire soins de"
+  },
+  {
+   "id": 5340,
+   "codeHospitalisation": "282321",
+   "repealedAt": "2022-09-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2022032632 (publ. 15-07-2022) suppression au 01/09/2022 : Arrêté royal modifiant l'annexe à l'arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d'assurance obligatoire soins de"
+  },
+  {
+   "id": 5341,
+   "codeHospitalisation": "282343",
+   "repealedAt": "2022-09-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2022032632 (publ. 15-07-2022) suppression au 01/09/2022 : Arrêté royal modifiant l'annexe à l'arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d'assurance obligatoire soins de"
+  },
+  {
+   "id": 5354,
+   "codeHospitalisation": "283021",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5355,
+   "codeHospitalisation": "283043",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5356,
+   "codeHospitalisation": "283065",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5358,
+   "codeHospitalisation": "283102",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5359,
+   "codeHospitalisation": "283124",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5362,
+   "codeHospitalisation": "283183",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5364,
+   "codeHospitalisation": "283220",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5365,
+   "codeHospitalisation": "283242",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5367,
+   "codeHospitalisation": "283286",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5372,
+   "codeHospitalisation": "283382",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5373,
+   "codeHospitalisation": "283404",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5375,
+   "codeHospitalisation": "283441",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5381,
+   "codeHospitalisation": "283566",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5382,
+   "codeHospitalisation": "283581",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5383,
+   "codeHospitalisation": "283603",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5385,
+   "codeHospitalisation": "283640",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5387,
+   "codeHospitalisation": "283684",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5391,
+   "codeHospitalisation": "283765",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5392,
+   "codeHospitalisation": "283780",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5393,
+   "codeHospitalisation": "283802",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5394,
+   "codeHospitalisation": "283824",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5395,
+   "codeHospitalisation": "283846",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5397,
+   "codeHospitalisation": "283883",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5398,
+   "codeHospitalisation": "283905",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5400,
+   "codeHospitalisation": "283942",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5401,
+   "codeHospitalisation": "283964",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5402,
+   "codeHospitalisation": "283986",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5403,
+   "codeHospitalisation": "284001",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5404,
+   "codeHospitalisation": "284023",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5405,
+   "codeHospitalisation": "284045",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5406,
+   "codeHospitalisation": "284060",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5407,
+   "codeHospitalisation": "284082",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5408,
+   "codeHospitalisation": "284104",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5410,
+   "codeHospitalisation": "284141",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5412,
+   "codeHospitalisation": "284185",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5413,
+   "codeHospitalisation": "284200",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5414,
+   "codeHospitalisation": "284222",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5417,
+   "codeHospitalisation": "284281",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5420,
+   "codeHospitalisation": "284340",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5421,
+   "codeHospitalisation": "284362",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5424,
+   "codeHospitalisation": "284421",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5426,
+   "codeHospitalisation": "284465",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5427,
+   "codeHospitalisation": "284480",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5429,
+   "codeHospitalisation": "284524",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5430,
+   "codeHospitalisation": "284546",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5431,
+   "codeHospitalisation": "284561",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5432,
+   "codeHospitalisation": "284583",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5433,
+   "codeHospitalisation": "284605",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5434,
+   "codeHospitalisation": "284620",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5437,
+   "codeHospitalisation": "284686",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5439,
+   "codeHospitalisation": "284723",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5440,
+   "codeHospitalisation": "284745",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5441,
+   "codeHospitalisation": "284760",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5442,
+   "codeHospitalisation": "284782",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5443,
+   "codeHospitalisation": "284804",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5445,
+   "codeHospitalisation": "284841",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5450,
+   "codeHospitalisation": "284944",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5453,
+   "codeHospitalisation": "285003",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5454,
+   "codeHospitalisation": "285025",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5458,
+   "codeHospitalisation": "285106",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5459,
+   "codeHospitalisation": "285121",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5460,
+   "codeHospitalisation": "285143",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5469,
+   "codeHospitalisation": "285320",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5471,
+   "codeHospitalisation": "285364",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5472,
+   "codeHospitalisation": "285386",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5474,
+   "codeHospitalisation": "285423",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5475,
+   "codeHospitalisation": "285445",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5476,
+   "codeHospitalisation": "285460",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5477,
+   "codeHospitalisation": "285482",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5478,
+   "codeHospitalisation": "285504",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5479,
+   "codeHospitalisation": "285526",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5480,
+   "codeHospitalisation": "285541",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5481,
+   "codeHospitalisation": "285563",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5482,
+   "codeHospitalisation": "285585",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5483,
+   "codeHospitalisation": "285600",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5484,
+   "codeHospitalisation": "285622",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5492,
+   "codeHospitalisation": "285784",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5493,
+   "codeHospitalisation": "285806",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5494,
+   "codeHospitalisation": "285821",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5495,
+   "codeHospitalisation": "285843",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5496,
+   "codeHospitalisation": "285865",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5497,
+   "codeHospitalisation": "285880",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5498,
+   "codeHospitalisation": "285902",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5499,
+   "codeHospitalisation": "285924",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5500,
+   "codeHospitalisation": "285946",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5501,
+   "codeHospitalisation": "285961",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5503,
+   "codeHospitalisation": "286005",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5504,
+   "codeHospitalisation": "286020",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5505,
+   "codeHospitalisation": "286042",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5506,
+   "codeHospitalisation": "286064",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5507,
+   "codeHospitalisation": "286086",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5508,
+   "codeHospitalisation": "286101",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5509,
+   "codeHospitalisation": "286123",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5510,
+   "codeHospitalisation": "286145",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5511,
+   "codeHospitalisation": "286160",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5512,
+   "codeHospitalisation": "286182",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5513,
+   "codeHospitalisation": "286204",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5514,
+   "codeHospitalisation": "286226",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5515,
+   "codeHospitalisation": "286241",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5516,
+   "codeHospitalisation": "286263",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5517,
+   "codeHospitalisation": "286285",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5518,
+   "codeHospitalisation": "286300",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5520,
+   "codeHospitalisation": "286344",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5521,
+   "codeHospitalisation": "286366",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5523,
+   "codeHospitalisation": "286403",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5524,
+   "codeHospitalisation": "286425",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5525,
+   "codeHospitalisation": "286440",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5526,
+   "codeHospitalisation": "286462",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5527,
+   "codeHospitalisation": "286484",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5528,
+   "codeHospitalisation": "286506",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5529,
+   "codeHospitalisation": "286521",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5530,
+   "codeHospitalisation": "286543",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5531,
+   "codeHospitalisation": "286565",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5532,
+   "codeHospitalisation": "286580",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5533,
+   "codeHospitalisation": "286602",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5542,
+   "codeHospitalisation": "287140",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5545,
+   "codeHospitalisation": "287206",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5546,
+   "codeHospitalisation": "287221",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5547,
+   "codeHospitalisation": "287243",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5551,
+   "codeHospitalisation": "287324",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5552,
+   "codeHospitalisation": "287346",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5553,
+   "codeHospitalisation": "287361",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5554,
+   "codeHospitalisation": "287383",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5555,
+   "codeHospitalisation": "287405",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5556,
+   "codeHospitalisation": "287420",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5563,
+   "codeHospitalisation": "287560",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5564,
+   "codeHospitalisation": "287582",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5565,
+   "codeHospitalisation": "287604",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5566,
+   "codeHospitalisation": "287626",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5579,
+   "codeHospitalisation": "287884",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5580,
+   "codeHospitalisation": "287906",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5581,
+   "codeHospitalisation": "287921",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5583,
+   "codeHospitalisation": "287965",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5584,
+   "codeHospitalisation": "287980",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5585,
+   "codeHospitalisation": "288002",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5586,
+   "codeHospitalisation": "288024",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5588,
+   "codeHospitalisation": "288061",
+   "repealedAt": "2023-08-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2023031243 (publ. 27-06-2023) suppression au 01/08/2023 : Arrêté royal modifiant l'article 14, k), de l'annexe à l'arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d'assurance"
+  },
+  {
+   "id": 5590,
+   "codeHospitalisation": "288105",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5616,
+   "codeHospitalisation": "288805",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5617,
+   "codeHospitalisation": "288820",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5625,
+   "codeHospitalisation": "288982",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5627,
+   "codeHospitalisation": "289026",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5629,
+   "codeHospitalisation": "289063",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5635,
+   "codeHospitalisation": "289181",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5639,
+   "codeHospitalisation": "289262",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5640,
+   "codeHospitalisation": "289284",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5641,
+   "codeHospitalisation": "289306",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5642,
+   "codeHospitalisation": "289321",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5643,
+   "codeHospitalisation": "289343",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5644,
+   "codeHospitalisation": "289365",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5645,
+   "codeHospitalisation": "289380",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5646,
+   "codeHospitalisation": "289402",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5647,
+   "codeHospitalisation": "289424",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5648,
+   "codeHospitalisation": "289446",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5649,
+   "codeHospitalisation": "289461",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5650,
+   "codeHospitalisation": "289483",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5651,
+   "codeHospitalisation": "289505",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5652,
+   "codeHospitalisation": "289520",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5653,
+   "codeHospitalisation": "289542",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5654,
+   "codeHospitalisation": "289564",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5655,
+   "codeHospitalisation": "289586",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5659,
+   "codeHospitalisation": "289660",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5660,
+   "codeHospitalisation": "289682",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5661,
+   "codeHospitalisation": "289704",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5662,
+   "codeHospitalisation": "289726",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5663,
+   "codeHospitalisation": "289741",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5666,
+   "codeHospitalisation": "289800",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5667,
+   "codeHospitalisation": "289822",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5668,
+   "codeHospitalisation": "289844",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5669,
+   "codeHospitalisation": "289866",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5670,
+   "codeHospitalisation": "289881",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5671,
+   "codeHospitalisation": "289903",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5674,
+   "codeHospitalisation": "289962",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5680,
+   "codeHospitalisation": "290080",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5684,
+   "codeHospitalisation": "290161",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5687,
+   "codeHospitalisation": "290220",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5688,
+   "codeHospitalisation": "290242",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5693,
+   "codeHospitalisation": "290345",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5694,
+   "codeHospitalisation": "290360",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5695,
+   "codeHospitalisation": "290382",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5696,
+   "codeHospitalisation": "290404",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5697,
+   "codeHospitalisation": "290426",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5698,
+   "codeHospitalisation": "290441",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5702,
+   "codeHospitalisation": "290522",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5704,
+   "codeHospitalisation": "290566",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5706,
+   "codeHospitalisation": "290603",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5707,
+   "codeHospitalisation": "290625",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5713,
+   "codeHospitalisation": "290743",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5716,
+   "codeHospitalisation": "290802",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5717,
+   "codeHospitalisation": "290824",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5720,
+   "codeHospitalisation": "290883",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5726,
+   "codeHospitalisation": "291001",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5727,
+   "codeHospitalisation": "291023",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5728,
+   "codeHospitalisation": "291045",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5729,
+   "codeHospitalisation": "291060",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5730,
+   "codeHospitalisation": "291082",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5731,
+   "codeHospitalisation": "291104",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5732,
+   "codeHospitalisation": "291126",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5733,
+   "codeHospitalisation": "291141",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5735,
+   "codeHospitalisation": "291185",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5740,
+   "codeHospitalisation": "291281",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5741,
+   "codeHospitalisation": "291303",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5742,
+   "codeHospitalisation": "291325",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5743,
+   "codeHospitalisation": "291340",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5744,
+   "codeHospitalisation": "291362",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5745,
+   "codeHospitalisation": "291384",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5746,
+   "codeHospitalisation": "291406",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5747,
+   "codeHospitalisation": "291421",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5748,
+   "codeHospitalisation": "291443",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5749,
+   "codeHospitalisation": "291465",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5750,
+   "codeHospitalisation": "291480",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5751,
+   "codeHospitalisation": "291502",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5757,
+   "codeHospitalisation": "291620",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5758,
+   "codeHospitalisation": "291642",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5760,
+   "codeHospitalisation": "291686",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5761,
+   "codeHospitalisation": "291701",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5762,
+   "codeHospitalisation": "291723",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5763,
+   "codeHospitalisation": "291745",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5764,
+   "codeHospitalisation": "291760",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5768,
+   "codeHospitalisation": "291841",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5770,
+   "codeHospitalisation": "291885",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5771,
+   "codeHospitalisation": "291900",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5772,
+   "codeHospitalisation": "291922",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5774,
+   "codeHospitalisation": "291966",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5775,
+   "codeHospitalisation": "291981",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5777,
+   "codeHospitalisation": "292025",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5778,
+   "codeHospitalisation": "292040",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5781,
+   "codeHospitalisation": "292106",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5782,
+   "codeHospitalisation": "292121",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5786,
+   "codeHospitalisation": "292202",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5787,
+   "codeHospitalisation": "292224",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5788,
+   "codeHospitalisation": "292246",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5789,
+   "codeHospitalisation": "292261",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5790,
+   "codeHospitalisation": "292283",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5791,
+   "codeHospitalisation": "292305",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5792,
+   "codeHospitalisation": "292320",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5793,
+   "codeHospitalisation": "292342",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5795,
+   "codeHospitalisation": "292386",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5796,
+   "codeHospitalisation": "292401",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5797,
+   "codeHospitalisation": "292423",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5798,
+   "codeHospitalisation": "292445",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5799,
+   "codeHospitalisation": "292460",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5800,
+   "codeHospitalisation": "292482",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5801,
+   "codeHospitalisation": "292504",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5804,
+   "codeHospitalisation": "292563",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5805,
+   "codeHospitalisation": "292585",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5806,
+   "codeHospitalisation": "292600",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5807,
+   "codeHospitalisation": "292622",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5811,
+   "codeHospitalisation": "292703",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5812,
+   "codeHospitalisation": "292725",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5813,
+   "codeHospitalisation": "292740",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5814,
+   "codeHospitalisation": "292762",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5815,
+   "codeHospitalisation": "292784",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5818,
+   "codeHospitalisation": "292843",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5819,
+   "codeHospitalisation": "292865",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5820,
+   "codeHospitalisation": "292880",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5821,
+   "codeHospitalisation": "292902",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5822,
+   "codeHospitalisation": "292924",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5823,
+   "codeHospitalisation": "292946",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5824,
+   "codeHospitalisation": "292961",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5825,
+   "codeHospitalisation": "292983",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5826,
+   "codeHospitalisation": "293005",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5827,
+   "codeHospitalisation": "293020",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5828,
+   "codeHospitalisation": "293042",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5829,
+   "codeHospitalisation": "293064",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5830,
+   "codeHospitalisation": "293086",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5831,
+   "codeHospitalisation": "293101",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5832,
+   "codeHospitalisation": "293123",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5833,
+   "codeHospitalisation": "293145",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5834,
+   "codeHospitalisation": "293160",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5835,
+   "codeHospitalisation": "293182",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5836,
+   "codeHospitalisation": "293204",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5837,
+   "codeHospitalisation": "293226",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5838,
+   "codeHospitalisation": "293241",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5839,
+   "codeHospitalisation": "293263",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5846,
+   "codeHospitalisation": "293403",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5871,
+   "codeHospitalisation": "294044",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5874,
+   "codeHospitalisation": "294103",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5880,
+   "codeHospitalisation": "294221",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5883,
+   "codeHospitalisation": "294280",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5885,
+   "codeHospitalisation": "294324",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5888,
+   "codeHospitalisation": "294383",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5889,
+   "codeHospitalisation": "294405",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5894,
+   "codeHospitalisation": "294501",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5895,
+   "codeHospitalisation": "294523",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5896,
+   "codeHospitalisation": "294545",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5899,
+   "codeHospitalisation": "294604",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5900,
+   "codeHospitalisation": "294626",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5906,
+   "codeHospitalisation": "294744",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5907,
+   "codeHospitalisation": "294766",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 5910,
+   "codeHospitalisation": "295024",
+   "repealedAt": "2022-09-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2022032632 (publ. 15-07-2022) suppression au 01/09/2022 : Arrêté royal modifiant l'annexe à l'arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d'assurance obligatoire soins de"
+  },
+  {
+   "id": 5911,
+   "codeHospitalisation": "295046",
+   "repealedAt": "2022-09-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2022032632 (publ. 15-07-2022) suppression au 01/09/2022 : Arrêté royal modifiant l'annexe à l'arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d'assurance obligatoire soins de"
+  },
+  {
+   "id": 5912,
+   "codeHospitalisation": "295061",
+   "repealedAt": "2024-05-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2024002388 (publ. 18-03-2024) suppression au 01/05/2024 : Arrêté royal modifiant l'article 14, k), de l'annexe à l'arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d'assurance"
+  },
+  {
+   "id": 5913,
+   "codeHospitalisation": "295083",
+   "repealedAt": "2024-05-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2024002388 (publ. 18-03-2024) suppression au 01/05/2024 : Arrêté royal modifiant l'article 14, k), de l'annexe à l'arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d'assurance"
+  },
+  {
+   "id": 5925,
+   "codeHospitalisation": "295621",
+   "repealedAt": "2022-09-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2022032632 (publ. 15-07-2022) suppression au 01/09/2022 : Arrêté royal modifiant l'annexe à l'arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d'assurance obligatoire soins de"
+  },
+  {
+   "id": 5926,
+   "codeHospitalisation": "295643",
+   "repealedAt": "2022-09-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2022032632 (publ. 15-07-2022) suppression au 01/09/2022 : Arrêté royal modifiant l'annexe à l'arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d'assurance obligatoire soins de"
+  },
+  {
+   "id": 6034,
+   "codeHospitalisation": "299224",
+   "repealedAt": "2001-03-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2001022124 (publ. 24-02-2001) suppression au 01/03/2001 : Arrêté royal modifiant l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d’assurance obligatoire soins de santé et i"
+  },
+  {
+   "id": 6045,
+   "codeHospitalisation": "299762",
+   "repealedAt": "1986-07-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB1986000300 (publ. 19-02-1986) suppression au 01/07/1986 : Arrêté royal modifiant l’annexe de l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d’assurance obligatoire soins d"
+  },
+  {
+   "id": 6047,
+   "codeHospitalisation": "299924",
+   "repealedAt": "1987-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB1987000067 (publ. 14-01-1987) suppression au 01/01/1987 : Arrêté royal modifiant l’annexe de l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d’assurance obligatoire soins d"
+  },
+  {
+   "id": 6048,
+   "codeHospitalisation": "299946",
+   "repealedAt": "1991-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB1991000197 (publ. 25-01-1991) suppression au 01/01/1991 : Arrêté royal modifiant l’annexe de l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d’assurance obligatoire soins d"
+  },
+  {
+   "id": 6050,
+   "codeHospitalisation": "299983",
+   "repealedAt": "2022-09-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2022032632 (publ. 15-07-2022) suppression au 01/09/2022 : Arrêté royal modifiant l'annexe à l'arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d'assurance obligatoire soins de"
+  },
+  {
+   "id": 6055,
+   "codeHospitalisation": "300344",
+   "repealedAt": "2014-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2013022580 (publ. 28-11-2013) suppression au 01/01/2014 : Arrêté royal modifiant les articles 14, b) et k), 15 et 21, § 3, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sant"
+  },
+  {
+   "id": 6056,
+   "codeHospitalisation": "300366",
+   "repealedAt": "2022-09-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2022032632 (publ. 15-07-2022) suppression au 01/09/2022 : Arrêté royal modifiant l'annexe à l'arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d'assurance obligatoire soins de"
+  },
+  {
+   "id": 6060,
+   "codeHospitalisation": "260024",
+   "repealedAt": "1986-07-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB1986000300 (publ. 19-02-1986) suppression au 01/07/1986 : Arrêté royal modifiant l’annexe de l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d’assurance obligatoire soins d"
+  },
+  {
+   "id": 6078,
+   "codeHospitalisation": "260385",
+   "repealedAt": "2007-05-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2007022407 (publ. 20-03-2007) suppression au 01/05/2007 : Arrêté royal modifiant les dispositions de l’article 14 j), de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en "
+  },
+  {
+   "id": 6118,
+   "codeHospitalisation": "261181",
+   "repealedAt": "1991-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB1991000197 (publ. 25-01-1991) suppression au 01/01/1991 : Arrêté royal modifiant l’annexe de l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d’assurance obligatoire soins d"
+  },
+  {
+   "id": 6134,
+   "codeHospitalisation": "261505",
+   "repealedAt": "1991-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB1991000197 (publ. 25-01-1991) suppression au 01/01/1991 : Arrêté royal modifiant l’annexe de l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d’assurance obligatoire soins d"
+  },
+  {
+   "id": 6135,
+   "codeHospitalisation": "261520",
+   "repealedAt": "1991-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB1991000197 (publ. 25-01-1991) suppression au 01/01/1991 : Arrêté royal modifiant l’annexe de l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d’assurance obligatoire soins d"
+  },
+  {
+   "id": 6142,
+   "codeHospitalisation": "261660",
+   "repealedAt": "2007-05-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2007022404 (publ. 20-03-2007) suppression au 01/05/2007 : Arrêté royal modifiant les dispositions de l’article 14, a), c), d), e), j), k), I., de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des"
+  },
+  {
+   "id": 6152,
+   "codeHospitalisation": "261866",
+   "repealedAt": "1991-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB1991000197 (publ. 25-01-1991) suppression au 01/01/1991 : Arrêté royal modifiant l’annexe de l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d’assurance obligatoire soins d"
+  },
+  {
+   "id": 6172,
+   "codeHospitalisation": "262264",
+   "repealedAt": "1986-07-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB1986000299 (publ. 19-02-1986) suppression au 01/07/1986 : Arrêté royal modifiant l’annexe de l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d’assurance obligatoire soins d"
+  },
+  {
+   "id": 6173,
+   "codeHospitalisation": "262286",
+   "repealedAt": "1986-07-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB1986000299 (publ. 19-02-1986) suppression au 01/07/1986 : Arrêté royal modifiant l’annexe de l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d’assurance obligatoire soins d"
+  },
+  {
+   "id": 6180,
+   "codeHospitalisation": "262426",
+   "repealedAt": "2010-04-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2010022123_v2 (publ. 15-03-2010) suppression au 01/04/2010 : Arrêté royal modifiant l’article 14, j), de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d’assura"
+  },
+  {
+   "id": 6192,
+   "codeHospitalisation": "220146",
+   "repealedAt": "2023-07-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2023042459 (publ. 30-05-2023) suppression au 01/07/2023 : Arrêté royal modifiant les articles 14, a), et 25, § 4, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en mati"
+  },
+  {
+   "id": 6194,
+   "codeHospitalisation": "220183",
+   "repealedAt": "2004-02-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2003023058 (publ. 09-12-2003) suppression au 01/02/2004 : Arrêté royal modifiant l’annexe de l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d’assurance obligatoire soins d"
+  },
+  {
+   "id": 6195,
+   "codeHospitalisation": "220205",
+   "repealedAt": "2004-02-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2003023058 (publ. 09-12-2003) suppression au 01/02/2004 : Arrêté royal modifiant l’annexe de l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d’assurance obligatoire soins d"
+  },
+  {
+   "id": 6196,
+   "codeHospitalisation": "220220",
+   "repealedAt": "2019-04-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2019040264 (publ. 12-02-2019) suppression au 01/04/2019 : Arrêté royal modifiant les articles 3, § 1er, A, I, et 14, a), de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé "
+  },
+  {
+   "id": 6218,
+   "codeHospitalisation": "240505",
+   "repealedAt": "2012-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2011022386 (publ. 22-11-2011) suppression au 01/01/2012 : Arrêté royal modifiant les articles 14, d), 15, § 15 et 25, § 1er, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sa"
+  },
+  {
+   "id": 6219,
+   "codeHospitalisation": "240520",
+   "repealedAt": "2012-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2011022386 (publ. 22-11-2011) suppression au 01/01/2012 : Arrêté royal modifiant les articles 14, d), 15, § 15 et 25, § 1er, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sa"
+  },
+  {
+   "id": 6221,
+   "codeHospitalisation": "241065",
+   "repealedAt": "2012-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2011022386 (publ. 22-11-2011) suppression au 01/01/2012 : Arrêté royal modifiant les articles 14, d), 15, § 15 et 25, § 1er, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sa"
+  },
+  {
+   "id": 6222,
+   "codeHospitalisation": "241080",
+   "repealedAt": "2012-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2011022386 (publ. 22-11-2011) suppression au 01/01/2012 : Arrêté royal modifiant les articles 14, d), 15, § 15 et 25, § 1er, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sa"
+  },
+  {
+   "id": 6223,
+   "codeHospitalisation": "241102",
+   "repealedAt": "2012-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2011022386 (publ. 22-11-2011) suppression au 01/01/2012 : Arrêté royal modifiant les articles 14, d), 15, § 15 et 25, § 1er, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sa"
+  },
+  {
+   "id": 6224,
+   "codeHospitalisation": "241124",
+   "repealedAt": "2012-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2011022386 (publ. 22-11-2011) suppression au 01/01/2012 : Arrêté royal modifiant les articles 14, d), 15, § 15 et 25, § 1er, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sa"
+  },
+  {
+   "id": 6225,
+   "codeHospitalisation": "241146",
+   "repealedAt": "2012-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2011022386 (publ. 22-11-2011) suppression au 01/01/2012 : Arrêté royal modifiant les articles 14, d), 15, § 15 et 25, § 1er, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sa"
+  },
+  {
+   "id": 6226,
+   "codeHospitalisation": "241161",
+   "repealedAt": "2012-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2011022386 (publ. 22-11-2011) suppression au 01/01/2012 : Arrêté royal modifiant les articles 14, d), 15, § 15 et 25, § 1er, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sa"
+  },
+  {
+   "id": 6233,
+   "codeHospitalisation": "241301",
+   "repealedAt": "2012-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2011022386 (publ. 22-11-2011) suppression au 01/01/2012 : Arrêté royal modifiant les articles 14, d), 15, § 15 et 25, § 1er, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sa"
+  },
+  {
+   "id": 6234,
+   "codeHospitalisation": "241323",
+   "repealedAt": "2012-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2011022386 (publ. 22-11-2011) suppression au 01/01/2012 : Arrêté royal modifiant les articles 14, d), 15, § 15 et 25, § 1er, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sa"
+  },
+  {
+   "id": 6235,
+   "codeHospitalisation": "241345",
+   "repealedAt": "2012-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2011022386 (publ. 22-11-2011) suppression au 01/01/2012 : Arrêté royal modifiant les articles 14, d), 15, § 15 et 25, § 1er, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sa"
+  },
+  {
+   "id": 6236,
+   "codeHospitalisation": "241360",
+   "repealedAt": "2012-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2011022386 (publ. 22-11-2011) suppression au 01/01/2012 : Arrêté royal modifiant les articles 14, d), 15, § 15 et 25, § 1er, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sa"
+  },
+  {
+   "id": 6237,
+   "codeHospitalisation": "241382",
+   "repealedAt": "2012-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2011022386 (publ. 22-11-2011) suppression au 01/01/2012 : Arrêté royal modifiant les articles 14, d), 15, § 15 et 25, § 1er, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sa"
+  },
+  {
+   "id": 6248,
+   "codeHospitalisation": "241603",
+   "repealedAt": "1995-10-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB1995022307 (publ. 19-08-1995) suppression au 01/10/1995 : Arrêté royal modifiant l’annexe de l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d’assurance obligatoire soins d"
+  },
+  {
+   "id": 6257,
+   "codeHospitalisation": "241802",
+   "repealedAt": "2012-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2011022386 (publ. 22-11-2011) suppression au 01/01/2012 : Arrêté royal modifiant les articles 14, d), 15, § 15 et 25, § 1er, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sa"
+  },
+  {
+   "id": 6260,
+   "codeHospitalisation": "241861",
+   "repealedAt": "2012-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2011022386 (publ. 22-11-2011) suppression au 01/01/2012 : Arrêté royal modifiant les articles 14, d), 15, § 15 et 25, § 1er, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sa"
+  },
+  {
+   "id": 6302,
+   "codeHospitalisation": "243025",
+   "repealedAt": "2007-05-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2007022404 (publ. 20-03-2007) suppression au 01/05/2007 : Arrêté royal modifiant les dispositions de l’article 14, a), c), d), e), j), k), I., de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des"
+  },
+  {
+   "id": 6346,
+   "codeHospitalisation": "244344",
+   "repealedAt": "1999-07-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB1999022423 (publ. 27-05-1999) suppression au 01/07/1999 : Arrêté royal modifiant l’annexe de l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d’assurance obligatoire soins d"
+  },
+  {
+   "id": 6364,
+   "codeHospitalisation": "244705",
+   "repealedAt": "2012-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2011022386 (publ. 22-11-2011) suppression au 01/01/2012 : Arrêté royal modifiant les articles 14, d), 15, § 15 et 25, § 1er, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sa"
+  },
+  {
+   "id": 6368,
+   "codeHospitalisation": "244786",
+   "repealedAt": "2012-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2011022386 (publ. 22-11-2011) suppression au 01/01/2012 : Arrêté royal modifiant les articles 14, d), 15, § 15 et 25, § 1er, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sa"
+  },
+  {
+   "id": 6404,
+   "codeHospitalisation": "238044",
+   "repealedAt": "1995-10-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB1995022307 (publ. 19-08-1995) suppression au 01/10/1995 : Arrêté royal modifiant l’annexe de l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d’assurance obligatoire soins d"
+  },
+  {
+   "id": 6423,
+   "codeHospitalisation": "239105",
+   "repealedAt": "2010-03-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2010022071 (publ. 28-01-2010) suppression au 01/03/2010 : Arrêté royal modifiant l’article 14, f), 5°, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d’assur"
+  },
+  {
+   "id": 6424,
+   "codeHospitalisation": "239120",
+   "repealedAt": "1991-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB1991000197 (publ. 25-01-1991) suppression au 01/01/1991 : Arrêté royal modifiant l’annexe de l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d’assurance obligatoire soins d"
+  },
+  {
+   "id": 6425,
+   "codeHospitalisation": "239142",
+   "repealedAt": "1991-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB1991000197 (publ. 25-01-1991) suppression au 01/01/1991 : Arrêté royal modifiant l’annexe de l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d’assurance obligatoire soins d"
+  },
+  {
+   "id": 6426,
+   "codeHospitalisation": "239164",
+   "repealedAt": "1995-10-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB1995022307 (publ. 19-08-1995) suppression au 01/10/1995 : Arrêté royal modifiant l’annexe de l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d’assurance obligatoire soins d"
+  },
+  {
+   "id": 6427,
+   "codeHospitalisation": "239186",
+   "repealedAt": "1995-10-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB1995022307 (publ. 19-08-1995) suppression au 01/10/1995 : Arrêté royal modifiant l’annexe de l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d’assurance obligatoire soins d"
+  },
+  {
+   "id": 6428,
+   "codeHospitalisation": "239201",
+   "repealedAt": "1995-10-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB1995022307 (publ. 19-08-1995) suppression au 01/10/1995 : Arrêté royal modifiant l’annexe de l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d’assurance obligatoire soins d"
+  },
+  {
+   "id": 6431,
+   "codeHospitalisation": "239260",
+   "repealedAt": "1995-10-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB1995022307 (publ. 19-08-1995) suppression au 01/10/1995 : Arrêté royal modifiant l’annexe de l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d’assurance obligatoire soins d"
+  },
+  {
+   "id": 6432,
+   "codeHospitalisation": "239282",
+   "repealedAt": "1995-10-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB1995022307 (publ. 19-08-1995) suppression au 01/10/1995 : Arrêté royal modifiant l’annexe de l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d’assurance obligatoire soins d"
+  },
+  {
+   "id": 6438,
+   "codeHospitalisation": "226962",
+   "repealedAt": "2008-12-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2008022550 (publ. 10-10-2008) suppression au 01/12/2008 : Arrêté royal modifiant les articles 14, c), et 14, e), de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matiè"
+  },
+  {
+   "id": 6439,
+   "codeHospitalisation": "226984",
+   "repealedAt": "2008-12-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2008022550 (publ. 10-10-2008) suppression au 01/12/2008 : Arrêté royal modifiant les articles 14, c), et 14, e), de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matiè"
+  },
+  {
+   "id": 6440,
+   "codeHospitalisation": "227006",
+   "repealedAt": "2008-12-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2008022550 (publ. 10-10-2008) suppression au 01/12/2008 : Arrêté royal modifiant les articles 14, c), et 14, e), de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matiè"
+  },
+  {
+   "id": 6441,
+   "codeHospitalisation": "227021",
+   "repealedAt": "2008-12-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2008022550 (publ. 10-10-2008) suppression au 01/12/2008 : Arrêté royal modifiant les articles 14, c), et 14, e), de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matiè"
+  },
+  {
+   "id": 6442,
+   "codeHospitalisation": "227043",
+   "repealedAt": "2008-12-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2008022550 (publ. 10-10-2008) suppression au 01/12/2008 : Arrêté royal modifiant les articles 14, c), et 14, e), de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matiè"
+  },
+  {
+   "id": 6443,
+   "codeHospitalisation": "227065",
+   "repealedAt": "2008-12-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2008022550 (publ. 10-10-2008) suppression au 01/12/2008 : Arrêté royal modifiant les articles 14, c), et 14, e), de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matiè"
+  },
+  {
+   "id": 6444,
+   "codeHospitalisation": "227080",
+   "repealedAt": "2008-12-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2008022550 (publ. 10-10-2008) suppression au 01/12/2008 : Arrêté royal modifiant les articles 14, c), et 14, e), de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matiè"
+  },
+  {
+   "id": 6452,
+   "codeHospitalisation": "227242",
+   "repealedAt": "2007-05-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2007022404 (publ. 20-03-2007) suppression au 01/05/2007 : Arrêté royal modifiant les dispositions de l’article 14, a), c), d), e), j), k), I., de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des"
+  },
+  {
+   "id": 6465,
+   "codeHospitalisation": "227500",
+   "repealedAt": "2025-07-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2025003814 (publ. 26-05-2025) suppression au 01/07/2025 : Arrêté royal modifiant les articles 11, §§ 4 et 5, 14, e), 20, §§ 1er et 2, 25, § 4, et 34, § 1er, de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la no"
+  },
+  {
+   "id": 6466,
+   "codeHospitalisation": "227522",
+   "repealedAt": "2011-08-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2011022220 (publ. 30-06-2011) suppression au 01/08/2011 : Arrêté royal modifiant l’article 14, c), II., 1., et e), de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en mat"
+  },
+  {
+   "id": 6505,
+   "codeHospitalisation": "229106",
+   "repealedAt": "1986-07-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB1986000300 (publ. 19-02-1986) suppression au 01/07/1986 : Arrêté royal modifiant l’annexe de l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d’assurance obligatoire soins d"
+  },
+  {
+   "id": 6507,
+   "codeHospitalisation": "229143",
+   "repealedAt": "2012-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2011022404 (publ. 25-11-2011) suppression au 01/01/2012 : Arrêté royal modifiant les articles 11, §§ 1er, 4 et 5, 13, § 1er, 14, b), e), et j), 15, § 8, 20, § 1er, et 25, § 1er, de l’annexe à l’arrêté royal du 14 septembre 1"
+  },
+  {
+   "id": 6508,
+   "codeHospitalisation": "229165",
+   "repealedAt": "2009-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2008022589 (publ. 05-11-2008) suppression au 01/01/2009 : Arrêté royal modifiant les articles 14, e), et 20, § 1er, e), de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé e"
+  },
+  {
+   "id": 6509,
+   "codeHospitalisation": "229180",
+   "repealedAt": "2012-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2011022404 (publ. 25-11-2011) suppression au 01/01/2012 : Arrêté royal modifiant les articles 11, §§ 1er, 4 et 5, 13, § 1er, 14, b), e), et j), 15, § 8, 20, § 1er, et 25, § 1er, de l’annexe à l’arrêté royal du 14 septembre 1"
+  },
+  {
+   "id": 6523,
+   "codeHospitalisation": "229460",
+   "repealedAt": "1986-07-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB1986000300 (publ. 19-02-1986) suppression au 01/07/1986 : Arrêté royal modifiant l’annexe de l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d’assurance obligatoire soins d"
+  },
+  {
+   "id": 6536,
+   "codeHospitalisation": "250143",
+   "repealedAt": "2003-04-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2003022343 (publ. 31-03-2003) suppression au 01/04/2003 : Arrêté royal modifiant l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d’assurance obligatoire soins de santé et i"
+  },
+  {
+   "id": 6537,
+   "codeHospitalisation": "250165",
+   "repealedAt": "2003-04-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2003022343 (publ. 31-03-2003) suppression au 01/04/2003 : Arrêté royal modifiant l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d’assurance obligatoire soins de santé et i"
+  },
+  {
+   "id": 6567,
+   "codeHospitalisation": "252442",
+   "repealedAt": "2011-08-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2011022220 (publ. 30-06-2011) suppression au 01/08/2011 : Arrêté royal modifiant l’article 14, c), II., 1., et e), de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en mat"
+  },
+  {
+   "id": 6591,
+   "codeHospitalisation": "253186",
+   "repealedAt": "2008-10-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2008022465 (publ. 29-08-2008) suppression au 01/10/2008 : Arrêté royal modifiant les articles 11, 14, c), 14, i), et 14, l), de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sa"
+  },
+  {
+   "id": 6592,
+   "codeHospitalisation": "253201",
+   "repealedAt": "2008-10-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2008022465 (publ. 29-08-2008) suppression au 01/10/2008 : Arrêté royal modifiant les articles 11, 14, c), 14, i), et 14, l), de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sa"
+  },
+  {
+   "id": 6593,
+   "codeHospitalisation": "253223",
+   "repealedAt": "2008-10-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2008022465 (publ. 29-08-2008) suppression au 01/10/2008 : Arrêté royal modifiant les articles 11, 14, c), 14, i), et 14, l), de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de sa"
+  },
+  {
+   "id": 6618,
+   "codeHospitalisation": "230495",
+   "repealedAt": "2013-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2012022433 (publ. 30-11-2012) suppression au 01/01/2013 : Arrêté royal modifiant les articles 11, § 2, et 14, b), de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en mati"
+  },
+  {
+   "id": 6630,
+   "codeHospitalisation": "230731",
+   "repealedAt": "2022-09-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2022032632 (publ. 15-07-2022) suppression au 01/09/2022 : Arrêté royal modifiant l'annexe à l'arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d'assurance obligatoire soins de"
+  },
+  {
+   "id": 6632,
+   "codeHospitalisation": "230775",
+   "repealedAt": "1988-08-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB1988001383 (publ. 30-07-1988) suppression au 01/08/1988 : Arrêté royal modifiant l’annexe de l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d’assurance obligatoire soins d"
+  },
+  {
+   "id": 6633,
+   "codeHospitalisation": "230790",
+   "repealedAt": "1988-08-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB1988001383 (publ. 30-07-1988) suppression au 01/08/1988 : Arrêté royal modifiant l’annexe de l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d’assurance obligatoire soins d"
+  },
+  {
+   "id": 6637,
+   "codeHospitalisation": "230871",
+   "repealedAt": "1988-08-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB1988001383 (publ. 30-07-1988) suppression au 01/08/1988 : Arrêté royal modifiant l’annexe de l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d’assurance obligatoire soins d"
+  },
+  {
+   "id": 6638,
+   "codeHospitalisation": "230893",
+   "repealedAt": "1988-08-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB1988001383 (publ. 30-07-1988) suppression au 01/08/1988 : Arrêté royal modifiant l’annexe de l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d’assurance obligatoire soins d"
+  },
+  {
+   "id": 6640,
+   "codeHospitalisation": "230930",
+   "repealedAt": "1988-08-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB1988001383 (publ. 30-07-1988) suppression au 01/08/1988 : Arrêté royal modifiant l’annexe de l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d’assurance obligatoire soins d"
+  },
+  {
+   "id": 6644,
+   "codeHospitalisation": "231416",
+   "repealedAt": "1988-08-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB1988001383 (publ. 30-07-1988) suppression au 01/08/1988 : Arrêté royal modifiant l’annexe de l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d’assurance obligatoire soins d"
+  },
+  {
+   "id": 6645,
+   "codeHospitalisation": "231431",
+   "repealedAt": "1988-08-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB1988001383 (publ. 30-07-1988) suppression au 01/08/1988 : Arrêté royal modifiant l’annexe de l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d’assurance obligatoire soins d"
+  },
+  {
+   "id": 6665,
+   "codeHospitalisation": "232470",
+   "repealedAt": "2012-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2011022404 (publ. 25-11-2011) suppression au 01/01/2012 : Arrêté royal modifiant les articles 11, §§ 1er, 4 et 5, 13, § 1er, 14, b), e), et j), 15, § 8, 20, § 1er, et 25, § 1er, de l’annexe à l’arrêté royal du 14 septembre 1"
+  },
+  {
+   "id": 6679,
+   "codeHospitalisation": "232750",
+   "repealedAt": "2022-09-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2022032632 (publ. 15-07-2022) suppression au 01/09/2022 : Arrêté royal modifiant l'annexe à l'arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d'assurance obligatoire soins de"
+  },
+  {
+   "id": 6680,
+   "codeHospitalisation": "232772",
+   "repealedAt": "2022-09-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2022032632 (publ. 15-07-2022) suppression au 01/09/2022 : Arrêté royal modifiant l'annexe à l'arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d'assurance obligatoire soins de"
+  },
+  {
+   "id": 6681,
+   "codeHospitalisation": "232794",
+   "repealedAt": "2022-09-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2022032632 (publ. 15-07-2022) suppression au 01/09/2022 : Arrêté royal modifiant l'annexe à l'arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d'assurance obligatoire soins de"
+  },
+  {
+   "id": 6682,
+   "codeHospitalisation": "232816",
+   "repealedAt": "2012-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2011022404 (publ. 25-11-2011) suppression au 01/01/2012 : Arrêté royal modifiant les articles 11, §§ 1er, 4 et 5, 13, § 1er, 14, b), e), et j), 15, § 8, 20, § 1er, et 25, § 1er, de l’annexe à l’arrêté royal du 14 septembre 1"
+  },
+  {
+   "id": 6683,
+   "codeHospitalisation": "232831",
+   "repealedAt": "2012-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2011022404 (publ. 25-11-2011) suppression au 01/01/2012 : Arrêté royal modifiant les articles 11, §§ 1er, 4 et 5, 13, § 1er, 14, b), e), et j), 15, § 8, 20, § 1er, et 25, § 1er, de l’annexe à l’arrêté royal du 14 septembre 1"
+  },
+  {
+   "id": 6684,
+   "codeHospitalisation": "232853",
+   "repealedAt": "2012-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2011022404 (publ. 25-11-2011) suppression au 01/01/2012 : Arrêté royal modifiant les articles 11, §§ 1er, 4 et 5, 13, § 1er, 14, b), e), et j), 15, § 8, 20, § 1er, et 25, § 1er, de l’annexe à l’arrêté royal du 14 septembre 1"
+  },
+  {
+   "id": 6685,
+   "codeHospitalisation": "232875",
+   "repealedAt": "2012-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2011022404 (publ. 25-11-2011) suppression au 01/01/2012 : Arrêté royal modifiant les articles 11, §§ 1er, 4 et 5, 13, § 1er, 14, b), e), et j), 15, § 8, 20, § 1er, et 25, § 1er, de l’annexe à l’arrêté royal du 14 septembre 1"
+  },
+  {
+   "id": 6686,
+   "codeHospitalisation": "232890",
+   "repealedAt": "2012-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2011022404 (publ. 25-11-2011) suppression au 01/01/2012 : Arrêté royal modifiant les articles 11, §§ 1er, 4 et 5, 13, § 1er, 14, b), e), et j), 15, § 8, 20, § 1er, et 25, § 1er, de l’annexe à l’arrêté royal du 14 septembre 1"
+  },
+  {
+   "id": 6691,
+   "codeHospitalisation": "318043",
+   "repealedAt": "2006-12-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB2006023080 (publ. 23-10-2006) suppression au 01/12/2006 : Arrêté royal modifiant, les dispositions des articles 14m) et 20, § 1er, de l’annexe de l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestation"
+  },
+  {
+   "id": 6694,
+   "codeHospitalisation": "318102",
+   "repealedAt": "1990-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB1989002310 (publ. 06-12-1989) suppression au 01/01/1990 : Arrêté royal modifiant l’annexe de l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d’assurance obligatoire soins d"
+  },
+  {
+   "id": 6695,
+   "codeHospitalisation": "318124",
+   "repealedAt": "1990-01-01",
+   "source": "INAMI NomenSoft 01.11.2026 — KB1989002310 (publ. 06-12-1989) suppression au 01/01/1990 : Arrêté royal modifiant l’annexe de l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d’assurance obligatoire soins d"
+  }
+ ]
+}
