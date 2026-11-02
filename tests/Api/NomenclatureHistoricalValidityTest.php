@@ -316,7 +316,168 @@ class NomenclatureHistoricalValidityTest extends ApiTestBase
         $this->assertContains('300344N250', $cells);
     }
 
+    // ------------------------------------------------- L'abrogation vérifiée prime sur `active`
+
+    /**
+     * Veille, jour exact et lendemain de l'abrogation vérifiée, code actif ET inactif : la date
+     * officielle décide seule, sur les trois routes de création.
+     */
+    public function testBoundaryDatesWithBothActiveValuesOnEveryCreationRoute(): void
+    {
+        $activeRepealed = $this->activeWithVerifiedRepeal();
+        $expected = ['2026-09-30' => 201, self::REPEALED => 'refus', '2026-10-02' => 'refus'];
+
+        foreach (['actif' => $activeRepealed, 'inactif' => $this->verified] as $label => $code) {
+            foreach ($expected as $date => $result) {
+                foreach (['addNewSurgery', 'add', 'apiPlatform'] as $route) {
+                    [$status, $message] = $this->createWithMessage($route, $code, $date);
+                    if ($result === 201) {
+                        $this->assertSame(201, $status, "$label $date $route");
+                    } else {
+                        $this->assertSame($route === 'apiPlatform' ? 422 : 400, $status, "$label $date $route");
+                        $this->assertStringContainsString('abrogé le 01/10/2026', $message, "$label $date $route");
+                    }
+                }
+            }
+        }
+        // 2 codes x 3 routes acceptés la veille seulement.
+        $this->assertCount(6, $this->rows());
+        foreach ($this->rows() as $row) {
+            $this->assertSame('2026-09-30', substr($row['date'], 0, 10));
+        }
+    }
+
+    public function testBoundaryDatesForAChangeOfActWithBothActiveValues(): void
+    {
+        $activeRepealed = $this->activeWithVerifiedRepeal();
+        $client = $this->clientFor($this->alice);
+
+        foreach (['actif' => $activeRepealed, 'inactif' => $this->verified] as $label => $code) {
+            foreach (['2026-09-30' => true, self::REPEALED => false, '2026-10-02' => false] as $date => $accepted) {
+                // API Platform (PUT) et ancienne route, à partir d'une intervention sur un code actif.
+                $s = $this->surgery($this->current, '289015N5', '2026-08-01');
+                $client->request('PUT', '/api/surgeries/' . $s->getId(), ['json' => ['date' => $date, 'surgeryId' => (string) $code->getId()]]);
+                $this->assertSame($accepted ? 200 : 422, $client->getResponse()->getStatusCode(), "$label $date PUT");
+                $legacy = $this->surgery($this->current, '289015N5', '2026-08-01');
+                $client->request('PUT', '/api/surgeries/update/' . $legacy->getId(), ['json' => [
+                    'year' => $this->year->getId(), 'date' => $date, 'position' => 1, 'surgeryId' => $code->getId(),
+                ]]);
+                $this->assertSame($accepted ? 200 : 400, $client->getResponse()->getStatusCode(), "$label $date ancienne route");
+                foreach ([$s, $legacy] as $edited) {
+                    $this->assertSame($accepted ? [$code->getCodeHospitalisation() . $code->getN(), $date] : ['289015N5', '2026-08-01'], $this->identity($edited), "$label $date");
+                }
+            }
+        }
+    }
+
+    public function testBoundaryDatesWhenMovingAnUnchangedActWithBothActiveValues(): void
+    {
+        $activeRepealed = $this->activeWithVerifiedRepeal();
+        $client = $this->clientFor($this->alice);
+
+        foreach (['actif' => $activeRepealed, 'inactif' => $this->verified] as $label => $code) {
+            $historical = $code->getCodeHospitalisation() . $code->getN() . '-HIST';
+            foreach (['2026-09-30' => true, self::REPEALED => false, '2026-10-02' => false] as $date => $accepted) {
+                $s = $this->surgery($code, $historical, '2026-09-01');
+                $client->request('PUT', '/api/surgeries/' . $s->getId(), ['json' => ['date' => $date, 'surgeryId' => '']]);
+                $this->assertSame($accepted ? 200 : 422, $client->getResponse()->getStatusCode(), "$label $date PUT");
+                $legacy = $this->surgery($code, $historical, '2026-09-01');
+                $client->request('PUT', '/api/surgeries/update/' . $legacy->getId(), ['json' => ['year' => $this->year->getId(), 'date' => $date, 'position' => 1]]);
+                $this->assertSame($accepted ? 200 : 400, $client->getResponse()->getStatusCode(), "$label $date ancienne route");
+                foreach ([$s, $legacy] as $edited) {
+                    // Identité INAMI jamais modifiée ; date modifiée seulement si acceptée.
+                    $this->assertSame([$historical, $accepted ? $date : '2026-09-01'], $this->identity($edited), "$label $date");
+                }
+            }
+
+            // Intervention déjà enregistrée dans la période abrogée : modifiable sans changer de date.
+            $after = $this->surgery($code, $historical, '2026-10-02');
+            $client->request('PUT', '/api/surgeries/' . $after->getId(), ['json' => ['date' => '2026-10-02', 'position' => '2', 'firstHand' => (string) $this->boss->getId(), 'surgeryId' => '']]);
+            $this->assertSame(200, $client->getResponse()->getStatusCode(), "$label rôle seul");
+            $this->assertSame([$historical, '2026-10-02'], $this->identity($after));
+        }
+    }
+
+    public function testAReactivationNeverBypassesAVerifiedRepeal(): void
+    {
+        $admin = $this->clientFor($this->admin);
+        $admin->request('PUT', '/api/admin/nomenclature/' . $this->verified->getId() . '/status', ['json' => ['active' => true]]);
+        $this->assertSame(200, $admin->getResponse()->getStatusCode());
+
+        $this->assertSame(201, $this->create('addNewSurgery', $this->verified, '2026-09-30'));
+        $this->assertSame(400, $this->create('addNewSurgery', $this->verified, self::REPEALED));
+        $this->assertSame(400, $this->create('addNewSurgery', $this->verified, '2026-10-02'));
+
+        // Liste sans date (favoris, anciens fronts : aujourd'hui, après l'abrogation) : absent.
+        $client = $this->clientFor($this->alice);
+        $this->assertNotContains($this->verified->getId(), array_column($client->request('GET', '/api/nomenclature/ortho')->toArray(), 'id'));
+        $client->request('POST', '/api/favorites/addNew', ['json' => ['surgeryId' => $this->verified->getId(), 'shortcut' => 'x']]);
+        $this->assertSame(400, $client->getResponse()->getStatusCode());
+        $this->assertStringContainsString('abrogé le 01/10/2026', $client->getResponse()->toArray(false)['error']);
+    }
+
+    public function testSelectionListsApplyTheVerifiedRepealToActiveCodes(): void
+    {
+        $activeRepealed = $this->activeWithVerifiedRepeal();
+        $activeFuture = $this->nomenclature('Code actif, abrogation vérifiée future', '289500', 'N9');
+        $this->em->flush();
+        $activeFuture->setInamiRepealedAt(new \DateTimeImmutable('+1 year'))->setInamiRepealSource('Moniteur belge (test)')->verifyRepeal(new \DateTimeImmutable());
+        $this->em->flush();
+        $client = $this->clientFor($this->alice);
+
+        $eve = array_column($client->request('GET', '/api/nomenclature/ortho?date=2026-09-30')->toArray(), null, 'id');
+        $this->assertSame([$this->current->getId(), $this->verified->getId(), $activeRepealed->getId(), $activeFuture->getId()], array_keys($eve));
+        $this->assertSame([true, self::REPEALED], [$eve[$activeRepealed->getId()]['active'], $eve[$activeRepealed->getId()]['inamiRepealedAt']]);
+        $this->assertNull($eve[$this->current->getId()]['inamiRepealedAt']);
+
+        foreach ([self::REPEALED, '2026-10-02'] as $date) {
+            $ids = array_column($client->request('GET', "/api/nomenclature/ortho?date=$date")->toArray(), 'id');
+            $this->assertSame([$this->current->getId(), $activeFuture->getId()], $ids, $date);
+        }
+
+        // Sans date : aujourd'hui (après le 01/10/2026) ; le code actif à abrogation future reste proposé.
+        $legacy = array_column($client->request('GET', '/api/nomenclature/ortho')->toArray(), 'id');
+        $this->assertSame([$this->current->getId(), $activeFuture->getId()], $legacy);
+
+        // Favori sur le code actif abrogé : signalé par sa date de validité.
+        $favorite = $this->favorite($activeRepealed, 'Actif abrogé');
+        $item = array_column($client->request('GET', '/api/favorites/getMyList')->toArray(), null, 'id')[$favorite->getId()];
+        $this->assertSame([true, self::REPEALED], [$item['active'], $item['historicalUntil']]);
+    }
+
+    public function testHistoricalInterventionsAndTheirExportAreUnchangedByTheRule(): void
+    {
+        $activeRepealed = $this->activeWithVerifiedRepeal();
+        // Données historiques, dont certaines datées après l'abrogation (saisies avant les règles).
+        $this->surgery($activeRepealed, 'ANCIEN-1', '2026-09-15');
+        $this->surgery($activeRepealed, 'ANCIEN-2', '2026-10-15');
+        $this->surgery($this->verified, 'ANCIEN-3', '2026-11-01');
+        $before = $this->rows();
+
+        $file = tempnam(sys_get_temp_dir(), 'carnet');
+        file_put_contents($file, $this->clientFor($this->alice)->request('GET', '/api/excel2/' . $this->year->getId())->getContent());
+        $cells = array_map(fn ($value) => trim((string) $value), array_merge(...IOFactory::load($file)->getSheet(1)->toArray()));
+        unlink($file);
+
+        foreach (['ANCIEN-1', 'ANCIEN-2', 'ANCIEN-3'] as $code) {
+            $this->assertContains($code, $cells);
+        }
+        $this->assertSame($before, $this->rows(), 'aucune intervention historique modifiée');
+    }
+
     // ------------------------------------------------- Helpers
+
+    /** Code ACTIF dont l'abrogation officielle au 01/10/2026 est vérifiée. */
+    private function activeWithVerifiedRepeal(): Nomenclature
+    {
+        $code = $this->nomenclature('Arthroplastie (actif, abrogation vérifiée)', '289300', 'N3');
+        $this->em->flush();
+        $code->setInamiRepealedAt(new \DateTimeImmutable(self::REPEALED))->setInamiRepealSource('Moniteur belge du 15/09/2026')->verifyRepeal(new \DateTimeImmutable('2026-09-20'));
+        $this->em->flush();
+        $this->assertTrue($code->isActive());
+
+        return $code;
+    }
 
     private function nomenclature(string $name, string $code, string $n): Nomenclature
     {

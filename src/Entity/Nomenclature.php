@@ -330,29 +330,32 @@ class Nomenclature
 
     /**
      * Le code peut-il servir pour une intervention réalisée à cette date ?
-     * - code actif : oui ;
-     * - code inactif : seulement si sa date officielle d'abrogation est VÉRIFIÉE et que
-     *   l'intervention la précède strictement (saisie tardive d'un acte réalisé avant l'abrogation).
-     *   Date absente ou non vérifiée : jamais (aucune période de validité n'est supposée).
+     *
+     * La date officielle d'abrogation VÉRIFIÉE prime toujours sur le statut administratif `active`
+     * (décision du 02/11/2026) :
+     * - abrogation vérifiée : utilisable seulement pour une intervention strictement antérieure,
+     *   que le code soit actif ou non (une réactivation ne la contourne jamais) ;
+     * - sans abrogation vérifiée : utilisable seulement si le code est actif (code inactif : aucune
+     *   période de validité supposée).
      */
     public function isUsableOn(\DateTimeInterface $date): bool
     {
-        if ($this->active) {
-            return true;
-        }
         $repealed = $this->getVerifiedRepealDate();
+        if ($repealed !== null) {
+            return $date->format('Y-m-d') < $repealed->format('Y-m-d');
+        }
 
-        return $repealed !== null && $date->format('Y-m-d') < $repealed->format('Y-m-d');
+        return $this->active;
     }
 
     /**
-     * Code inactif dont l'abrogation, vérifiée, est connue pour cette date (date >= abrogation).
-     * Sert à refuser le déplacement d'une intervention existante au-delà de l'abrogation.
+     * Abrogation VÉRIFIÉE atteinte à cette date (date >= abrogation), que le code soit actif ou non.
+     * Sert à refuser le déplacement d'une intervention existante dans la période abrogée.
      */
     public function isKnownRepealedOn(\DateTimeInterface $date): bool
     {
         $repealed = $this->getVerifiedRepealDate();
 
-        return !$this->active && $repealed !== null && $date->format('Y-m-d') >= $repealed->format('Y-m-d');
+        return $repealed !== null && $date->format('Y-m-d') >= $repealed->format('Y-m-d');
     }
 }

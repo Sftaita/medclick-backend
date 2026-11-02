@@ -21,22 +21,24 @@ class NomenclatureRepository extends ServiceEntityRepository
     }
 
     /**
-     * Codes ACTIFS d'une spécialité : liste proposée pour choisir l'acte d'une nouvelle
-     * intervention ou d'un favori (GET /api/nomenclature/{speciality}).
+     * Liste sans date (favoris, anciens fronts) : codes ACTIFS dont aucune abrogation vérifiée
+     * n'est atteinte au jour indiqué (aujourd'hui). Forme historique de la réponse.
      *
-     * Seule requête filtrée sur `active` (ADR-210) : les interventions historiques, les favoris,
-     * les statistiques, les exports et l'administration lisent tous les codes, actifs ou non.
+     * Les requêtes de sélection sont les seules filtrées sur le statut (ADR-210) : les interventions
+     * historiques, les favoris, les statistiques, les exports et l'administration lisent tous les codes.
      *
      * @param string $speciality
      * @return array<int, array<string, mixed>>
      */
-    public function fetchBySpeciality($speciality)
+    public function fetchBySpeciality($speciality, ?\DateTimeInterface $today = null)
     {
         return $this->createQueryBuilder('u')
             ->andWhere('u.speciality = :val')
             ->andWhere('u.active = :active')
+            ->andWhere('u.inamiRepealVerifiedAt IS NULL OR u.inamiRepealedAt > :today')
             ->setParameter('val', $speciality)
             ->setParameter('active', true)
+            ->setParameter('today', self::day($today ?? new \DateTimeImmutable('today')), Types::DATE_IMMUTABLE)
             ->select('u.id, u.codeAmbulant, u.codeHospitalisation, u.codeHospitalisation, u.name, u.n, u.type, u.subType ')
             ->getQuery()
             ->getResult()
@@ -44,10 +46,11 @@ class NomenclatureRepository extends ServiceEntityRepository
     }
 
     /**
-     * Codes d'une spécialité UTILISABLES pour une intervention réalisée à cette date (saisie, y
-     * compris tardive) : codes actifs, et codes inactifs dont la date officielle d'abrogation est
-     * VÉRIFIÉE et postérieure à l'intervention (même règle que Nomenclature::isUsableOn()).
-     * Chaque ligne indique `active` et, pour un ancien code, `inamiRepealedAt` (« AAAA-MM-JJ »).
+     * Codes d'une spécialité UTILISABLES pour une intervention réalisée à cette date (même règle
+     * que Nomenclature::isUsableOn()) :
+     * - abrogation vérifiée : seulement si elle est postérieure à l'intervention, actif ou non ;
+     * - sans abrogation vérifiée : seulement les codes actifs.
+     * Chaque ligne indique `active` et `inamiRepealedAt` (abrogation VÉRIFIÉE, « AAAA-MM-JJ », sinon null).
      *
      * @return array<int, array<string, mixed>>
      */
@@ -55,21 +58,27 @@ class NomenclatureRepository extends ServiceEntityRepository
     {
         $rows = $this->createQueryBuilder('u')
             ->andWhere('u.speciality = :val')
-            ->andWhere('u.active = true OR (u.inamiRepealVerifiedAt IS NOT NULL AND u.inamiRepealedAt > :date)')
+            ->andWhere('(u.inamiRepealVerifiedAt IS NOT NULL AND u.inamiRepealedAt > :date) OR (u.inamiRepealVerifiedAt IS NULL AND u.active = true)')
             ->setParameter('val', $speciality)
-            ->setParameter('date', \DateTimeImmutable::createFromInterface($date)->setTime(0, 0), Types::DATE_IMMUTABLE)
-            ->select('u.id, u.codeAmbulant, u.codeHospitalisation, u.name, u.n, u.type, u.subType, u.active, u.inamiRepealedAt')
+            ->setParameter('date', self::day($date), Types::DATE_IMMUTABLE)
+            ->select('u.id, u.codeAmbulant, u.codeHospitalisation, u.name, u.n, u.type, u.subType, u.active, u.inamiRepealedAt, u.inamiRepealVerifiedAt')
             ->orderBy('u.id')
             ->getQuery()
             ->getResult();
 
         return array_map(static function (array $row): array {
+            $verified = $row['inamiRepealVerifiedAt'] !== null;
+            unset($row['inamiRepealVerifiedAt']);
             $row['active'] = (bool) $row['active'];
-            // Date officielle exposée seulement pour un ancien code (elle est alors vérifiée).
-            $row['inamiRepealedAt'] = $row['active'] ? null : $row['inamiRepealedAt']?->format('Y-m-d');
+            $row['inamiRepealedAt'] = $verified ? $row['inamiRepealedAt']?->format('Y-m-d') : null;
 
             return $row;
         }, $rows);
+    }
+
+    private static function day(\DateTimeInterface $date): \DateTimeImmutable
+    {
+        return \DateTimeImmutable::createFromInterface($date)->setTime(0, 0);
     }
 
     /**

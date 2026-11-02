@@ -134,6 +134,14 @@ Sur le code de recette 6970 (inactif, abrogation au 01/10/2026 non vérifiée au
 | H10 | Source modifiée sans nouvelle vérification | « non vérifiée » ; H3 de nouveau refusé |
 | H11 | Empreintes, export, journaux | 1 775 codes existants actifs et inchangés ; seules les lignes de recette diffèrent ; aucune erreur |
 
+### Abrogation vérifiée prioritaire sur `active` (à jouer après autorisation)
+
+Sur un code de recette ACTIF dont l'abrogation vérifiée est fixée (ex. 01/10/2026) et sur le code
+6970 (inactif) : veille (30/09) acceptée, jour exact (01/10) et lendemain (02/10) refusés, en
+création (PWA et trois routes API), en changement d'acte et en déplacement de date ; réactivation
+sans effet sur ces refus ; écrans : favori « Code INAMI abrogé » grisé, administration « Actif » +
+« Code INAMI abrogé ».
+
 ## Décisions métier encore nécessaires
 
 1. **Saisie tardive** d'un acte réalisé avant l'abrogation (ex. intervention de juin saisie en

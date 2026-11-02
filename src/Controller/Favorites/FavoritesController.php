@@ -3,6 +3,7 @@
 namespace App\Controller\Favorites;
 
 use App\Entity\Favorites;
+use App\Entity\Nomenclature;
 use App\Repository\FavoritesRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use App\Repository\NomenclatureRepository;
@@ -50,8 +51,8 @@ class FavoritesController extends AbstractController
                 'speciality' => $favorite->getSpeciality(),
                 // Statut de la nomenclature liée (sans nomenclature : inutilisable).
                 'active' => $favorite->getSurgery()?->isActive() ?? false,
-                // Code inactif : date officielle d'abrogation VÉRIFIÉE, avant laquelle le favori
-                // reste utilisable pour une intervention (saisie tardive) ; null sinon.
+                // Date officielle d'abrogation VÉRIFIÉE (code actif ou non) : le favori ne sert que
+                // pour une intervention antérieure ; null sans abrogation vérifiée.
                 'historicalUntil' => self::historicalUntil($favorite),
             ];
         }
@@ -111,9 +112,9 @@ class FavoritesController extends AbstractController
         }
 
         // Étape 4 (ADR-210) : un nouveau favori n'utilise qu'un code INAMI actif.
-        if (!$surgery->isActive()) {
+        if (!self::selectableForFavorite($surgery)) {
             return new JsonResponse([
-                'error' => InactiveNomenclatureException::MESSAGE,
+                'error' => self::refusal($surgery),
                 'reason' => InactiveNomenclatureException::REASON,
             ], 400);
         }
@@ -184,9 +185,9 @@ class FavoritesController extends AbstractController
             }
 
             // Étape 4 (ADR-210) : un nouveau favori n'utilise qu'un code INAMI actif.
-            if (!$surgery->isActive()) {
+            if (!self::selectableForFavorite($surgery)) {
                 return new JsonResponse([
-                    'error' => InactiveNomenclatureException::MESSAGE,
+                    'error' => self::refusal($surgery),
                     'reason' => InactiveNomenclatureException::REASON,
                 ], 400);
             }
@@ -214,14 +215,23 @@ class FavoritesController extends AbstractController
 
     }
 
-    /** « AAAA-MM-JJ » : abrogation vérifiée du code inactif lié (utilisable avant cette date), sinon null. */
+    /** « AAAA-MM-JJ » : abrogation vérifiée du code lié, actif ou non (utilisable avant cette date), sinon null. */
     private static function historicalUntil(Favorites $favorite): ?string
     {
-        $nomenclature = $favorite->getSurgery();
-        if ($nomenclature === null || $nomenclature->isActive()) {
-            return null;
-        }
+        return $favorite->getSurgery()?->getVerifiedRepealDate()?->format('Y-m-d');
+    }
 
-        return $nomenclature->getVerifiedRepealDate()?->format('Y-m-d');
+    /**
+     * Un favori (sans date d'intervention) ne pointe que vers un code actif ET non abrogé
+     * aujourd'hui : l'abrogation vérifiée prime sur `active` (ADR-210).
+     */
+    private static function selectableForFavorite(Nomenclature $nomenclature): bool
+    {
+        return $nomenclature->isActive() && $nomenclature->isUsableOn(new \DateTimeImmutable('today'));
+    }
+
+    private static function refusal(Nomenclature $nomenclature): string
+    {
+        return InactiveNomenclatureException::forDate($nomenclature, new \DateTimeImmutable('today'))->getMessage();
     }
 }

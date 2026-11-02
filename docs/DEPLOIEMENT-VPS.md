@@ -123,6 +123,26 @@ donc compatible avec la version en service. Une migration destructive exige une 
 Les conteneurs temporaires (`docker compose run`) portent `traefik.enable=false` : sans cette
 étiquette, ils reprendraient celles du service backend et Traefik leur enverrait une part du trafic.
 
+## Accès navigateur de recette (préproduction, tunnel SSH)
+
+Quand le poste de recette n'est pas dans la liste d'IP de Traefik (IP changeante), la préproduction
+reste accessible sans l'ouvrir ni modifier Traefik : service `recette-acces` du Compose de
+préproduction (nginx, profil inactif par défaut, `deploy/vps/recette-acces/nginx.conf`), publié
+seulement sur `127.0.0.1:8095` du VPS, sur le réseau privé de la préproduction. Il sert la même
+image de frontend et l'API sous une même origine (l'URL absolue de l'API est réécrite en `/api/`).
+
+```bash
+# VPS, /opt/stack/apps/medclick-staging : démarrer pour la séance de recette
+docker compose --profile recette-acces up -d --no-deps recette-acces
+# poste : tunnel (clé SSH), puis http://localhost:8095 dans un profil de navigateur dédié
+ssh -N -L 8095:127.0.0.1:8095 surgicalhub-prod
+# VPS, fin de séance : arrêter et supprimer le conteneur
+docker compose --profile recette-acces rm -sf recette-acces
+```
+
+Préalable (une fois) : le frontend rejoint le réseau privé de la préproduction (déploiement normal
+avec `deploy.sh`). Aucune exposition publique : seul un compte SSH du VPS peut ouvrir le tunnel.
+
 ## Copie production → préproduction
 
 1. Dump sur Hostinger selon `docs/DEPLOIEMENT.md` (mysqldump `--single-transaction`), contrôle

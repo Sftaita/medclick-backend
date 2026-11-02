@@ -133,6 +133,8 @@ services:
     restart: unless-stopped
     networks:
       - proxy
+      # Réseau privé de la préproduction : joignable par l'accès de recette (service recette-acces).
+      - medclick-staging-internal
     depends_on:
       backend:
         condition: service_healthy
@@ -146,6 +148,25 @@ services:
       - "traefik.http.routers.medclick-staging-web.middlewares=medclick-staging-allow@file,secure-headers@file,compress@file"
       - "traefik.http.routers.medclick-staging-web.service=medclick-staging-frontend"
       - "traefik.http.services.medclick-staging-frontend.loadbalancer.server.port=80"
+
+  # Accès navigateur de recette par tunnel SSH (docs/DEPLOIEMENT-VPS.md) : INACTIF par défaut
+  # (profil « recette-acces », ni démarré ni recréé par deploy.sh). Publié seulement sur 127.0.0.1
+  # du VPS, réseau privé de la préproduction uniquement, jamais routé par Traefik.
+  recette-acces:
+    image: nginx:1.29-alpine
+    container_name: medclick-staging-recette-acces
+    profiles: ["recette-acces"]
+    restart: "no"
+    ports:
+      - "127.0.0.1:8095:8080"
+    volumes:
+      - ./src/backend/deploy/vps/recette-acces/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    networks:
+      - medclick-staging-internal
+    labels:
+      - "traefik.enable=false"
+    mem_limit: 64m
+    cpus: 0.25
 
   mailpit:
     image: axllent/mailpit:v1.29
