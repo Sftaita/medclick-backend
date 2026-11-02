@@ -246,6 +246,22 @@ Décision :
   première désactivation ; la réactivation l'efface et garde la date officielle sauf si elle est
   envoyée.
 
-Conséquences : aucune désactivation réelle avant validation de la liste officielle ; décisions
-métier ouvertes listées dans `docs/RECETTE-NOMENCLATURE-ETAPE4.md` (saisie tardive d'un acte
-réalisé avant l'abrogation, notamment).
+- **Validité historique** (décision du 02/11/2026) : la validité d'un code dépend de la DATE RÉELLE
+  de l'intervention. Code actif : utilisable. Code inactif : utilisable seulement si sa date
+  officielle d'abrogation est **vérifiée** (source citée, attestation de l'administrateur :
+  `inami_repeal_source`, `inami_repeal_verified_at`, migration `Version20261104090000`) et que
+  l'intervention la précède strictement ; refusé le jour de l'abrogation et après. Date absente ou
+  non vérifiée : jamais (aucune période supposée). Modifier la date ou la source efface la
+  vérification. Règle appliquée par le serveur sur toutes les routes de création et de changement
+  d'acte, avec la date de l'intervention (`Nomenclature::isUsableOn()`).
+- Acte inchangé : code historique préservé ; une nouvelle date au-delà de l'abrogation vérifiée est
+  refusée (422 sur `date`, ancienne route 400 `reason: nomenclature_repealed_on_date`), jamais de
+  remplacement silencieux. Date inchangée ou abrogation non vérifiée : aucune restriction.
+- Liste de choix `GET /api/nomenclature/{speciality}?date=AAAA-MM-JJ` : codes utilisables à cette
+  date (anciens codes signalés `active: false`, `inamiRepealedAt`) ; sans date : codes actifs.
+- Favoris : `historicalUntil` (abrogation vérifiée) ; un favori à code inactif reste signalé et
+  n'est sélectionnable que pour une intervention antérieure ; aucun favori ne peut être créé ou
+  redirigé vers un code inactif (un favori n'a pas de date).
+
+Conséquences : aucune désactivation réelle avant validation de la liste officielle ; questions
+fonctionnelles restantes dans `docs/RECETTE-NOMENCLATURE-ETAPE4.md`.

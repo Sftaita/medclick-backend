@@ -118,7 +118,7 @@ Points notables :
 | GET | `/api/partner/active` | public | Partenaire affiché aujourd'hui (204 sinon) |
 | GET | `/api/partner/logo/{sha256}.{png\|svg}` | public | Logo du partenaire (CSP sans script, cache immuable) |
 | GET | `/api/marketing/image/{sha256}.webp` | public | Visuel importé d'une campagne (CSP sans script, cache immuable) |
-| GET | `/api/nomenclature/{speciality}` | user | Codes **actifs** d'une spécialité (choix d'un acte) |
+| GET | `/api/nomenclature/{speciality}[?date=AAAA-MM-JJ]` | user | Choix d'un acte : codes actifs ; avec la date de l'intervention, aussi les anciens codes abrogés (vérifiés) après cette date |
 | GET | `/api/list/{id}` | propriétaire | Chirurgiens d'une année |
 | POST | `/api/years/create` | user | Création d'année (unicité année/user) |
 | POST | `/api/surgeries/add` | user | Création d'intervention (v1) |

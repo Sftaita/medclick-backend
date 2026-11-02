@@ -56,14 +56,35 @@ final class SurgeryNomenclatureSelection
     }
 
     /**
-     * Un acte choisi pour une création ou un changement d'acte doit être actif.
+     * Un acte choisi pour une création ou un changement d'acte doit être utilisable à la date de
+     * l'intervention : actif, ou inactif avec une date officielle d'abrogation VÉRIFIÉE postérieure
+     * à l'intervention (saisie tardive). Sans date : seulement un code actif.
      *
      * @throws InactiveNomenclatureException
      */
-    public static function assertSelectable(Nomenclature $reference): void
+    public static function assertSelectable(Nomenclature $reference, ?\DateTimeInterface $date = null): void
     {
-        if (!$reference->isActive()) {
-            throw new InactiveNomenclatureException();
+        $usable = $date !== null ? $reference->isUsableOn($date) : $reference->isActive();
+        if (!$usable) {
+            throw $date !== null ? InactiveNomenclatureException::forDate($reference, $date) : new InactiveNomenclatureException();
+        }
+    }
+
+    /**
+     * Intervention existante dont l'acte est inchangé : sa nouvelle date ne doit pas franchir
+     * l'abrogation VÉRIFIÉE de son code (le code historique n'est jamais remplacé en silence).
+     * Date inchangée, code actif ou abrogation non vérifiée : aucune restriction (aucune période
+     * de validité supposée, données historiques préservées).
+     *
+     * @throws RepealedOnDateException
+     */
+    public static function assertDateKeepsAct(?Nomenclature $current, ?\DateTimeInterface $previousDate, ?\DateTimeInterface $newDate): void
+    {
+        if ($current === null || $newDate === null || $previousDate?->format('Y-m-d') === $newDate->format('Y-m-d')) {
+            return;
+        }
+        if ($current->isKnownRepealedOn($newDate)) {
+            throw new RepealedOnDateException($current, $newDate);
         }
     }
 

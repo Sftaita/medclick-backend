@@ -116,6 +116,24 @@ Les trois colonnes sont ignorées par la version précédente : la migration peu
 Pour la retirer aussi (après une sauvegarde) : `doctrine:migrations:migrate prev` **avant** de
 redéployer l'ancienne version (testé sur la base isolée). Sauvegarde du §0 en dernier recours.
 
+## Validité historique (migration `Version20261104090000`, même procédure sans interruption)
+
+Sur le code de recette 6970 (inactif, abrogation au 01/10/2026 non vérifiée au départ) :
+
+| # | Scénario | Attendu |
+|---|---|---|
+| H1 | Date non vérifiée : intervention du 15/09/2026 avec le code (API et PWA) | refusée ; code absent de la liste du 15/09/2026 |
+| H2 | Admin : « Abrogation », source saisie, case « vérifiée » cochée | « vérifiée » affiché ; trace dans `nomenclature-prod-AAAA-MM.log` |
+| H3 | PWA : nouvelle intervention datée du 15/09/2026, orthopédie | code proposé, mention « Ancien code INAMI : uniquement pour une intervention avant le 01/10/2026 » ; enregistrement accepté |
+| H4 | Même saisie datée du 01/10/2026 et du 15/10/2026 | code absent de la liste ; API : 400 (trois routes de création) |
+| H5 | Date passée du 15/09 au 05/10 après choix de l'ancien code | acte retiré, message sous « Intervention », rien envoyé |
+| H6 | Intervention historique (acte inchangé) déplacée au 05/10/2026 | refusée, message sous « Date » ; code et date inchangés en base |
+| H7 | Même intervention déplacée au 20/09/2026 | acceptée, code historique conservé |
+| H8 | « Mes favoris » : R4 avant le 01/10/2026 / après | sélectionnable et signalé / grisé |
+| H9 | Changement d'acte vers le code de recette, date antérieure / postérieure | accepté / refusé (422 sur `name`) |
+| H10 | Source modifiée sans nouvelle vérification | « non vérifiée » ; H3 de nouveau refusé |
+| H11 | Empreintes, export, journaux | 1 775 codes existants actifs et inchangés ; seules les lignes de recette diffèrent ; aucune erreur |
+
 ## Décisions métier encore nécessaires
 
 1. **Saisie tardive** d'un acte réalisé avant l'abrogation (ex. intervention de juin saisie en

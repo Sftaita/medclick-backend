@@ -7,6 +7,7 @@ use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\Validator\Exception\ValidationException;
 use App\Entity\Surgeries;
 use App\Service\InactiveNomenclatureException;
+use App\Service\RepealedOnDateException;
 use App\Service\SurgeryNomenclatureSelection;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Request;
@@ -28,8 +29,10 @@ use Symfony\Component\Validator\ConstraintViolationList;
  *   leur correction relève de `app:repair-surgery-nomenclature --scope=favorites`.
  *
  * - Étape 4 (ADR-210) : l'acte choisi pour un changement d'acte (ou une création POST
- *   /api/surgeries avec `surgeryId`) doit être ACTIF, sinon 422 avec une violation sur `name`.
- *   Un code inactif déjà lié reste accepté tant qu'il n'est pas changé.
+ *   /api/surgeries avec `surgeryId`) doit être utilisable à la date de l'intervention : actif, ou
+ *   inactif avec une abrogation VÉRIFIÉE postérieure à cette date ; sinon 422 sur `name`.
+ *   Un code inactif déjà lié reste accepté tant qu'il n'est pas changé ; seule une nouvelle date
+ *   au-delà de son abrogation vérifiée est refusée (422 sur `date`).
  *
  * `surgeryId` n'est pas une propriété de l'entité : il est lu dans le corps de la requête.
  *
@@ -67,8 +70,9 @@ final class SurgeryNomenclatureProcessor implements ProcessorInterface
         if ($selected && SurgeryNomenclatureSelection::isAnotherAct($current, $selected)) {
             // Changement d'acte réellement demandé : l'acte doit être actif, puis les quatre champs
             // suivent l'acte choisi (la spécialité est celle de la nomenclature, jamais « favorites »).
+            // Utilisable à la date (nouvelle) de l'intervention : actif, ou abrogé après cette date.
             try {
-                SurgeryNomenclatureSelection::assertSelectable($selected);
+                SurgeryNomenclatureSelection::assertSelectable($selected, $data->getDate());
             } catch (InactiveNomenclatureException $e) {
                 throw new ValidationException(new ConstraintViolationList([
                     new ConstraintViolation($e->getMessage(), null, [], $data, 'name', $payload['surgeryId'] ?? null),
@@ -76,6 +80,15 @@ final class SurgeryNomenclatureProcessor implements ProcessorInterface
             }
             SurgeryNomenclatureSelection::applyAct($data, $selected);
         } elseif ($previous) {
+            // Acte inchangé : une nouvelle date au-delà de l'abrogation vérifiée est refusée (sur
+            // « date ») plutôt que de garder ou remplacer le code en silence.
+            try {
+                SurgeryNomenclatureSelection::assertDateKeepsAct($current, $previous->getDate(), $data->getDate());
+            } catch (RepealedOnDateException $e) {
+                throw new ValidationException(new ConstraintViolationList([
+                    new ConstraintViolation($e->getMessage(), null, [], $data, 'date', $data->getDate()?->format('Y-m-d')),
+                ]));
+            }
             // Même acte ou aucun choix : les quatre champs reprennent STRICTEMENT les valeurs
             // enregistrées (y compris une spécialité « favorites », une nomenclature absente ou
             // un code différent du référentiel actuel). Aucune normalisation n'est appliquée.

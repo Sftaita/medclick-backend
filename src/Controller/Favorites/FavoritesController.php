@@ -50,6 +50,9 @@ class FavoritesController extends AbstractController
                 'speciality' => $favorite->getSpeciality(),
                 // Statut de la nomenclature liée (sans nomenclature : inutilisable).
                 'active' => $favorite->getSurgery()?->isActive() ?? false,
+                // Code inactif : date officielle d'abrogation VÉRIFIÉE, avant laquelle le favori
+                // reste utilisable pour une intervention (saisie tardive) ; null sinon.
+                'historicalUntil' => self::historicalUntil($favorite),
             ];
         }
 
@@ -78,6 +81,7 @@ class FavoritesController extends AbstractController
             'speciality' => $favorite->getSpeciality(),
             'surgeryId' => $favorite->getSurgery()?->getId(),
             'active' => $favorite->getSurgery()?->isActive() ?? false,
+            'historicalUntil' => self::historicalUntil($favorite),
         ]);
     }
 
@@ -208,5 +212,16 @@ class FavoritesController extends AbstractController
             'message' => "ok"
         ], JsonResponse::HTTP_OK, ['Access-Control-Allow-Origin' =>  $_ENV['CORS_ALLOW_ORIGIN']]);
 
+    }
+
+    /** « AAAA-MM-JJ » : abrogation vérifiée du code inactif lié (utilisable avant cette date), sinon null. */
+    private static function historicalUntil(Favorites $favorite): ?string
+    {
+        $nomenclature = $favorite->getSurgery();
+        if ($nomenclature === null || $nomenclature->isActive()) {
+            return null;
+        }
+
+        return $nomenclature->getVerifiedRepealDate()?->format('Y-m-d');
     }
 }

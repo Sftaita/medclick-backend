@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Nomenclature;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -40,6 +41,35 @@ class NomenclatureRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult()
         ;
+    }
+
+    /**
+     * Codes d'une spécialité UTILISABLES pour une intervention réalisée à cette date (saisie, y
+     * compris tardive) : codes actifs, et codes inactifs dont la date officielle d'abrogation est
+     * VÉRIFIÉE et postérieure à l'intervention (même règle que Nomenclature::isUsableOn()).
+     * Chaque ligne indique `active` et, pour un ancien code, `inamiRepealedAt` (« AAAA-MM-JJ »).
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    public function fetchUsableBySpecialityOn(string $speciality, \DateTimeInterface $date): array
+    {
+        $rows = $this->createQueryBuilder('u')
+            ->andWhere('u.speciality = :val')
+            ->andWhere('u.active = true OR (u.inamiRepealVerifiedAt IS NOT NULL AND u.inamiRepealedAt > :date)')
+            ->setParameter('val', $speciality)
+            ->setParameter('date', \DateTimeImmutable::createFromInterface($date)->setTime(0, 0), Types::DATE_IMMUTABLE)
+            ->select('u.id, u.codeAmbulant, u.codeHospitalisation, u.name, u.n, u.type, u.subType, u.active, u.inamiRepealedAt')
+            ->orderBy('u.id')
+            ->getQuery()
+            ->getResult();
+
+        return array_map(static function (array $row): array {
+            $row['active'] = (bool) $row['active'];
+            // Date officielle exposée seulement pour un ancien code (elle est alors vérifiée).
+            $row['inamiRepealedAt'] = $row['active'] ? null : $row['inamiRepealedAt']?->format('Y-m-d');
+
+            return $row;
+        }, $rows);
     }
 
     /**

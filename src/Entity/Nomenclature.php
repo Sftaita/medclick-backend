@@ -56,6 +56,17 @@ class Nomenclature
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
     private ?\DateTimeImmutable $deactivatedAt = null;
 
+    /** Référence de la publication officielle de l'abrogation (ex. « Moniteur belge du … »). */
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private ?string $inamiRepealSource = null;
+
+    /**
+     * Vérification de la date officielle d'abrogation par un administrateur (date et heure).
+     * Effacée dès que la date ou la source change : une nouvelle vérification est alors exigée.
+     */
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
+    private ?\DateTimeImmutable $inamiRepealVerifiedAt = null;
+
     #[ORM\OneToMany(targetEntity: Surgeries::class, mappedBy: 'nomenclature')]
     private $surgeries;
 
@@ -250,8 +261,12 @@ class Nomenclature
         return $this->inamiRepealedAt;
     }
 
+    /** Une date différente efface la vérification (nouvelle vérification exigée). */
     public function setInamiRepealedAt(?\DateTimeImmutable $inamiRepealedAt): self
     {
+        if ($this->inamiRepealedAt?->format('Y-m-d') !== $inamiRepealedAt?->format('Y-m-d')) {
+            $this->inamiRepealVerifiedAt = null;
+        }
         $this->inamiRepealedAt = $inamiRepealedAt;
 
         return $this;
@@ -260,5 +275,84 @@ class Nomenclature
     public function getDeactivatedAt(): ?\DateTimeImmutable
     {
         return $this->deactivatedAt;
+    }
+
+    public function getInamiRepealSource(): ?string
+    {
+        return $this->inamiRepealSource;
+    }
+
+    /** Une source différente efface la vérification (nouvelle vérification exigée). */
+    public function setInamiRepealSource(?string $source): self
+    {
+        $source = $source !== null && trim($source) !== '' ? trim($source) : null;
+        if ($source !== $this->inamiRepealSource) {
+            $this->inamiRepealVerifiedAt = null;
+        }
+        $this->inamiRepealSource = $source;
+
+        return $this;
+    }
+
+    public function getInamiRepealVerifiedAt(): ?\DateTimeImmutable
+    {
+        return $this->inamiRepealVerifiedAt;
+    }
+
+    /**
+     * Atteste que la date officielle d'abrogation a été vérifiée dans la publication citée.
+     * Une vérification existante (même date, même source) garde sa date d'origine.
+     *
+     * @throws \DomainException si la date officielle ou la source manque
+     */
+    public function verifyRepeal(\DateTimeImmutable $at): self
+    {
+        if ($this->inamiRepealedAt === null || $this->inamiRepealSource === null) {
+            throw new \DomainException("La date officielle d'abrogation et sa source sont requises pour la vérification.");
+        }
+        $this->inamiRepealVerifiedAt ??= $at;
+
+        return $this;
+    }
+
+    public function unverifyRepeal(): self
+    {
+        $this->inamiRepealVerifiedAt = null;
+
+        return $this;
+    }
+
+    /** Date officielle d'abrogation, seulement si elle a été vérifiée (sinon null : aucune période supposée). */
+    public function getVerifiedRepealDate(): ?\DateTimeImmutable
+    {
+        return $this->inamiRepealVerifiedAt !== null ? $this->inamiRepealedAt : null;
+    }
+
+    /**
+     * Le code peut-il servir pour une intervention réalisée à cette date ?
+     * - code actif : oui ;
+     * - code inactif : seulement si sa date officielle d'abrogation est VÉRIFIÉE et que
+     *   l'intervention la précède strictement (saisie tardive d'un acte réalisé avant l'abrogation).
+     *   Date absente ou non vérifiée : jamais (aucune période de validité n'est supposée).
+     */
+    public function isUsableOn(\DateTimeInterface $date): bool
+    {
+        if ($this->active) {
+            return true;
+        }
+        $repealed = $this->getVerifiedRepealDate();
+
+        return $repealed !== null && $date->format('Y-m-d') < $repealed->format('Y-m-d');
+    }
+
+    /**
+     * Code inactif dont l'abrogation, vérifiée, est connue pour cette date (date >= abrogation).
+     * Sert à refuser le déplacement d'une intervention existante au-delà de l'abrogation.
+     */
+    public function isKnownRepealedOn(\DateTimeInterface $date): bool
+    {
+        $repealed = $this->getVerifiedRepealDate();
+
+        return !$this->active && $repealed !== null && $date->format('Y-m-d') >= $repealed->format('Y-m-d');
     }
 }

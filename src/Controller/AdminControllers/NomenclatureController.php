@@ -41,6 +41,10 @@ class NomenclatureController extends AbstractController{
             // dates de l'administration).
             'inamiRepealedAt' => $nomenclature->getInamiRepealedAt()?->format('Y-m-d'),
             'deactivatedAt' => $nomenclature->getDeactivatedAt()?->format('Y-m-d H:i:s'),
+            // Vérification de la date officielle (source citée, date de vérification) : seule une
+            // date vérifiée autorise la saisie tardive d'un acte réalisé avant l'abrogation.
+            'inamiRepealSource' => $nomenclature->getInamiRepealSource(),
+            'inamiRepealVerifiedAt' => $nomenclature->getInamiRepealVerifiedAt()?->format('Y-m-d H:i:s'),
         ];
     }
 
@@ -66,12 +70,17 @@ class NomenclatureController extends AbstractController{
     }
 
     /**
-     * Active ou désactive un code. Corps : { active: bool, inamiRepealedAt?: "AAAA-MM-JJ" | null }.
+     * Active ou désactive un code. Corps : { active: bool, inamiRepealedAt?: "AAAA-MM-JJ" | null,
+     * inamiRepealSource?: string | null, inamiRepealVerified?: bool }.
      *
      * - désactivation : la date technique est fixée par le serveur (la première désactivation est
      *   conservée si le code l'était déjà) ;
      * - réactivation : la date technique est effacée ;
-     * - inamiRepealedAt (date officielle) n'est modifiée que si la clé est envoyée.
+     * - inamiRepealedAt (date officielle) et inamiRepealSource ne changent que si la clé est envoyée ;
+     *   un changement de l'une ou de l'autre efface la vérification ;
+     * - inamiRepealVerified: true atteste la vérification (date officielle ET source requises, sinon
+     *   400) ; false la retire. Sans vérification, un code inactif n'est jamais utilisable, même pour
+     *   une intervention antérieure (aucune période de validité supposée).
      *
      * Seule la ligne de nomenclature change : ni suppression, ni modification des interventions et
      * des favoris liés (qui conservent code, intitulé, spécialité et relation).
@@ -108,6 +117,29 @@ class NomenclatureController extends AbstractController{
             $nomenclature->setInamiRepealedAt($repealedAt);
         }
 
+        if (array_key_exists('inamiRepealSource', $data)) {
+            $source = $data['inamiRepealSource'];
+            if ($source !== null && (!is_string($source) || mb_strlen($source) > 255)) {
+                return new JsonResponse(['error' => "Source de l'abrogation invalide (texte de 255 caractères au plus)."], 400);
+            }
+            $nomenclature->setInamiRepealSource($source);
+        }
+
+        if (array_key_exists('inamiRepealVerified', $data)) {
+            if (!is_bool($data['inamiRepealVerified'])) {
+                return new JsonResponse(['error' => '« inamiRepealVerified » doit être un booléen.'], 400);
+            }
+            if ($data['inamiRepealVerified']) {
+                try {
+                    $nomenclature->verifyRepeal($clock->now());
+                } catch (\DomainException $e) {
+                    return new JsonResponse(['error' => $e->getMessage()], 400);
+                }
+            } else {
+                $nomenclature->unverifyRepeal();
+            }
+        }
+
         if ($data['active']) {
             $nomenclature->activate();
         } else {
@@ -122,6 +154,8 @@ class NomenclatureController extends AbstractController{
             'nomenclature_id' => $nomenclature->getId(),
             'active' => $nomenclature->isActive(),
             'inami_repealed_at' => $nomenclature->getInamiRepealedAt()?->format('Y-m-d'),
+            'inami_repeal_source' => $nomenclature->getInamiRepealSource(),
+            'inami_repeal_verified' => $nomenclature->getInamiRepealVerifiedAt() !== null,
             'admin_id' => $admin instanceof User ? $admin->getId() : null,
         ]);
 

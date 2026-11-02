@@ -255,7 +255,7 @@ class NomenclatureActiveStatusTest extends ApiTestBase
         $this->assertFalse($list[$misleading->getId()]['active']);
         $this->assertTrue($list[$renumbered->getId()]['active']);
         // Les autres clés du contrat sont inchangées.
-        $this->assertSame(['id', 'surgeryId', 'codeHospitalisation', 'name', 'shorcut', 'speciality', 'active'], array_keys($list[$misleading->getId()]));
+        $this->assertSame(['id', 'surgeryId', 'codeHospitalisation', 'name', 'shorcut', 'speciality', 'active', 'historicalUntil'], array_keys($list[$misleading->getId()]));
         $this->assertSame('289015N5', $list[$misleading->getId()]['codeHospitalisation']);
 
         $this->assertFalse($client->request('GET', '/api/favorites/getById/' . $misleading->getId())->toArray()['active']);
@@ -370,6 +370,8 @@ class NomenclatureActiveStatusTest extends ApiTestBase
             'nomenclature_id' => $this->current->getId(),
             'active' => false,
             'inami_repealed_at' => '2026-12-31',
+            'inami_repeal_source' => null,
+            'inami_repeal_verified' => false,
             'admin_id' => $this->admin->getId(),
         ], $record->context);
     }
