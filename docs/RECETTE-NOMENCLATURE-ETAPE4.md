@@ -50,23 +50,27 @@ Empreintes (lecture seule) : mêmes formules que l'étape 3 (interventions, nome
 globales et ligne par ligne, fichiers `validation/` en 600). Les nouvelles colonnes n'entrent pas
 dans la formule de la nomenclature : l'empreinte doit rester identique après la migration.
 
-## 1. Déploiement staging (migration comprise)
+## 1. Migration puis déploiement staging, sans interruption
+
+Procédure de `docs/DEPLOIEMENT-VPS.md`, « Mise à jour avec migration ». Le `deploy.sh` du dossier
+de l'environnement est d'abord remplacé par celui de la branche (copie précédente dans `backups/`).
 
 ```bash
-# poste : archive du frontend au SHA de la branche PWA
+# poste : archive du frontend au SHA de la branche PWA (le frontend en service n'est pas touché)
 git -C <pwa> archive <sha_front> frontend | ssh surgicalhub-prod "cd /opt/stack/apps/medclick-staging && mv src/pwa src/pwa.a624bfc && mkdir src/pwa && tar -x -C src/pwa && echo <sha_front> > src/pwa/.commit"
 # VPS
 cd /opt/stack/apps/medclick-staging
-./deploy.sh <sha_backend> <sha_front>; echo "code $?"     # attendu : 2 (1 migration en attente)
-docker compose exec -T backend php bin/console doctrine:migrations:status | grep -E "New|Next"   # Version20261103090000 seule
-docker compose exec -T backend php bin/console doctrine:migrations:migrate --no-interaction
-./deploy.sh <sha_backend> <sha_front>; echo "code $?"     # attendu : 0, « Vérification finale : OK »
-./deploy.sh --verify <sha_backend> <sha_front>; echo "code $?"   # attendu : 0
+cp -p deploy.sh backups/deploy.sh-avant-etape4-$TS && git -C src/backend fetch -q origin && git -C src/backend show <sha_backend>:deploy/vps/deploy.sh > deploy.sh
+./deploy.sh <sha_backend> <sha_front>; echo "code $?"          # attendu : 2, AUCUN service remplacé
+./deploy.sh --migrate <sha_backend> <sha_front>; echo "code $?"  # sauvegarde + migration, services inchangés
+./deploy.sh --verify f87df67485757a2c9714975e2d4c889c334b4426 a624bfcd44bea335a0cdcd0824f67dfb3370f0cb   # ancienne version : 0
+#   + santé, requêtes de l'ancienne version (lecture, écriture de recette, export), journaux
+./deploy.sh <sha_backend> <sha_front>; echo "code $?"          # attendu : 0, « Vérification finale : OK »
+./deploy.sh --verify <sha_backend> <sha_front>; echo "code $?" # attendu : 0
 ```
 
-**Fenêtre à enchaîner sans attendre** : entre l'arrêt en code 2 et la migration, le nouveau backend
-tourne sans les colonnes (erreurs sur la nomenclature, les favoris et l'édition). La migration
-n'est appliquée qu'après le contrôle humain du code 2 (règle d'ADR-207).
+Contrôles du verrou : après le premier `deploy.sh` (code 2), identifiants des conteneurs backend,
+worker et frontend inchangés, étiquettes de `.env` inchangées, aucune colonne ajoutée.
 
 ## 2. Contrôles après déploiement (lecture seule)
 
