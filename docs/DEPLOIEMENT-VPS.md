@@ -98,7 +98,7 @@ sinon restaurer la sauvegarde prise par `--migrate`. Le script
 `deploy.sh` du dossier de l'environnement n'est pas remplacé par un déploiement : après une mise à
 jour du script (`cp src/backend/deploy/vps/deploy.sh .`), garder la copie précédente dans `backups/`.
 
-## Mise à jour avec migration (sans interruption)
+## Mise à jour avec migration (migration sans interruption)
 
 Le nouveau backend n'est **jamais** mis en service avant que la base soit à son niveau de migration :
 
@@ -117,6 +117,10 @@ Le nouveau backend n'est **jamais** mis en service avant que la base soit à son
    convient pas ici : `src/backend` et `src/pwa` contiennent déjà la nouvelle version.)
 5. `./deploy.sh <sha_backend> <sha_front>` : verrou de schéma franchi, mise en service, puis
    `./deploy.sh --verify` (code 0) et empreintes.
+
+Interruption : la migration (étape 3) n'interrompt pas le service ; le remplacement des services
+(étape 5) peut provoquer une courte indisponibilité (recréation du conteneur backend, quelques
+secondes). Plan appliqué à la version 3.6.0 : `docs/MEP-3.6.0.md`.
 
 Condition : la migration doit être **additive** (colonnes avec valeur par défaut, tables, index),
 donc compatible avec la version en service. Une migration destructive exige une autre procédure.

@@ -50,7 +50,7 @@ Empreintes (lecture seule) : mêmes formules que l'étape 3 (interventions, nome
 globales et ligne par ligne, fichiers `validation/` en 600). Les nouvelles colonnes n'entrent pas
 dans la formule de la nomenclature : l'empreinte doit rester identique après la migration.
 
-## 1. Migration puis déploiement staging, sans interruption
+## 1. Migration (sans interruption) puis déploiement staging (courte indisponibilité possible)
 
 Procédure de `docs/DEPLOIEMENT-VPS.md`, « Mise à jour avec migration ». Le `deploy.sh` du dossier
 de l'environnement est d'abord remplacé par celui de la branche (copie précédente dans `backups/`).
@@ -116,7 +116,7 @@ Les trois colonnes sont ignorées par la version précédente : la migration peu
 Pour la retirer aussi (après une sauvegarde) : `doctrine:migrations:migrate prev` **avant** de
 redéployer l'ancienne version (testé sur la base isolée). Sauvegarde du §0 en dernier recours.
 
-## Validité historique (migration `Version20261104090000`, même procédure sans interruption)
+## Validité historique (migration `Version20261104090000`, même procédure : migration sans interruption)
 
 Sur le code de recette 6970 (inactif, abrogation au 01/10/2026 non vérifiée au départ) :
 
