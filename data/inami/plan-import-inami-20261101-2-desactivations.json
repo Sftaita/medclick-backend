@@ -6,30 +6,7 @@
   "page": "https://www.inami.fgov.be/fr/nomenclature/tableaux-de-reference",
   "generated": "2026-11-02T14:15:13+00:00"
  },
- "add": [
-  {
-   "speciality": "uro",
-   "codeHospitalisation": "262625",
-   "codeAmbulant": "262614",
-   "n": "K75",
-   "name": "Circoncision chez un enfant de moins de 6 ans",
-   "type": null,
-   "subType": null,
-   "officialStart": "2026-06-01",
-   "reference": "INAMI NomenSoft 01.11.2026 — KB2026003268 (publ. 30-04-2026) création au 01/06/2026 : Arrêté royal modifiant l’article 14, j), de l’annexe à l’arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d’assurance ob"
-  },
-  {
-   "speciality": "ortho",
-   "codeHospitalisation": "286720",
-   "codeAmbulant": "286716",
-   "n": "N440",
-   "name": "Remplacement complet d’une prothèse totale de l'articulation trapézo-métacarpienne",
-   "type": "1",
-   "subType": "wristhand",
-   "officialStart": "2024-10-01",
-   "reference": "INAMI NomenSoft 01.11.2026 — KB2024007896 (publ. 12-08-2024) création au 01/10/2024 : Arrêté royal modifiant l'article 14, k), de l'annexe à l'arrêté royal du 14 septembre 1984 établissant la nomenclature des prestations de santé en matière d'assurance ob"
-  }
- ],
+ "add": [],
  "repeal": [
   {
    "id": 5046,

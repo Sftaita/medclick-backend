@@ -191,6 +191,61 @@ class NomenclatureHistoricalValidityTest extends ApiTestBase
         $this->assertSame(['300344N250', '2026-11-01'], $this->identity($s));
     }
 
+    /**
+     * Étape 5 : intervention DÉJÀ datée après l'abrogation (18 807 en production) : la date reste
+     * corrigible, y compris vers une autre date abrogée ; code jamais recodé ; avertissement.
+     * Code actif ou inactif (l'abrogation vérifiée décide).
+     */
+    public function testAnInterventionAlreadyDatedAfterTheRepealCanBeCorrectedWithAWarning(): void
+    {
+        $activeRepealed = $this->activeWithVerifiedRepeal();
+        $client = $this->clientFor($this->alice);
+
+        foreach (['inactif' => $this->verified, 'actif' => $activeRepealed] as $label => $code) {
+            $historical = $code->getCodeHospitalisation() . $code->getN();
+            $s = $this->surgery($code, $historical, '2026-10-15');
+
+            // Détail : la date officielle d'abrogation du code est fournie à la PWA.
+            $item = $client->request('GET', '/api/surgeries/' . $s->getId())->toArray();
+            $this->assertSame(self::REPEALED, $item['inamiRepealedAt'], $label);
+
+            // API Platform : autre date postérieure, puis date antérieure : acceptées, code conservé.
+            foreach (['2026-10-20', '2026-09-20'] as $date) {
+                $client->request('PUT', '/api/surgeries/' . $s->getId(), ['json' => ['date' => $date, 'surgeryId' => '']]);
+                $this->assertSame(200, $client->getResponse()->getStatusCode(), "$label PUT $date");
+                $this->assertSame([$historical, $date], $this->identity($s));
+            }
+
+            // Ancienne route : correction vers une date postérieure acceptée avec un avertissement.
+            $legacy = $this->surgery($code, $historical, '2026-10-15');
+            $response = $client->request('PUT', '/api/surgeries/update/' . $legacy->getId(), ['json' => ['year' => $this->year->getId(), 'date' => '2026-10-21', 'position' => 1]]);
+            $this->assertSame(200, $response->getStatusCode(), "$label ancienne route");
+            $this->assertStringContainsString('officiellement abrogé depuis le 01/10/2026', $response->toArray()['warning']);
+            $this->assertSame([$historical, '2026-10-21'], $this->identity($legacy));
+
+            // Intervention datée AVANT l'abrogation : son déplacement après l'abrogation reste refusé.
+            $before = $this->surgery($code, $historical, '2026-09-10');
+            $client->request('PUT', '/api/surgeries/' . $before->getId(), ['json' => ['date' => '2026-10-20', 'surgeryId' => '']]);
+            $this->assertSame(422, $client->getResponse()->getStatusCode(), "$label franchissement");
+            $client->request('PUT', '/api/surgeries/update/' . $before->getId(), ['json' => ['year' => $this->year->getId(), 'date' => '2026-10-20', 'position' => 1]]);
+            $this->assertSame(400, $client->getResponse()->getStatusCode(), "$label franchissement ancienne route");
+            $this->assertSame([$historical, '2026-09-10'], $this->identity($before));
+        }
+
+        // Toujours refusé : une NOUVELLE intervention avec ce code après l'abrogation.
+        $this->assertSame(400, $this->create('addNewSurgery', $this->verified, '2026-10-20'));
+        $this->assertSame(400, $this->create('addNewSurgery', $activeRepealed, '2026-10-20'));
+    }
+
+    public function testAnInterventionOnACodeWithoutVerifiedRepealHasNoRepealDate(): void
+    {
+        $s = $this->surgery($this->current, '289015N5', '2026-10-15');
+        $item = $this->clientFor($this->alice)->request('GET', '/api/surgeries/' . $s->getId())->toArray();
+        $this->assertNull($item['inamiRepealedAt'] ?? null, 'absente (valeurs nulles omises par API Platform)');
+        $list = $this->clientFor($this->alice)->request('GET', '/api/surgeries')->toArray()['hydra:member'];
+        $this->assertArrayNotHasKey('inamiRepealedAt', $list[0], 'pas dans la liste');
+    }
+
     public function testDateChangesAreNotRestrictedWhenTheRepealDateIsNotVerified(): void
     {
         // Aucune date vérifiée : on ne suppose ni validité ni invalidité ; le code reste inchangé.

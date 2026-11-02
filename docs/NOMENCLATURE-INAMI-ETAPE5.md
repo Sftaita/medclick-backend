@@ -36,14 +36,35 @@ Actualisation des codes INAMI des neuf spécialités MedClick à partir des tabl
 
 ## Import (`app:nomenclature:import-inami`)
 
+Deux plans séparés, appliqués l'un après l'autre (déploiement contrôlé) :
+
 ```bash
-php bin/console app:nomenclature:import-inami data/inami/plan-import-inami-20261101.json             # dry-run
-php bin/console app:nomenclature:import-inami data/inami/plan-import-inami-20261101.json --apply     # écriture (transaction)
+P=data/inami/plan-import-inami-20261101
+php bin/console app:nomenclature:import-inami $P-1-ajouts.json                 # 2 ajouts : dry-run
+php bin/console app:nomenclature:import-inami $P-1-ajouts.json --apply
+php bin/console app:nomenclature:import-inami $P-2-desactivations.json         # 448 abrogations : dry-run
+php bin/console app:nomenclature:import-inami $P-2-desactivations.json --apply
+php bin/console app:nomenclature:import-inami $P-2-desactivations.json --revert [--apply]   # retour arrière
 ```
 
 Idempotent (deuxième exécution : « déjà présent » / « déjà appliquée »), plan validé en entier avant
 toute écriture (identifiant et code doivent concorder), aucune suppression, abrogation différente
-déjà saisie jamais écrasée, trace dans `var/log/nomenclature-<env>-AAAA-MM.log`.
+déjà saisie jamais écrasée, trace dans `var/log/nomenclature-<env>-AAAA-MM.log`. `--revert` ne
+rétablit que les lignes exactement dans l'état importé ; les ajouts ne sont jamais supprimés.
 
-Régénérer le plan : `python tools/inami/analyze.py <dossier TXT> <export TSV nomenclature> analysis.json`
-puis `python tools/inami/make_plan.py analysis.json TXT.zip plan.json`.
+Vérification ciblée des 448 abrogations (`tools/inami/verify_pairs.py`) : pour chaque ligne, tous
+les codes officiels de la prestation (deux colonnes MedClick et leurs codes correspondants
+ambulant / hospitalisé) sont abrogés à la même date et le libellé correspond : 448 certaines,
+0 douteuse (dont 18 lignes neuro portant le code ambulant dans les deux colonnes ; aucune des 69
+lignes orthopédiques inversées n'est concernée).
+
+## Interventions déjà datées après l'abrogation (18 808 en production)
+
+Jamais recodées. Leur date reste corrigible, même vers une autre date postérieure à l'abrogation,
+avec un avertissement (`inamiRepealedAt` dans le détail d'une intervention ; `warning` de l'ancienne
+route). Une intervention datée avant l'abrogation ne peut pas être déplacée après ; toute nouvelle
+saisie exige un code valable à la date.
+
+Régénérer les plans : `python tools/inami/analyze.py <dossier TXT> <export TSV nomenclature> analysis.json`,
+`python tools/inami/make_plan.py analysis.json TXT.zip plan.json`, puis
+`python tools/inami/verify_pairs.py <dossier TXT> analysis.json plan.json <dossier de sortie>`.

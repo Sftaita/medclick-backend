@@ -136,6 +136,28 @@ class ImportInamiNomenclatureCommandTest extends ApiTestBase
         $this->assertSame('2015-01-01', $old->getInamiRepealedAt()->format('Y-m-d'));
     }
 
+    public function testSeparatePlansAndRevertOfTheDeactivations(): void
+    {
+        $initial = $this->row('nomenclature', $this->old->getId());
+        $adds = ['add' => $this->plan()['add'], 'repeal' => []] + $this->plan();
+        $deactivations = ['add' => [], 'repeal' => $this->plan()['repeal']] + $this->plan();
+
+        // Ajouts seuls : aucune désactivation.
+        $this->runImport($adds, true);
+        $this->em->clear();
+        $this->assertTrue($this->em->find(Nomenclature::class, $this->old->getId())->isActive());
+        $this->assertNotNull($this->em->getRepository(Nomenclature::class)->findOneBy(['codeHospitalisation' => '262625']));
+
+        // Désactivations, puis retour arrière : simulation sans écriture, puis état initial exact.
+        $this->runImport($deactivations, true);
+        $before = $this->snapshot();
+        $this->assertMatchesRegularExpression('/à rétablir\s+1/', $this->runImport($deactivations, false, true)->getDisplay());
+        $this->assertSame($before, $this->snapshot());
+        $this->assertMatchesRegularExpression('/rétabli\s+1/', $this->runImport($deactivations, true, true)->getDisplay());
+        $this->assertSame($initial, $this->row('nomenclature', $this->old->getId()), 'ligne revenue à son état initial');
+        $this->assertNotNull($this->em->getRepository(Nomenclature::class)->findOneBy(['codeHospitalisation' => '262625']), 'ajout jamais supprimé');
+    }
+
     public function testLateEntryAndExportAfterTheImport(): void
     {
         $exportBefore = $this->exportCells();
@@ -170,12 +192,12 @@ class ImportInamiNomenclatureCommandTest extends ApiTestBase
         ];
     }
 
-    private function runImport(array $plan, bool $apply = false): CommandTester
+    private function runImport(array $plan, bool $apply = false, bool $revert = false): CommandTester
     {
         $path = $this->dir . '/plan.json';
         file_put_contents($path, json_encode($plan, JSON_UNESCAPED_UNICODE));
         $tester = new CommandTester((new Application(static::$kernel))->find('app:nomenclature:import-inami'));
-        $tester->execute(['plan' => $path] + ($apply ? ['--apply' => true] : []));
+        $tester->execute(['plan' => $path] + ($apply ? ['--apply' => true] : []) + ($revert ? ['--revert' => true] : []));
 
         return $tester;
     }

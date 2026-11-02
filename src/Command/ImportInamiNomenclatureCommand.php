@@ -55,7 +55,45 @@ final class ImportInamiNomenclatureCommand extends Command
         $this
             ->addArgument('plan', InputArgument::REQUIRED, 'Plan JSON vérifié (ajouts et abrogations établies)')
             ->addOption('apply', null, InputOption::VALUE_NONE, 'Applique réellement le plan (sinon dry-run)')
-            ->addOption('report', null, InputOption::VALUE_REQUIRED, 'Écrit le compte rendu détaillé (JSON) dans ce fichier');
+            ->addOption('report', null, InputOption::VALUE_REQUIRED, 'Écrit le compte rendu détaillé (JSON) dans ce fichier')
+            ->addOption('revert', null, InputOption::VALUE_NONE, 'Retour arrière des abrogations du plan (codes exactement dans l\'état importé ; ajouts jamais supprimés)');
+    }
+
+    /**
+     * Retour arrière des abrogations du plan : seules les lignes EXACTEMENT dans l'état importé
+     * (inactives, même date, même source, vérifiées) sont réactivées et leur abrogation effacée.
+     * Une ligne modifiée depuis (administration) n'est pas touchée. Les ajouts ne sont jamais supprimés.
+     *
+     * @param list<array{0: array, 1: Nomenclature}> $repeals
+     */
+    private function revert(SymfonyStyle $io, array $repeals, bool $apply): int
+    {
+        $io->title(($apply ? 'Retour arrière' : 'Simulation du retour arrière') . ' des abrogations du plan');
+        $result = ['à rétablir' => 0, 'rétabli' => 0, 'non concerné (état différent)' => 0];
+        $this->em->wrapInTransaction(function () use ($repeals, $apply, &$result): void {
+            foreach ($repeals as [$item, $nomenclature]) {
+                $imported = !$nomenclature->isActive() && $nomenclature->getInamiRepealedAt()?->format('Y-m-d') === $item['repealedAt']
+                    && $nomenclature->getInamiRepealSource() === trim($item['source']) && $nomenclature->getInamiRepealVerifiedAt() !== null;
+                if (!$imported) {
+                    ++$result['non concerné (état différent)'];
+                    continue;
+                }
+                if (!$apply) {
+                    ++$result['à rétablir'];
+                    continue;
+                }
+                $nomenclature->unverifyRepeal()->setInamiRepealSource(null)->setInamiRepealedAt(null)->activate();
+                $this->logger->notice('Nomenclature INAMI : abrogation importée annulée (retour arrière)', ['nomenclature_id' => $nomenclature->getId()]);
+                ++$result['rétabli'];
+            }
+            if ($apply) {
+                $this->em->flush();
+            }
+        });
+        $io->table(['Résultat', 'Nombre'], array_map(null, array_keys($result), array_values($result)));
+        $io->success($apply ? 'Retour arrière appliqué.' : 'Simulation : aucune écriture (relancer avec --apply).');
+
+        return Command::SUCCESS;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -70,6 +108,10 @@ final class ImportInamiNomenclatureCommand extends Command
             $io->error('Plan refusé, aucune écriture : ' . $e->getMessage());
 
             return Command::FAILURE;
+        }
+
+        if ($input->getOption('revert')) {
+            return $this->revert($io, $repeals, $apply);
         }
 
         $io->title(($apply ? 'Import' : 'Simulation (dry-run)') . ' — ' . ($plan['source']['label'] ?? 'plan INAMI'));
