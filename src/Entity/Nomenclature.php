@@ -73,10 +73,60 @@ class Nomenclature
     #[ORM\OneToMany(targetEntity: Favorites::class, mappedBy: 'surgery')]
     private $favorites;
 
+    /**
+     * Spécialités SUPPLÉMENTAIRES autorisées pour ce code (ADR-211), en plus de `speciality`.
+     *
+     * @var Collection<int, NomenclatureSharedSpeciality>
+     */
+    #[ORM\OneToMany(targetEntity: NomenclatureSharedSpeciality::class, mappedBy: 'nomenclature', cascade: ['persist'], orphanRemoval: true)]
+    private Collection $sharedSpecialities;
+
     public function __construct()
     {
         $this->surgeries = new ArrayCollection();
         $this->favorites = new ArrayCollection();
+        $this->sharedSpecialities = new ArrayCollection();
+    }
+
+    /**
+     * Spécialités supplémentaires (hors spécialité principale), triées.
+     *
+     * @return list<string>
+     */
+    public function getSharedSpecialities(): array
+    {
+        $specialities = array_map(static fn (NomenclatureSharedSpeciality $s) => $s->getSpeciality(), $this->sharedSpecialities->toArray());
+        sort($specialities);
+
+        return array_values(array_unique($specialities));
+    }
+
+    /** Vrai si une intervention ou un favori peut être enregistré sous cette spécialité avec ce code. */
+    public function allowsSpeciality(string $speciality): bool
+    {
+        return $speciality === $this->speciality || in_array($speciality, $this->getSharedSpecialities(), true);
+    }
+
+    /** Autorise une spécialité supplémentaire (sans effet si elle l'est déjà ou si c'est la principale). */
+    public function shareWith(string $speciality): self
+    {
+        if (!$this->allowsSpeciality($speciality)) {
+            $this->sharedSpecialities->add(new NomenclatureSharedSpeciality($this, $speciality));
+        }
+
+        return $this;
+    }
+
+    /** Retire une spécialité supplémentaire (les interventions et favoris déjà enregistrés ne changent pas). */
+    public function unshareWith(string $speciality): self
+    {
+        foreach ($this->sharedSpecialities as $shared) {
+            if ($shared->getSpeciality() === $speciality) {
+                $this->sharedSpecialities->removeElement($shared);
+            }
+        }
+
+        return $this;
     }
 
     public function getId(): ?int

@@ -7,6 +7,7 @@ use App\Repository\NomenclatureRepository;
 use App\Repository\UserRepository;
 use App\Repository\YearsRepository;
 use App\Service\InactiveNomenclatureException;
+use App\Service\SpecialityNotAllowedException;
 use App\Service\SurgeryNomenclatureSelection;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -114,6 +115,17 @@ class NewSurgeriesAPIController extends AbstractController
             ], JsonResponse::HTTP_BAD_REQUEST, ['Access-Control-Allow-Origin' => $_ENV['CORS_ALLOW_ORIGIN']]);
         }
 
+        // ADR-211 : spécialité choisie dans le formulaire (acte partagé, ex. rachis en neurochirurgie),
+        // vérifiée par le serveur ; sans spécialité envoyée, spécialité principale du code.
+        try {
+            $speciality = SurgeryNomenclatureSelection::specialityFor($surgeryReference, $data['speciality'] ?? null);
+        } catch (SpecialityNotAllowedException $e) {
+            return new JsonResponse([
+                'message' => $e->getMessage(),
+                'reason' => SpecialityNotAllowedException::REASON,
+            ], JsonResponse::HTTP_BAD_REQUEST, ['Access-Control-Allow-Origin' => $_ENV['CORS_ALLOW_ORIGIN']]);
+        }
+
         // Create a unique code for the surgery.
         $code = $surgeryReference->getCodeHospitalisation() . '' . $surgeryReference->getN();
 
@@ -124,7 +136,7 @@ class NewSurgeriesAPIController extends AbstractController
         $surgery->setYear($year)
             ->setNomenclature($surgeryReference)
             ->setDate($date)
-            ->setSpeciality($surgeryReference->getSpeciality())
+            ->setSpeciality($speciality)
             ->setCode($code)
             ->setName($surgeryReference->getName())
             ->setPosition((string) $position)

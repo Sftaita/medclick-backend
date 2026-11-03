@@ -9,6 +9,7 @@ use App\Repository\UserRepository;
 use App\Repository\YearsRepository;
 use App\Service\InactiveNomenclatureException;
 use App\Service\RepealedOnDateException;
+use App\Service\SpecialityNotAllowedException;
 use App\Service\SurgeryNomenclatureSelection;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Routing\Attribute\Route;
@@ -104,6 +105,16 @@ class SurgeriesController extends AbstractController
             ], JsonResponse::HTTP_FORBIDDEN, ['Access-Control-Allow-Origin' => $_ENV['CORS_ALLOW_ORIGIN']]);
         }
 
+        // ADR-211 : spécialité demandée vérifiée pour ce code (sans spécialité : principale).
+        try {
+            $speciality = SurgeryNomenclatureSelection::specialityFor($surgeryReference, $data['speciality'] ?? null);
+        } catch (SpecialityNotAllowedException $e) {
+            return new JsonResponse([
+                'message' => $e->getMessage(),
+                'reason' => SpecialityNotAllowedException::REASON,
+            ], JsonResponse::HTTP_BAD_REQUEST, ['Access-Control-Allow-Origin' => $_ENV['CORS_ALLOW_ORIGIN']]);
+        }
+
         // Code construction
         $code = $surgeryReference->getCodeHospitalisation().''.$surgeryReference->getN();
 
@@ -114,7 +125,7 @@ class SurgeriesController extends AbstractController
         $surgery->setYear($year)
             ->setNomenclature($surgeryReference)
             ->setDate($date)
-            ->setSpeciality($surgeryReference->getSpeciality())
+            ->setSpeciality($speciality)
             ->setCode($code)
             ->setName($surgeryReference->getName())
             ->setPosition($data['position']);
@@ -229,17 +240,19 @@ class SurgeriesController extends AbstractController
         try {
             if ($anotherAct) {
                 SurgeryNomenclatureSelection::assertSelectable($surgeryReference, $date);
+                // ADR-211 : spécialité du nouvel acte (demandée et autorisée, sinon principale).
+                $speciality = SurgeryNomenclatureSelection::specialityFor($surgeryReference, $data['speciality'] ?? null);
             } else {
                 SurgeryNomenclatureSelection::assertDateKeepsAct($currentReference, $surgery->getDate(), $date);
             }
-        } catch (InactiveNomenclatureException|RepealedOnDateException $e) {
+        } catch (InactiveNomenclatureException|RepealedOnDateException|SpecialityNotAllowedException $e) {
             return new JsonResponse([
                 'message' => $e->getMessage(),
-                'reason' => $e instanceof RepealedOnDateException ? RepealedOnDateException::REASON : InactiveNomenclatureException::REASON,
+                'reason' => $e::REASON,
             ], JsonResponse::HTTP_BAD_REQUEST, ['Access-Control-Allow-Origin' => $_ENV['CORS_ALLOW_ORIGIN']]);
         }
         if ($anotherAct) {
-            SurgeryNomenclatureSelection::applyAct($surgery, $surgeryReference);
+            SurgeryNomenclatureSelection::applyAct($surgery, $surgeryReference, $speciality);
         }
         // Code historique conservé mais officiellement abrogé à la date : avertissement (étape 5).
         $warning = $anotherAct ? null : SurgeryNomenclatureSelection::repealWarning($currentReference, $date);

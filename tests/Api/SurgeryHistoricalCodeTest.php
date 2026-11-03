@@ -167,15 +167,31 @@ class SurgeryHistoricalCodeTest extends ApiTestBase
     {
         $surgery = $this->historicalSurgery();
 
-        // Nom, code et spécialité du payload incohérents avec l'acte choisi : l'acte fait foi.
+        // Nom et code du payload incohérents avec l'acte choisi : l'acte fait foi.
         $this->put($surgery, [
             'name' => 'Nom saisi à la main',
-            'speciality' => 'ortho',
+            'speciality' => 'dig',
             'code' => '000000',
             'surgeryId' => $this->appendice->getId(),
         ]);
 
         $this->assertIdentity($this->reload($surgery), $this->appendice, '241415N200', 'Appendicectomie', 'dig');
+    }
+
+    /** ADR-211 : une spécialité non autorisée pour l'acte choisi est refusée, rien n'est modifié. */
+    public function testChoosingAnotherActWithASpecialityNotAllowedIsRefused(): void
+    {
+        $surgery = $this->historicalSurgery();
+        $before = $this->em->getConnection()->fetchAssociative('SELECT * FROM surgeries WHERE id = ?', [$surgery->getId()]);
+
+        $response = $this->clientFor($this->alice)->request('PUT', '/api/surgeries/' . $surgery->getId(), ['json' => [
+            'speciality' => 'ortho',
+            'surgeryId' => $this->appendice->getId(),
+        ]]);
+
+        $this->assertResponseStatusCodeSame(422);
+        $this->assertSame('speciality', $response->toArray(false)['violations'][0]['propertyPath']);
+        $this->assertSame($before, $this->em->getConnection()->fetchAssociative('SELECT * FROM surgeries WHERE id = ?', [$surgery->getId()]));
     }
 
     public function testComingBackToTheOriginalActAfterAChangeTakesItsCurrentCode(): void

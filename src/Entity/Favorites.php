@@ -6,10 +6,6 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Metadata\Patch;
-use ApiPlatform\Metadata\Post;
-use ApiPlatform\Metadata\Put;
-use App\State\CurrentUserAssignProcessor;
 use App\Repository\FavoritesRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
@@ -17,13 +13,15 @@ use Doctrine\Common\Collections\Collection;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
+/**
+ * Écritures uniquement par /api/favorites/addNew et /api/favorites/updateNew, qui vérifient le code
+ * (ADR-210) et la spécialité (ADR-211). POST, PUT et PATCH bruts d'API Platform sont fermés : ils
+ * acceptaient un code ou une spécialité quelconques et aucun client (PWA, ancien front) ne les utilise.
+ */
 #[ApiResource(
     operations: [
         new Get(),
         new GetCollection(),
-        new Post(processor: CurrentUserAssignProcessor::class),
-        new Put(securityPostDenormalize: "is_granted('OWNER', object)", securityPostDenormalizeMessage: 'Cette ressource ne vous appartient pas.'),
-        new Patch(securityPostDenormalize: "is_granted('OWNER', object)", securityPostDenormalizeMessage: 'Cette ressource ne vous appartient pas.'),
         new Delete(),
     ],
     normalizationContext: ['groups' => ['favorites_read']],

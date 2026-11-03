@@ -8,6 +8,7 @@ use ApiPlatform\Validator\Exception\ValidationException;
 use App\Entity\Surgeries;
 use App\Service\InactiveNomenclatureException;
 use App\Service\RepealedOnDateException;
+use App\Service\SpecialityNotAllowedException;
 use App\Service\SurgeryNomenclatureSelection;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Request;
@@ -33,6 +34,10 @@ use Symfony\Component\Validator\ConstraintViolationList;
  *   inactif avec une abrogation VÉRIFIÉE postérieure à cette date ; sinon 422 sur `name`.
  *   Un code inactif déjà lié reste accepté tant qu'il n'est pas changé ; seule une nouvelle date
  *   au-delà de son abrogation vérifiée est refusée (422 sur `date`).
+ *
+ * - ADR-211 : avec un acte choisi, `speciality` peut désigner une spécialité avec laquelle le code
+ *   est partagé (ex. rachis, article 14 n), en neurochirurgie) ; une spécialité non autorisée pour
+ *   ce code est refusée (422 sur `speciality`). Acte inchangé : spécialité enregistrée conservée.
  *
  * `surgeryId` n'est pas une propriété de l'entité : il est lu dans le corps de la requête.
  *
@@ -78,7 +83,16 @@ final class SurgeryNomenclatureProcessor implements ProcessorInterface
                     new ConstraintViolation($e->getMessage(), null, [], $data, 'name', $payload['surgeryId'] ?? null),
                 ]));
             }
-            SurgeryNomenclatureSelection::applyAct($data, $selected);
+            // ADR-211 : spécialité envoyée avec l'acte, vérifiée pour ce code (acte partagé) ;
+            // absente, vide ou « favorites » : spécialité principale du code, comme avant.
+            try {
+                $speciality = SurgeryNomenclatureSelection::specialityFor($selected, $payload['speciality'] ?? null);
+            } catch (SpecialityNotAllowedException $e) {
+                throw new ValidationException(new ConstraintViolationList([
+                    new ConstraintViolation($e->getMessage(), null, [], $data, 'speciality', $payload['speciality'] ?? null),
+                ]));
+            }
+            SurgeryNomenclatureSelection::applyAct($data, $selected, $speciality);
         } elseif ($previous) {
             // Acte inchangé : une nouvelle date au-delà de l'abrogation vérifiée est refusée (sur
             // « date ») plutôt que de garder ou remplacer le code en silence.

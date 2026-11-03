@@ -1,0 +1,2747 @@
+{
+ "source": {
+  "label": "INAMI NomenSoft — sous-article 14n en vigueur au 01/11/2026 : n) les prestations relevant de la spécialité de chirurgie orthopédique (DP) et neurochirurgie (DA)",
+  "url": "https://www.inami.fgov.be/SiteCollectionDocuments/TXT.zip",
+  "sha256": "e8c7c46c0525d3a34178015c78a78d2aaed3f054f461579d703f9ff91d5a7468",
+  "page": "https://www.inami.fgov.be/fr/nomenclature/tableaux-de-reference",
+  "rule": "classify : codes hospitalier et ambulant du sous-article 14n (NOMEN_SUMMARY_EXT.nomen_sub_art) ; share : paire officielle réciproque, catégories et valeur exactes ; withdraw : les autres",
+  "officialCodes": 260,
+  "generated": "2026-11-03T08:47:17+00:00"
+ },
+ "share": [
+  {
+   "id": 6843,
+   "codeHospitalisation": "224140",
+   "codeAmbulant": "224136",
+   "n": "K430",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "name": "Corporectomie de la colonne cervicale par abord antérieur, y compris la reconstruction sur 1 niveau"
+  },
+  {
+   "id": 6844,
+   "codeHospitalisation": "224162",
+   "codeAmbulant": "224151",
+   "n": "K540",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "name": "Corporectomie de la colonne cervicale par abord antérieur, y compris la reconstruction sur 2 niveaux"
+  },
+  {
+   "id": 6845,
+   "codeHospitalisation": "224184",
+   "codeAmbulant": "224173",
+   "n": "K650",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "name": "Corporectomie de la colonne cervicale par abord antérieur, y compris la reconstruction sur 3 niveaux ou plus"
+  },
+  {
+   "id": 6853,
+   "codeHospitalisation": "224081",
+   "codeAmbulant": "224070",
+   "n": "K350",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "name": "Discectomie cervicale par abord antérieur, y compris la reconstruction sur 1 niveau"
+  },
+  {
+   "id": 6854,
+   "codeHospitalisation": "224103",
+   "codeAmbulant": "224092",
+   "n": "K435",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "name": "Discectomie cervicale par abord antérieur, y compris la reconstruction sur 2 niveaux"
+  },
+  {
+   "id": 6855,
+   "codeHospitalisation": "224125",
+   "codeAmbulant": "224114",
+   "n": "K520",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "name": "Discectomie cervicale par abord antérieur, y compris la reconstruction sur 3 niveaux ou plus"
+  },
+  {
+   "id": 6859,
+   "codeHospitalisation": "226240",
+   "codeAmbulant": "226236",
+   "n": "K195",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "name": "Fixation de l'articulation sacro-iliaque"
+  },
+  {
+   "id": 6860,
+   "codeHospitalisation": "224066",
+   "codeAmbulant": "224055",
+   "n": "K335",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "name": "Fixation de l’odontoïde par vissage antérieur"
+  },
+  {
+   "id": 6867,
+   "codeHospitalisation": "224221",
+   "codeAmbulant": "224210",
+   "n": "K435",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "name": "Foraminotomie cervicale antérieure ou latérale, avec ou sans décompression de l'artère vertébrale sur 2 niveaux"
+  },
+  {
+   "id": 6868,
+   "codeHospitalisation": "224243",
+   "codeAmbulant": "224232",
+   "n": "K520",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "name": "Foraminotomie cervicale antérieure ou latérale, avec ou sans décompression de l'artère vertébrale sur 3 niveaux ou plus"
+  },
+  {
+   "id": 6869,
+   "codeHospitalisation": "224206",
+   "codeAmbulant": "224195",
+   "n": "K350",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "name": "Foraminotomie cervicale antérieure ou latérale, avec ou sans décompression de l’artère vertébrale sur 1 niveau"
+  },
+  {
+   "id": 6870,
+   "codeHospitalisation": "224405",
+   "codeAmbulant": "224394",
+   "n": "K350",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "name": "Foraminotomie cervicale postérieure sur 1 niveau"
+  },
+  {
+   "id": 6873,
+   "codeHospitalisation": "224265",
+   "codeAmbulant": "224254",
+   "n": "K310",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "name": "Fusion et / ou fixation occipito-cervicale, y compris l'éventuelle décompression"
+  },
+  {
+   "id": 6874,
+   "codeHospitalisation": "224280",
+   "codeAmbulant": "224276",
+   "n": "K170",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "name": "Fusion et / ou fixation postérieure des vertèbres cervicales C1 et C2 à l'aide de crochets ou de fils"
+  },
+  {
+   "id": 6875,
+   "codeHospitalisation": "224302",
+   "codeAmbulant": "224291",
+   "n": "K310",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "name": "Fusion et / ou fixation postérieure des vertèbres cervicales C1 et C2 à l'aide de vis"
+  },
+  {
+   "id": 6876,
+   "codeHospitalisation": "224324",
+   "codeAmbulant": "224313",
+   "n": "K280",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "name": "Laminectomie cervicale quel que soit le nombre de niveaux"
+  },
+  {
+   "id": 6878,
+   "codeHospitalisation": "224346",
+   "codeAmbulant": "224335",
+   "n": "K250",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "name": "Laminoplastie cervicale sur 1 niveau"
+  },
+  {
+   "id": 6879,
+   "codeHospitalisation": "224361",
+   "codeAmbulant": "224350",
+   "n": "K310",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "name": "Laminoplastie cervicale sur 2 niveaux"
+  },
+  {
+   "id": 6880,
+   "codeHospitalisation": "224383",
+   "codeAmbulant": "224372",
+   "n": "K370",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "name": "Laminoplastie cervicale sur 3 niveaux ou plus"
+  },
+  {
+   "id": 6882,
+   "codeHospitalisation": "226122",
+   "codeAmbulant": "226111",
+   "n": "K225",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "name": "Résection d'une masse néoplasique ou inflammatoire du sacrum"
+  },
+  {
+   "id": 6885,
+   "codeHospitalisation": "226063",
+   "codeAmbulant": "226052",
+   "n": "K140",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "name": "Scoliose à l'aide de tiges de croissance (\"growing rods\") - implantation d'ancres (\"anchors\")"
+  },
+  {
+   "id": 6886,
+   "codeHospitalisation": "226041",
+   "codeAmbulant": "226030",
+   "n": "K140",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "name": "Scoliose à l'aide de tiges de croissance (\"growing rods\") - implantation de tiges"
+  },
+  {
+   "id": 6890,
+   "codeHospitalisation": "226306",
+   "codeAmbulant": "226295",
+   "n": "K500",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "name": "Biopsie par voie chirurgicale d'une masse intramédullaire néoplasique ou inflammatoire"
+  },
+  {
+   "id": 6902,
+   "codeHospitalisation": "225923",
+   "codeAmbulant": "225912",
+   "n": "K560",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "name": "Correction de l'alignement sagittal au moyen d'une ostéotomie par soustraction pédiculaire en cas de déformation thoraco-lombaire"
+  },
+  {
+   "id": 6903,
+   "codeHospitalisation": "225960",
+   "codeAmbulant": "225956",
+   "n": "K375",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "name": "Correction de l'alignement sagittal de la colonne par ostéotomie vertébrale de soustraction par abord postérieur, sur 2 niveaux en cas de déformation thoraco-lombaire"
+  },
+  {
+   "id": 6904,
+   "codeHospitalisation": "225982",
+   "codeAmbulant": "225971",
+   "n": "K450",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "name": "Correction de l'alignement sagittal de la colonne par ostéotomie vertébrale de soustraction par abord postérieur, sur 3 niveaux ou plus en cas de déformation thoraco-lombaire"
+  },
+  {
+   "id": 6905,
+   "codeHospitalisation": "225945",
+   "codeAmbulant": "225934",
+   "n": "K300",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "name": "Correction de l'alignement sagittal par ostéotomie vertébrale de soustraction par abord postérieur, sur 1 niveau en cas de déformation thoraco-lombaire"
+  },
+  {
+   "id": 6906,
+   "codeHospitalisation": "224022",
+   "codeAmbulant": "224011",
+   "n": "K500",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "name": "Décompression de la moelle épinière au niveau de la colonne cervicale par voie transorale, transmaxillaire ou transmandibulaire"
+  },
+  {
+   "id": 6907,
+   "codeHospitalisation": "224044",
+   "codeAmbulant": "224033",
+   "n": "K555",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "name": "Décompression de la moelle épinière au niveau de la colonne cervicale par voie transorale, transmaxillaire ou transmandibulaire, y compris la reconstruction"
+  },
+  {
+   "id": 6914,
+   "codeHospitalisation": "226262",
+   "codeAmbulant": "226251",
+   "n": "K500",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "name": "Drainage chirurgical d'un hématome intra-dural rachidien"
+  },
+  {
+   "id": 6915,
+   "codeHospitalisation": "226380",
+   "codeAmbulant": "226376",
+   "n": "K500",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "name": "Drainage en cas de syringomyélie"
+  },
+  {
+   "id": 6921,
+   "codeHospitalisation": "226144",
+   "codeAmbulant": "226133",
+   "n": "K670",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "name": "Résection d'une masse néoplasique ou inflammatoire du sacrumavec reconstruction de la charnière lombo-sacrée"
+  },
+  {
+   "id": 6922,
+   "codeHospitalisation": "226365",
+   "codeAmbulant": "226354",
+   "n": "K800",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "name": "Résection d'une tumeur de la gaine du nerf spinal"
+  },
+  {
+   "id": 6923,
+   "codeHospitalisation": "226321",
+   "codeAmbulant": "226310",
+   "n": "K800",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "name": "Résection d'une tumeur intradurale extramédullaire"
+  },
+  {
+   "id": 6924,
+   "codeHospitalisation": "226343",
+   "codeAmbulant": "226332",
+   "n": "K1000",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "name": "Résection d'une tumeur intramédullaire"
+  },
+  {
+   "id": 6927,
+   "codeHospitalisation": "226181",
+   "codeAmbulant": "226170",
+   "n": "K835",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "name": "Sacrectomie totale en bloc pour une tumeur avec reconstruction"
+  },
+  {
+   "id": 6928,
+   "codeHospitalisation": "226166",
+   "codeAmbulant": "226155",
+   "n": "K400",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "name": "Sacrectomie totale en bloc pour une tumeur sans reconstruction"
+  },
+  {
+   "id": 6929,
+   "codeHospitalisation": "226026",
+   "codeAmbulant": "226015",
+   "n": "K390",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "name": "Scoliose par une libération antérieure avec interposition de greffons, sur 3 niveaux ou plus"
+  },
+  {
+   "id": 6930,
+   "codeHospitalisation": "226004",
+   "codeAmbulant": "225993",
+   "n": "K800",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "name": "Scoliose thoraco-lombaire de 12 niveaux ou plus, y compris le neuromonitoring"
+  },
+  {
+   "id": 6940,
+   "codeHospitalisation": "226402",
+   "codeAmbulant": "226391",
+   "n": "K500",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "name": "Traitement chirurgical d'excroissances arachnoïdiennes en cas de syringomyélie"
+  },
+  {
+   "id": 6941,
+   "codeHospitalisation": "226284",
+   "codeAmbulant": "226273",
+   "n": "K1000",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "name": "Traitement chirurgical d'une fistule ou malformation artério-veineuse rachidienne"
+  },
+  {
+   "id": 6942,
+   "codeHospitalisation": "226424",
+   "codeAmbulant": "226413",
+   "n": "K400",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "name": "Traitement chirurgical d'une méningomyélocèle congenitale"
+  },
+  {
+   "id": 6943,
+   "codeHospitalisation": "226446",
+   "codeAmbulant": "226435",
+   "n": "K1000",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "name": "Traitement chirurgical d’une lipoméningomyélocèle (syndrome congénital de la moelle attachée ou \"tethered cord\" congenitale)"
+  },
+  {
+   "id": 6944,
+   "codeHospitalisation": "226461",
+   "codeAmbulant": "226450",
+   "n": "K600",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "name": "Traitement chirurgical du syndrome acquis de la moelle attachée (\"tethered cord\" acquis)"
+  },
+  {
+   "id": 6948,
+   "codeHospitalisation": "226586",
+   "codeAmbulant": "226575",
+   "n": "K50",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "name": "Ablation ou repositionnnement de vis ou de matériel déplacé ou défectueux"
+  },
+  {
+   "id": 6952,
+   "codeHospitalisation": "226100",
+   "codeAmbulant": "226096",
+   "n": "K95",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "name": "Biopsie par voie chirurgicale d'une masse extra-durale sacrée néoplasique ou inflammatoire"
+  },
+  {
+   "id": 6954,
+   "codeHospitalisation": "226225",
+   "codeAmbulant": "226214",
+   "n": "K80",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "name": "Coccygectomie"
+  },
+  {
+   "id": 6955,
+   "codeHospitalisation": "226483",
+   "codeAmbulant": "226472",
+   "n": "K170",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "name": "Drainage chirurgical d'un hématome extra-dural rachidien post-opératoire, y compris la décompression"
+  },
+  {
+   "id": 6959,
+   "codeHospitalisation": "226601",
+   "codeAmbulant": "226590",
+   "n": "K85",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "name": "Placement d'un spacer inter-épineux"
+  },
+  {
+   "id": 6961,
+   "codeHospitalisation": "226542",
+   "codeAmbulant": "226531",
+   "n": "K140",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "name": "Répétition du traitement chirurgical d'une infection profonde, sous aponévrotique, avec débridement supplémentaire, après une chirurgie rachidienne"
+  },
+  {
+   "id": 6962,
+   "codeHospitalisation": "226085",
+   "codeAmbulant": "226074",
+   "n": "K140",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "name": "Scoliose à l'aide de tiges de croissance (\"growing rods\") - prolongation"
+  },
+  {
+   "id": 6963,
+   "codeHospitalisation": "226623",
+   "codeAmbulant": "226612",
+   "n": "K70",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "name": "Supplément d’honoraire pour les prestations de l'article 14 n), §1 précédées du signe ^"
+  },
+  {
+   "id": 6964,
+   "codeHospitalisation": "226645",
+   "codeAmbulant": "226634",
+   "n": "K120",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "name": "Supplément d’honoraire pour les prestations de l'article 14 n), §1 précédées du signe ^^"
+  },
+  {
+   "id": 6965,
+   "codeHospitalisation": "226520",
+   "codeAmbulant": "226516",
+   "n": "K225",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "name": "Traitement chirurgical d'une infection profonde, sous-aponévrotique, après une chirurgie rachidienne"
+  },
+  {
+   "id": 6966,
+   "codeHospitalisation": "226564",
+   "codeAmbulant": "226553",
+   "n": "K20",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "name": "Traitement chirurgical de plaies superficielles après une chirurgie rachidienne"
+  },
+  {
+   "id": 6967,
+   "codeHospitalisation": "224685",
+   "codeAmbulant": "224674",
+   "n": "K50",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "name": "Traitement non-chirurgical de fractures, luxations ou fractures-luxations de la colonne cervical sans réduction"
+  }
+ ],
+ "withdraw": [
+  {
+   "id": 6840,
+   "codeHospitalisation": "225094",
+   "codeAmbulant": "225083",
+   "n": "K200",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "reason": "paire non officielle : 225094 va avec 225105, 225083 va avec 225072"
+  },
+  {
+   "id": 6841,
+   "codeHospitalisation": "225116",
+   "codeAmbulant": "225105",
+   "n": "K250",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "reason": "paire non officielle : 225116 va avec 225120, 225105 va avec 225094"
+  },
+  {
+   "id": 6842,
+   "codeHospitalisation": "225131",
+   "codeAmbulant": "225120",
+   "n": "K300",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "reason": "paire non officielle : 225131 va avec 225142, 225120 va avec 225116"
+  },
+  {
+   "id": 6846,
+   "codeHospitalisation": "225772",
+   "codeAmbulant": "225761",
+   "n": "K670",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "reason": "paire non officielle : 225772 va avec 225783, 225761 va avec 225750"
+  },
+  {
+   "id": 6847,
+   "codeHospitalisation": "225610",
+   "codeAmbulant": "225606",
+   "n": "K280",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "reason": "paire non officielle : 225610 va avec 225621, 225606 va avec 225595"
+  },
+  {
+   "id": 6848,
+   "codeHospitalisation": "225396",
+   "codeAmbulant": "225385",
+   "n": "K250",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "reason": "paire non officielle : 225396 va avec 225400, 225385 va avec 225374"
+  },
+  {
+   "id": 6849,
+   "codeHospitalisation": "225411",
+   "codeAmbulant": "225400",
+   "n": "K325",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "reason": "paire non officielle : 225411 va avec 225422, 225400 va avec 225396"
+  },
+  {
+   "id": 6850,
+   "codeHospitalisation": "225455",
+   "codeAmbulant": "225422",
+   "n": "K400",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "reason": "paire non officielle : 225455 va avec 225466, 225422 va avec 225411"
+  },
+  {
+   "id": 6851,
+   "codeHospitalisation": "224932",
+   "codeAmbulant": "224921",
+   "n": "K335",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "reason": "paire non officielle : 224932 va avec 224943, 224921 va avec 224910"
+  },
+  {
+   "id": 6852,
+   "codeHospitalisation": "224954",
+   "codeAmbulant": "224943",
+   "n": "K390",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "reason": "paire non officielle : 224954 va avec 224965, 224943 va avec 224932"
+  },
+  {
+   "id": 6856,
+   "codeHospitalisation": "224475",
+   "codeAmbulant": "224464",
+   "n": "K225",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "reason": "paire non officielle : 224475 va avec 224486, 224464 va avec 224453"
+  },
+  {
+   "id": 6857,
+   "codeHospitalisation": "224490",
+   "codeAmbulant": "224486",
+   "n": "K280",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "reason": "paire non officielle : 224490 va avec 224501, 224486 va avec 224475"
+  },
+  {
+   "id": 6858,
+   "codeHospitalisation": "224512",
+   "codeAmbulant": "224501",
+   "n": "K335",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "reason": "paire non officielle : 224512 va avec 224523, 224501 va avec 224490"
+  },
+  {
+   "id": 6861,
+   "codeHospitalisation": "224895",
+   "codeAmbulant": "224884",
+   "n": "K250",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "reason": "paire non officielle : 224895 va avec 224906, 224884 va avec 224873"
+  },
+  {
+   "id": 6862,
+   "codeHospitalisation": "224910",
+   "codeAmbulant": "224906",
+   "n": "K305",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "reason": "paire non officielle : 224910 va avec 224921, 224906 va avec 224895"
+  },
+  {
+   "id": 6863,
+   "codeHospitalisation": "225492",
+   "codeAmbulant": "225481",
+   "n": "K300",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "reason": "paire non officielle : 225492 va avec 225503, 225481 va avec 225470"
+  },
+  {
+   "id": 6864,
+   "codeHospitalisation": "225514",
+   "codeAmbulant": "225503",
+   "n": "K380",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "reason": "paire non officielle : 225514 va avec 225525, 225503 va avec 225492"
+  },
+  {
+   "id": 6865,
+   "codeHospitalisation": "225536",
+   "codeAmbulant": "225525",
+   "n": "K460",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "reason": "paire non officielle : 225536 va avec 225540, 225525 va avec 225514"
+  },
+  {
+   "id": 6866,
+   "codeHospitalisation": "225470",
+   "codeAmbulant": "225466",
+   "n": "K280",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "reason": "paire non officielle : 225470 va avec 225481, 225466 va avec 225455"
+  },
+  {
+   "id": 6871,
+   "codeHospitalisation": "224431",
+   "codeAmbulant": "224416",
+   "n": "K435",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "reason": "paire non officielle : 224431 va avec 224442, 224416 va avec 224420"
+  },
+  {
+   "id": 6872,
+   "codeHospitalisation": "225621",
+   "codeAmbulant": "224442",
+   "n": "K520",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "reason": "paire non officielle : 225621 va avec 225610, 224442 va avec 224431"
+  },
+  {
+   "id": 6877,
+   "codeHospitalisation": "224873",
+   "codeAmbulant": "224862",
+   "n": "K170",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "reason": "paire non officielle : 224873 va avec 224884, 224862 va avec 224851"
+  },
+  {
+   "id": 6881,
+   "codeHospitalisation": "224991",
+   "codeAmbulant": "224980",
+   "n": "K300",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "reason": "paire non officielle : 224991 va avec 225002, 224980 va avec 224976"
+  },
+  {
+   "id": 6883,
+   "codeHospitalisation": "224571",
+   "codeAmbulant": "224560",
+   "n": "K300",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "reason": "paire non officielle : 224571 va avec 224582, 224560 va avec 224556"
+  },
+  {
+   "id": 6884,
+   "codeHospitalisation": "225676",
+   "codeAmbulant": "225665",
+   "n": "K300",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "reason": "paire non officielle : 225676 va avec 225680, 225665 va avec 225654"
+  },
+  {
+   "id": 6887,
+   "codeHospitalisation": "225551",
+   "codeAmbulant": "225540",
+   "n": "K360",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "reason": "paire non officielle : 225551 va avec 225562, 225540 va avec 225536"
+  },
+  {
+   "id": 6888,
+   "codeHospitalisation": "225573",
+   "codeAmbulant": "225562",
+   "n": "K450",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "reason": "paire non officielle : 225573 va avec 225584, 225562 va avec 225551"
+  },
+  {
+   "id": 6889,
+   "codeHospitalisation": "225595",
+   "codeAmbulant": "225584",
+   "n": "K540",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "reason": "paire non officielle : 225595 va avec 225606, 225584 va avec 225573"
+  },
+  {
+   "id": 6891,
+   "codeHospitalisation": "225330",
+   "codeAmbulant": "225326",
+   "n": "K560",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "reason": "paire non officielle : 225330 va avec 225341, 225326 va avec 225315"
+  },
+  {
+   "id": 6892,
+   "codeHospitalisation": "224814",
+   "codeAmbulant": "224803",
+   "n": "K430",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "reason": "paire non officielle : 224814 va avec 224825, 224803 va avec 224792"
+  },
+  {
+   "id": 6893,
+   "codeHospitalisation": "224836",
+   "codeAmbulant": "224825",
+   "n": "K540",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "reason": "paire non officielle : 224836 va avec 224840, 224825 va avec 224814"
+  },
+  {
+   "id": 6894,
+   "codeHospitalisation": "224851",
+   "codeAmbulant": "224840",
+   "n": "K650",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "reason": "paire non officielle : 224851 va avec 224862, 224840 va avec 224836"
+  },
+  {
+   "id": 6895,
+   "codeHospitalisation": "225352",
+   "codeAmbulant": "225341",
+   "n": "K700",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "reason": "paire non officielle : 225352 va avec 225363, 225341 va avec 225330"
+  },
+  {
+   "id": 6896,
+   "codeHospitalisation": "225374",
+   "codeAmbulant": "225363",
+   "n": "K840",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "reason": "paire non officielle : 225374 va avec 225385, 225363 va avec 225352"
+  },
+  {
+   "id": 6897,
+   "codeHospitalisation": "225794",
+   "codeAmbulant": "225783",
+   "n": "K835",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "reason": "paire non officielle : 225794 va avec 225805, 225783 va avec 225772"
+  },
+  {
+   "id": 6898,
+   "codeHospitalisation": "225816",
+   "codeAmbulant": "225805",
+   "n": "K1000",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "reason": "paire non officielle : 225816 va avec 225820, 225805 va avec 225794"
+  },
+  {
+   "id": 6899,
+   "codeHospitalisation": "225271",
+   "codeAmbulant": "225260",
+   "n": "K450",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "reason": "paire non officielle : 225271 va avec 225282, 225260 va avec 225256"
+  },
+  {
+   "id": 6900,
+   "codeHospitalisation": "225293",
+   "codeAmbulant": "225282",
+   "n": "K560",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "reason": "paire non officielle : 225293 va avec 225304, 225282 va avec 225271"
+  },
+  {
+   "id": 6901,
+   "codeHospitalisation": "225315",
+   "codeAmbulant": "225304",
+   "n": "K670",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "reason": "paire non officielle : 225315 va avec 225326, 225304 va avec 225293"
+  },
+  {
+   "id": 6908,
+   "codeHospitalisation": "225212",
+   "codeAmbulant": "225201",
+   "n": "K460",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "reason": "paire non officielle : 225212 va avec 225223, 225201 va avec 225190"
+  },
+  {
+   "id": 6909,
+   "codeHospitalisation": "225234",
+   "codeAmbulant": "225223",
+   "n": "K575",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "reason": "paire non officielle : 225234 va avec 225245, 225223 va avec 225212"
+  },
+  {
+   "id": 6910,
+   "codeHospitalisation": "225256",
+   "codeAmbulant": "225245",
+   "n": "K690",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "reason": "paire non officielle : 225256 va avec 225260, 225245 va avec 225234"
+  },
+  {
+   "id": 6911,
+   "codeHospitalisation": "225153",
+   "codeAmbulant": "225142",
+   "n": "K350",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "reason": "paire non officielle : 225153 va avec 225164, 225142 va avec 225131"
+  },
+  {
+   "id": 6912,
+   "codeHospitalisation": "225175",
+   "codeAmbulant": "225164",
+   "n": "K435",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "reason": "paire non officielle : 225175 va avec 225186, 225164 va avec 225153"
+  },
+  {
+   "id": 6913,
+   "codeHospitalisation": "225190",
+   "codeAmbulant": "225186",
+   "n": "K520",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "reason": "paire non officielle : 225190 va avec 225201, 225186 va avec 225175"
+  },
+  {
+   "id": 6916,
+   "codeHospitalisation": "224534",
+   "codeAmbulant": "224523",
+   "n": "K560",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "reason": "paire non officielle : 224534 va avec 224545, 224523 va avec 224512"
+  },
+  {
+   "id": 6917,
+   "codeHospitalisation": "225013",
+   "codeAmbulant": "225002",
+   "n": "K500",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "reason": "paire non officielle : 225013 va avec 225024, 225002 va avec 224991"
+  },
+  {
+   "id": 6918,
+   "codeHospitalisation": "224755",
+   "codeAmbulant": "224744",
+   "n": "K400",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "reason": "paire non officielle : 224755 va avec 224766, 224744 va avec 224733"
+  },
+  {
+   "id": 6919,
+   "codeHospitalisation": "224770",
+   "codeAmbulant": "224766",
+   "n": "K490",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "reason": "paire non officielle : 224770 va avec 224781, 224766 va avec 224755"
+  },
+  {
+   "id": 6920,
+   "codeHospitalisation": "224792",
+   "codeAmbulant": "224781",
+   "n": "K580",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "reason": "paire non officielle : 224792 va avec 224803, 224781 va avec 224770"
+  },
+  {
+   "id": 6925,
+   "codeHospitalisation": "224593",
+   "codeAmbulant": "224582",
+   "n": "K500",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "reason": "paire non officielle : 224593 va avec 224604, 224582 va avec 224571"
+  },
+  {
+   "id": 6926,
+   "codeHospitalisation": "225691",
+   "codeAmbulant": "225680",
+   "n": "K500",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "reason": "paire non officielle : 225691 va avec 225702, 225680 va avec 225676"
+  },
+  {
+   "id": 6931,
+   "codeHospitalisation": "224615",
+   "codeAmbulant": "224604",
+   "n": "K670",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "reason": "paire non officielle : 224615 va avec 224626, 224604 va avec 224593"
+  },
+  {
+   "id": 6932,
+   "codeHospitalisation": "224630",
+   "codeAmbulant": "224626",
+   "n": "K835",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "reason": "paire non officielle : 224630 va avec 224641, 224626 va avec 224615"
+  },
+  {
+   "id": 6933,
+   "codeHospitalisation": "224652",
+   "codeAmbulant": "224641",
+   "n": "K1000",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "reason": "paire non officielle : 224652 va avec 224663, 224641 va avec 224630"
+  },
+  {
+   "id": 6934,
+   "codeHospitalisation": "225713",
+   "codeAmbulant": "225702",
+   "n": "K670",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "reason": "paire non officielle : 225713 va avec 225724, 225702 va avec 225691"
+  },
+  {
+   "id": 6935,
+   "codeHospitalisation": "225735",
+   "codeAmbulant": "225724",
+   "n": "K835",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "reason": "paire non officielle : 225735 va avec 225746, 225724 va avec 225713"
+  },
+  {
+   "id": 6936,
+   "codeHospitalisation": "225750",
+   "codeAmbulant": "225746",
+   "n": "K1000",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "reason": "paire non officielle : 225750 va avec 225761, 225746 va avec 225735"
+  },
+  {
+   "id": 6937,
+   "codeHospitalisation": "225035",
+   "codeAmbulant": "225024",
+   "n": "K670",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "reason": "paire non officielle : 225035 va avec 225046, 225024 va avec 225013"
+  },
+  {
+   "id": 6938,
+   "codeHospitalisation": "225050",
+   "codeAmbulant": "225046",
+   "n": "K835",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "reason": "paire non officielle : 225050 va avec 225061, 225046 va avec 225035"
+  },
+  {
+   "id": 6939,
+   "codeHospitalisation": "225072",
+   "codeAmbulant": "225061",
+   "n": "K1000",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "reason": "paire non officielle : 225072 va avec 225083, 225061 va avec 225050"
+  },
+  {
+   "id": 6945,
+   "codeHospitalisation": "225831",
+   "codeAmbulant": "225820",
+   "n": "K140",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "reason": "paire non officielle : 225831 va avec 225842, 225820 va avec 225816"
+  },
+  {
+   "id": 6946,
+   "codeHospitalisation": "225853",
+   "codeAmbulant": "225842",
+   "n": "K195",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "reason": "paire non officielle : 225853 va avec 225864, 225842 va avec 225831"
+  },
+  {
+   "id": 6947,
+   "codeHospitalisation": "224696",
+   "codeAmbulant": "224663",
+   "n": "K155",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "reason": "paire non officielle : 224696 va avec 224700, 224663 va avec 224652"
+  },
+  {
+   "id": 6949,
+   "codeHospitalisation": "224556",
+   "codeAmbulant": "224545",
+   "n": "K95",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "reason": "paire non officielle : 224556 va avec 224560, 224545 va avec 224534"
+  },
+  {
+   "id": 6950,
+   "codeHospitalisation": "225890",
+   "codeAmbulant": "225632",
+   "n": "K95",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "reason": "paire non officielle : 225890 va avec 225901, 225632 va avec 225643"
+  },
+  {
+   "id": 6951,
+   "codeHospitalisation": "225654",
+   "codeAmbulant": "225643",
+   "n": "K95",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "reason": "paire non officielle : 225654 va avec 225665, 225643 va avec 225632"
+  },
+  {
+   "id": 6953,
+   "codeHospitalisation": "224976",
+   "codeAmbulant": "224965",
+   "n": "K95",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "reason": "paire non officielle : 224976 va avec 224980, 224965 va avec 224954"
+  },
+  {
+   "id": 6956,
+   "codeHospitalisation": "224453",
+   "codeAmbulant": "226505",
+   "n": "K200",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "reason": "paire non officielle : 224453 va avec 224464, 226505 va avec 226494"
+  },
+  {
+   "id": 6957,
+   "codeHospitalisation": "226542",
+   "codeAmbulant": "226494",
+   "n": "K200",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "reason": "paire non officielle : 226542 va avec 226531, 226494 va avec 226505"
+  },
+  {
+   "id": 6958,
+   "codeHospitalisation": "224711",
+   "codeAmbulant": "224700",
+   "n": "K80",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "reason": "paire non officielle : 224711 va avec 224722, 224700 va avec 224696"
+  },
+  {
+   "id": 6960,
+   "codeHospitalisation": "224733",
+   "codeAmbulant": "224722",
+   "n": "K120",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "reason": "paire non officielle : 224733 va avec 224744, 224722 va avec 224711"
+  },
+  {
+   "id": 6968,
+   "codeHospitalisation": "225901",
+   "codeAmbulant": "225886",
+   "n": "K120",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "reason": "paire non officielle : 225901 va avec 225890, 225886 va avec 225875"
+  },
+  {
+   "id": 6969,
+   "codeHospitalisation": "225875",
+   "codeAmbulant": "225864",
+   "n": "K50",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "reason": "paire non officielle : 225875 va avec 225886, 225864 va avec 225853"
+  }
+ ],
+ "classify": [
+  {
+   "id": 6840,
+   "codeHospitalisation": "225094",
+   "codeAmbulant": "225083",
+   "n": "K200",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6841,
+   "codeHospitalisation": "225116",
+   "codeAmbulant": "225105",
+   "n": "K250",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6842,
+   "codeHospitalisation": "225131",
+   "codeAmbulant": "225120",
+   "n": "K300",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6843,
+   "codeHospitalisation": "224140",
+   "codeAmbulant": "224136",
+   "n": "K430",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6844,
+   "codeHospitalisation": "224162",
+   "codeAmbulant": "224151",
+   "n": "K540",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6845,
+   "codeHospitalisation": "224184",
+   "codeAmbulant": "224173",
+   "n": "K650",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6846,
+   "codeHospitalisation": "225772",
+   "codeAmbulant": "225761",
+   "n": "K670",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6847,
+   "codeHospitalisation": "225610",
+   "codeAmbulant": "225606",
+   "n": "K280",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6848,
+   "codeHospitalisation": "225396",
+   "codeAmbulant": "225385",
+   "n": "K250",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6849,
+   "codeHospitalisation": "225411",
+   "codeAmbulant": "225400",
+   "n": "K325",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6850,
+   "codeHospitalisation": "225455",
+   "codeAmbulant": "225422",
+   "n": "K400",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6851,
+   "codeHospitalisation": "224932",
+   "codeAmbulant": "224921",
+   "n": "K335",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6852,
+   "codeHospitalisation": "224954",
+   "codeAmbulant": "224943",
+   "n": "K390",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6853,
+   "codeHospitalisation": "224081",
+   "codeAmbulant": "224070",
+   "n": "K350",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6854,
+   "codeHospitalisation": "224103",
+   "codeAmbulant": "224092",
+   "n": "K435",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6855,
+   "codeHospitalisation": "224125",
+   "codeAmbulant": "224114",
+   "n": "K520",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6856,
+   "codeHospitalisation": "224475",
+   "codeAmbulant": "224464",
+   "n": "K225",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6857,
+   "codeHospitalisation": "224490",
+   "codeAmbulant": "224486",
+   "n": "K280",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6858,
+   "codeHospitalisation": "224512",
+   "codeAmbulant": "224501",
+   "n": "K335",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6859,
+   "codeHospitalisation": "226240",
+   "codeAmbulant": "226236",
+   "n": "K195",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6860,
+   "codeHospitalisation": "224066",
+   "codeAmbulant": "224055",
+   "n": "K335",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6861,
+   "codeHospitalisation": "224895",
+   "codeAmbulant": "224884",
+   "n": "K250",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6862,
+   "codeHospitalisation": "224910",
+   "codeAmbulant": "224906",
+   "n": "K305",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6863,
+   "codeHospitalisation": "225492",
+   "codeAmbulant": "225481",
+   "n": "K300",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6864,
+   "codeHospitalisation": "225514",
+   "codeAmbulant": "225503",
+   "n": "K380",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6865,
+   "codeHospitalisation": "225536",
+   "codeAmbulant": "225525",
+   "n": "K460",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6866,
+   "codeHospitalisation": "225470",
+   "codeAmbulant": "225466",
+   "n": "K280",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6867,
+   "codeHospitalisation": "224221",
+   "codeAmbulant": "224210",
+   "n": "K435",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6868,
+   "codeHospitalisation": "224243",
+   "codeAmbulant": "224232",
+   "n": "K520",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6869,
+   "codeHospitalisation": "224206",
+   "codeAmbulant": "224195",
+   "n": "K350",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6870,
+   "codeHospitalisation": "224405",
+   "codeAmbulant": "224394",
+   "n": "K350",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6871,
+   "codeHospitalisation": "224431",
+   "codeAmbulant": "224416",
+   "n": "K435",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6872,
+   "codeHospitalisation": "225621",
+   "codeAmbulant": "224442",
+   "n": "K520",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6873,
+   "codeHospitalisation": "224265",
+   "codeAmbulant": "224254",
+   "n": "K310",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6874,
+   "codeHospitalisation": "224280",
+   "codeAmbulant": "224276",
+   "n": "K170",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6875,
+   "codeHospitalisation": "224302",
+   "codeAmbulant": "224291",
+   "n": "K310",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6876,
+   "codeHospitalisation": "224324",
+   "codeAmbulant": "224313",
+   "n": "K280",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6877,
+   "codeHospitalisation": "224873",
+   "codeAmbulant": "224862",
+   "n": "K170",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6878,
+   "codeHospitalisation": "224346",
+   "codeAmbulant": "224335",
+   "n": "K250",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6879,
+   "codeHospitalisation": "224361",
+   "codeAmbulant": "224350",
+   "n": "K310",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6880,
+   "codeHospitalisation": "224383",
+   "codeAmbulant": "224372",
+   "n": "K370",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6881,
+   "codeHospitalisation": "224991",
+   "codeAmbulant": "224980",
+   "n": "K300",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6882,
+   "codeHospitalisation": "226122",
+   "codeAmbulant": "226111",
+   "n": "K225",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6883,
+   "codeHospitalisation": "224571",
+   "codeAmbulant": "224560",
+   "n": "K300",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6884,
+   "codeHospitalisation": "225676",
+   "codeAmbulant": "225665",
+   "n": "K300",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6885,
+   "codeHospitalisation": "226063",
+   "codeAmbulant": "226052",
+   "n": "K140",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6886,
+   "codeHospitalisation": "226041",
+   "codeAmbulant": "226030",
+   "n": "K140",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6887,
+   "codeHospitalisation": "225551",
+   "codeAmbulant": "225540",
+   "n": "K360",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6888,
+   "codeHospitalisation": "225573",
+   "codeAmbulant": "225562",
+   "n": "K450",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6889,
+   "codeHospitalisation": "225595",
+   "codeAmbulant": "225584",
+   "n": "K540",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6890,
+   "codeHospitalisation": "226306",
+   "codeAmbulant": "226295",
+   "n": "K500",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6891,
+   "codeHospitalisation": "225330",
+   "codeAmbulant": "225326",
+   "n": "K560",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6892,
+   "codeHospitalisation": "224814",
+   "codeAmbulant": "224803",
+   "n": "K430",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6893,
+   "codeHospitalisation": "224836",
+   "codeAmbulant": "224825",
+   "n": "K540",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6894,
+   "codeHospitalisation": "224851",
+   "codeAmbulant": "224840",
+   "n": "K650",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6895,
+   "codeHospitalisation": "225352",
+   "codeAmbulant": "225341",
+   "n": "K700",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6896,
+   "codeHospitalisation": "225374",
+   "codeAmbulant": "225363",
+   "n": "K840",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6897,
+   "codeHospitalisation": "225794",
+   "codeAmbulant": "225783",
+   "n": "K835",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6898,
+   "codeHospitalisation": "225816",
+   "codeAmbulant": "225805",
+   "n": "K1000",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6899,
+   "codeHospitalisation": "225271",
+   "codeAmbulant": "225260",
+   "n": "K450",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6900,
+   "codeHospitalisation": "225293",
+   "codeAmbulant": "225282",
+   "n": "K560",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6901,
+   "codeHospitalisation": "225315",
+   "codeAmbulant": "225304",
+   "n": "K670",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6902,
+   "codeHospitalisation": "225923",
+   "codeAmbulant": "225912",
+   "n": "K560",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6903,
+   "codeHospitalisation": "225960",
+   "codeAmbulant": "225956",
+   "n": "K375",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6904,
+   "codeHospitalisation": "225982",
+   "codeAmbulant": "225971",
+   "n": "K450",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6905,
+   "codeHospitalisation": "225945",
+   "codeAmbulant": "225934",
+   "n": "K300",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6906,
+   "codeHospitalisation": "224022",
+   "codeAmbulant": "224011",
+   "n": "K500",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6907,
+   "codeHospitalisation": "224044",
+   "codeAmbulant": "224033",
+   "n": "K555",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6908,
+   "codeHospitalisation": "225212",
+   "codeAmbulant": "225201",
+   "n": "K460",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6909,
+   "codeHospitalisation": "225234",
+   "codeAmbulant": "225223",
+   "n": "K575",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6910,
+   "codeHospitalisation": "225256",
+   "codeAmbulant": "225245",
+   "n": "K690",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6911,
+   "codeHospitalisation": "225153",
+   "codeAmbulant": "225142",
+   "n": "K350",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6912,
+   "codeHospitalisation": "225175",
+   "codeAmbulant": "225164",
+   "n": "K435",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6913,
+   "codeHospitalisation": "225190",
+   "codeAmbulant": "225186",
+   "n": "K520",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6914,
+   "codeHospitalisation": "226262",
+   "codeAmbulant": "226251",
+   "n": "K500",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6915,
+   "codeHospitalisation": "226380",
+   "codeAmbulant": "226376",
+   "n": "K500",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6916,
+   "codeHospitalisation": "224534",
+   "codeAmbulant": "224523",
+   "n": "K560",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6917,
+   "codeHospitalisation": "225013",
+   "codeAmbulant": "225002",
+   "n": "K500",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6918,
+   "codeHospitalisation": "224755",
+   "codeAmbulant": "224744",
+   "n": "K400",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6919,
+   "codeHospitalisation": "224770",
+   "codeAmbulant": "224766",
+   "n": "K490",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6920,
+   "codeHospitalisation": "224792",
+   "codeAmbulant": "224781",
+   "n": "K580",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6921,
+   "codeHospitalisation": "226144",
+   "codeAmbulant": "226133",
+   "n": "K670",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6922,
+   "codeHospitalisation": "226365",
+   "codeAmbulant": "226354",
+   "n": "K800",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6923,
+   "codeHospitalisation": "226321",
+   "codeAmbulant": "226310",
+   "n": "K800",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6924,
+   "codeHospitalisation": "226343",
+   "codeAmbulant": "226332",
+   "n": "K1000",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6925,
+   "codeHospitalisation": "224593",
+   "codeAmbulant": "224582",
+   "n": "K500",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6926,
+   "codeHospitalisation": "225691",
+   "codeAmbulant": "225680",
+   "n": "K500",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6927,
+   "codeHospitalisation": "226181",
+   "codeAmbulant": "226170",
+   "n": "K835",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6928,
+   "codeHospitalisation": "226166",
+   "codeAmbulant": "226155",
+   "n": "K400",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6929,
+   "codeHospitalisation": "226026",
+   "codeAmbulant": "226015",
+   "n": "K390",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6930,
+   "codeHospitalisation": "226004",
+   "codeAmbulant": "225993",
+   "n": "K800",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6931,
+   "codeHospitalisation": "224615",
+   "codeAmbulant": "224604",
+   "n": "K670",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6932,
+   "codeHospitalisation": "224630",
+   "codeAmbulant": "224626",
+   "n": "K835",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6933,
+   "codeHospitalisation": "224652",
+   "codeAmbulant": "224641",
+   "n": "K1000",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6934,
+   "codeHospitalisation": "225713",
+   "codeAmbulant": "225702",
+   "n": "K670",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6935,
+   "codeHospitalisation": "225735",
+   "codeAmbulant": "225724",
+   "n": "K835",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6936,
+   "codeHospitalisation": "225750",
+   "codeAmbulant": "225746",
+   "n": "K1000",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6937,
+   "codeHospitalisation": "225035",
+   "codeAmbulant": "225024",
+   "n": "K670",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6938,
+   "codeHospitalisation": "225050",
+   "codeAmbulant": "225046",
+   "n": "K835",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6939,
+   "codeHospitalisation": "225072",
+   "codeAmbulant": "225061",
+   "n": "K1000",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6940,
+   "codeHospitalisation": "226402",
+   "codeAmbulant": "226391",
+   "n": "K500",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6941,
+   "codeHospitalisation": "226284",
+   "codeAmbulant": "226273",
+   "n": "K1000",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6942,
+   "codeHospitalisation": "226424",
+   "codeAmbulant": "226413",
+   "n": "K400",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6943,
+   "codeHospitalisation": "226446",
+   "codeAmbulant": "226435",
+   "n": "K1000",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6944,
+   "codeHospitalisation": "226461",
+   "codeAmbulant": "226450",
+   "n": "K600",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6945,
+   "codeHospitalisation": "225831",
+   "codeAmbulant": "225820",
+   "n": "K140",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6946,
+   "codeHospitalisation": "225853",
+   "codeAmbulant": "225842",
+   "n": "K195",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6947,
+   "codeHospitalisation": "224696",
+   "codeAmbulant": "224663",
+   "n": "K155",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6948,
+   "codeHospitalisation": "226586",
+   "codeAmbulant": "226575",
+   "n": "K50",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6949,
+   "codeHospitalisation": "224556",
+   "codeAmbulant": "224545",
+   "n": "K95",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6950,
+   "codeHospitalisation": "225890",
+   "codeAmbulant": "225632",
+   "n": "K95",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6951,
+   "codeHospitalisation": "225654",
+   "codeAmbulant": "225643",
+   "n": "K95",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6952,
+   "codeHospitalisation": "226100",
+   "codeAmbulant": "226096",
+   "n": "K95",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6953,
+   "codeHospitalisation": "224976",
+   "codeAmbulant": "224965",
+   "n": "K95",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6954,
+   "codeHospitalisation": "226225",
+   "codeAmbulant": "226214",
+   "n": "K80",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6955,
+   "codeHospitalisation": "226483",
+   "codeAmbulant": "226472",
+   "n": "K170",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6956,
+   "codeHospitalisation": "224453",
+   "codeAmbulant": "226505",
+   "n": "K200",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6957,
+   "codeHospitalisation": "226542",
+   "codeAmbulant": "226494",
+   "n": "K200",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6958,
+   "codeHospitalisation": "224711",
+   "codeAmbulant": "224700",
+   "n": "K80",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6959,
+   "codeHospitalisation": "226601",
+   "codeAmbulant": "226590",
+   "n": "K85",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6960,
+   "codeHospitalisation": "224733",
+   "codeAmbulant": "224722",
+   "n": "K120",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6961,
+   "codeHospitalisation": "226542",
+   "codeAmbulant": "226531",
+   "n": "K140",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6962,
+   "codeHospitalisation": "226085",
+   "codeAmbulant": "226074",
+   "n": "K140",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6963,
+   "codeHospitalisation": "226623",
+   "codeAmbulant": "226612",
+   "n": "K70",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6964,
+   "codeHospitalisation": "226645",
+   "codeAmbulant": "226634",
+   "n": "K120",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6965,
+   "codeHospitalisation": "226520",
+   "codeAmbulant": "226516",
+   "n": "K225",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6966,
+   "codeHospitalisation": "226564",
+   "codeAmbulant": "226553",
+   "n": "K20",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6967,
+   "codeHospitalisation": "224685",
+   "codeAmbulant": "224674",
+   "n": "K50",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6968,
+   "codeHospitalisation": "225901",
+   "codeAmbulant": "225886",
+   "n": "K120",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  },
+  {
+   "id": 6969,
+   "codeHospitalisation": "225875",
+   "codeAmbulant": "225864",
+   "n": "K50",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ]
+  }
+ ]
+}

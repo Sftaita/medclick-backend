@@ -57,7 +57,7 @@ Doc OpenAPI générée par API Platform : `GET /api` (ne couvre pas les contrôl
   `$this->isGranted('OWNER', $x)` dans les contrôleurs custom.
 - `src/State/` — state processors API Platform branchés par opération (`processor:`) :
   `UserProcessor` (hash du mot de passe, email d'activation), `CurrentUserAssignProcessor`
-  (propriétaire des `Years`/`Favorites`), `SurgeonProcessor` (maître de stage unique),
+  (propriétaire des `Years`), `SurgeonProcessor` (maître de stage unique),
   `SurgeonRemoveProcessor` (interventions supprimées avec le chirurgien), `FormationProcessor`.
 - `src/Events/JwtCreatedSubscriber.php` — claims ajoutés au JWT.
 - **Capture des erreurs** : `src/Service/ErrorRecorder.php` (table `error_log`, regroupement par
