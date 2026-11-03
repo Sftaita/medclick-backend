@@ -82,8 +82,9 @@ Points notables :
 - `Nomenclature` : `speciality`, `codeAmbulant`, `codeHospitalisation`, `n`, `name`,
   `type`, `subType`, `active` (code proposé aux nouvelles saisies), `inamiRepealedAt` (date
   officielle d'abrogation), `deactivatedAt` (date technique de désactivation). Un code obsolète est
-  désactivé, jamais supprimé (ADR-210). `NomenclatureSharedSpeciality` : spécialités
-  supplémentaires d'un code (ex. article 14 n) en neurochirurgie), une seule ligne par code (ADR-211).
+  désactivé, jamais supprimé (ADR-210). Une seule ligne par code (ADR-211) :
+  `NomenclatureSharedSpeciality` autorise une spécialité supplémentaire pour une nouvelle saisie ;
+  `NomenclatureHistoricalSpeciality` classe seulement les interventions déjà enregistrées au récapitulatif.
 
 ## 4. Authentification et autorisation
 

@@ -4,6 +4,7 @@ namespace App\Tests\Api;
 
 use App\Entity\Favorites;
 use App\Entity\Nomenclature;
+use App\Entity\NomenclatureHistoricalSpeciality;
 use App\Entity\Surgeries;
 use App\Entity\User;
 use App\Entity\Years;
@@ -327,14 +328,96 @@ class SharedSpecialityTest extends ApiTestBase
         $this->assertCount(2, $withCode($book, 1), 'carnet : une ligne par intervention');
         $this->assertCount(2, $withCode($book, 2), 'récapitulatif : acte listé une fois par spécialité enregistrée');
 
-        // Retrait du partage : l'intervention garde sa spécialité ; l'export revient à l'ancien
-        // comportement pour cette ligne (région du code), sans erreur.
+        // Retrait du partage, sans classement historique : l'intervention garde sa spécialité ; l'export
+        // revient à l'ancien comportement pour cette ligne (région du code), sans erreur.
         $this->share([$this->spine], apply: true, revert: true);
         file_put_contents($file = tempnam(sys_get_temp_dir(), 'carnet'), $this->clientFor($this->alice)->request('GET', '/api/excel2/' . $this->year->getId())->getContent());
         $book = IOFactory::load($file);
         unlink($file);
         $this->assertCount(1, $withCode($book, 2));
         $this->assertSame('neuro', $this->rows()[$neuroId]['speciality']);
+    }
+
+    /**
+     * Code NON autorisé en neurochirurgie mais classé (ADR-211) : l'intervention déjà enregistrée reste au
+     * récapitulatif ; aucune nouvelle saisie possible ; aucune donnée modifiée ; orthopédie inchangée.
+     */
+    public function testHistoricalClassificationIsSeparateFromTheSelectionRight(): void
+    {
+        $plan = $this->plan([$this->spine]);
+        $plan['withdraw'] = $this->plan([$this->spineOther])['share'];
+        $plan['classify'] = $this->plan([$this->spine, $this->spineOther])['share'];
+
+        // Retrait de l'autorisation excédentaire, classement ajouté ; seconde exécution sans effet.
+        $display = $this->runShare($plan)->getDisplay();
+        $this->assertMatchesRegularExpression('/autorisation à retirer\s+1/', $display);
+        $this->assertMatchesRegularExpression('/classement à ajouter\s+2/', $display);
+        $this->assertSame(2, (int) $this->em->getConnection()->fetchOne('SELECT COUNT(*) FROM nomenclature_shared_speciality'), 'simulation : aucune écriture');
+        $this->runShare($plan, apply: true);
+        $display = $this->runShare($plan, apply: true)->getDisplay();
+        $this->assertMatchesRegularExpression('/autorisation retirée\s+0/', $display);
+        $this->assertMatchesRegularExpression('/déjà sans autorisation \(ignoré\)\s+1/', $display);
+        $this->assertMatchesRegularExpression('/déjà autorisé \(ignoré\)\s+1/', $display);
+        $this->assertMatchesRegularExpression('/déjà classé \(ignoré\)\s+2/', $display);
+        $connection = $this->em->getConnection();
+        $this->assertSame([$this->spine->getId()], array_map('intval', $connection->fetchFirstColumn('SELECT nomenclature_id FROM nomenclature_shared_speciality')));
+        $this->assertSame(2, (int) $connection->fetchOne('SELECT COUNT(*) FROM nomenclature_historical_speciality'));
+
+        // Intervention historique en neurochirurgie sur le code retiré.
+        $historical = $this->surgery($this->spineOther, 'neuro', '226542K225', '2024-03-01');
+        $before = $this->rows();
+
+        // Sélection : absent en neurochirurgie, présent en orthopédie ; saisie et favori refusés en neuro.
+        $client = $this->clientFor($this->alice);
+        $this->assertNotContains($this->spineOther->getId(), array_column($client->request('GET', '/api/nomenclature/neuro')->toArray(), 'id'));
+        $this->assertContains($this->spine->getId(), array_column($client->request('GET', '/api/nomenclature/neuro')->toArray(), 'id'));
+        $this->assertContains($this->spineOther->getId(), array_column($client->request('GET', '/api/nomenclature/ortho')->toArray(), 'id'));
+        foreach (self::ROUTES as $route) {
+            [$status] = $this->create($route, $this->spineOther, 'neuro');
+            $this->assertSame($route === 'apiPlatform' ? 422 : 400, $status, $route);
+        }
+        $client = $this->clientFor($this->alice);
+        $response = $client->request('POST', '/api/favorites/addNew', ['json' => ['shortcut' => 'x', 'surgeryId' => $this->spineOther->getId(), 'speciality' => 'neuro']]);
+        $this->assertResponseStatusCodeSame(400);
+        $this->assertSame('speciality_not_allowed', $response->toArray(false)['reason']);
+        $this->assertSame($before, $this->rows());
+
+        // Modification de l'intervention historique : spécialité et code conservés.
+        $client->request('PUT', '/api/surgeries/' . $historical->getId(), ['json' => ['date' => '2024-03-02', 'speciality' => 'neuro']]);
+        $this->assertResponseIsSuccessful();
+        $row = $this->rows()[$historical->getId()];
+        $this->assertSame(['neuro', '226542K225', $this->spineOther->getId()], [$row['speciality'], $row['code'], (int) $row['nomenclature_id']]);
+
+        // Récapitulatif : l'intervention historique en neuro et une intervention en orthopédie.
+        $this->surgery($this->spineOther, 'ortho', '226542K225', '2024-04-01');
+        $withCode = fn ($book, int $sheet) => array_values(array_filter($book->getSheet($sheet)->toArray(), fn ($row) => in_array('226542K225', array_map(fn ($v) => trim((string) $v), $row), true)));
+        $file = tempnam(sys_get_temp_dir(), 'carnet');
+        file_put_contents($file, $this->clientFor($this->alice)->request('GET', '/api/excel2/' . $this->year->getId())->getContent());
+        $book = IOFactory::load($file);
+        unlink($file);
+        $this->assertCount(2, $withCode($book, 2), 'une ligne par spécialité enregistrée, sans autorisation de saisie');
+
+        // Sans classement ni autorisation (code hors 14 n) : traitement historique inchangé.
+        $this->em->clear();
+        $classified = $this->em->getRepository(NomenclatureHistoricalSpeciality::class)->findBy(['nomenclature' => $this->spineOther->getId()]);
+        $this->assertCount(1, $classified);
+        $this->em->remove($classified[0]);
+        $this->em->flush();
+        $file = tempnam(sys_get_temp_dir(), 'carnet');
+        file_put_contents($file, $this->clientFor($this->alice)->request('GET', '/api/excel2/' . $this->year->getId())->getContent());
+        $book = IOFactory::load($file);
+        unlink($file);
+        $this->assertCount(1, $withCode($book, 2));
+
+        // Retour arrière : autorisations et classements du plan retirés, retrait jamais annulé.
+        $this->runShare($plan, apply: true, revert: true);
+        $this->assertSame(0, (int) $connection->fetchOne('SELECT COUNT(*) FROM nomenclature_shared_speciality'));
+        $this->assertSame(0, (int) $connection->fetchOne('SELECT COUNT(*) FROM nomenclature_historical_speciality'));
+        $this->assertSame(5, (int) $connection->fetchOne('SELECT COUNT(*) FROM nomenclature'));
+
+        // Plan incohérent : une autorisation à la fois accordée et retirée.
+        $plan['withdraw'] = $plan['share'];
+        $this->assertSame(1, $this->runShare($plan, apply: true)->getStatusCode());
     }
 
     // ------------------------------------------------- Commande de partage
@@ -371,19 +454,30 @@ class SharedSpecialityTest extends ApiTestBase
     public function testTheShippedPlanSharesTheOfficialArticle14nCodesWithNeurosurgery(): void
     {
         $plan = json_decode(file_get_contents(static::getContainer()->getParameter('kernel.project_dir') . '/data/inami/plan-partage-rachis-14n-20261101.json'), true);
-        $this->assertCount(128, $plan['share']);
+        $this->assertCount(56, $plan['share'], 'autorisations : paires officielles exactes uniquement');
+        $this->assertCount(74, $plan['withdraw']);
+        $this->assertCount(130, $plan['classify'], 'classement historique : toutes les lignes officielles 14 n)');
         $this->assertSame(260, $plan['source']['officialCodes']);
-        // Références non rapprochables de NomenSoft : exclues provisoirement ; 6961 (paire officielle exacte) reste.
-        $this->assertSame([6871, 6957], array_column($plan['source']['excluded'], 'id'));
-        $this->assertNotContains(6871, array_column($plan['share'], 'id'));
-        $this->assertNotContains(6957, array_column($plan['share'], 'id'));
-        $this->assertContains(6961, array_column($plan['share'], 'id'));
+        $shared = array_column($plan['share'], 'id');
+        $withdrawn = array_column($plan['withdraw'], 'id');
+        $this->assertSame([], array_intersect($shared, $withdrawn));
+        $merged = array_merge($shared, $withdrawn);
+        sort($merged);
+        $this->assertSame($merged, array_column($plan['classify'], 'id'));
+        // 6961 : paire officielle exacte. 6871 et 6957 : références erronées. 6840 : colonnes décalées.
+        $this->assertContains(6961, $shared);
+        foreach ([6871, 6957, 6840] as $id) {
+            $this->assertContains($id, $withdrawn);
+        }
+        foreach ($plan['withdraw'] as $item) {
+            $this->assertNotSame('', $item['reason']);
+        }
         $this->assertStringContainsString('14n', $plan['source']['label']);
         foreach ($plan['share'] as $item) {
             $this->assertSame('ortho', $item['speciality']);
             $this->assertSame(['neuro'], $item['specialities']);
         }
-        $this->assertCount(128, array_unique(array_column($plan['share'], 'id')));
+        $this->assertCount(56, array_unique($shared));
     }
 
     // ------------------------------------------------- Helpers

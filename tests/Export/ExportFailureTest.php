@@ -127,7 +127,7 @@ final class ExportFailureTest extends ExportTestCase
         self::assertSame(ExportFailure::DATABASE, $failed->getErrorCategory());
         self::assertSame('loading', $failed->getErrorStep());
         // Code technique : exception, emplacement dans le code de l'application, SQLSTATE.
-        self::assertSame('TableNotFoundException@CarnetDeStageDataLoader.php:70 SQLSTATE[HY000]', $failed->getErrorCode());
+        self::assertSame('TableNotFoundException@CarnetDeStageDataLoader.php:71 SQLSTATE[HY000]', $failed->getErrorCode());
         self::assertSame('La lecture des données a échoué.', $failed->getErrorMessage());
         self::assertCount(1, $this->sentEmails());
     }

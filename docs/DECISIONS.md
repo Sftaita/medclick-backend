@@ -279,21 +279,29 @@ chirurgie orthopédique (DP) et neurochirurgie (DA) », 130 lignes MedClick, 260
 classé en `ortho` dans MedClick : un assistant en neurochirurgie ne les trouve pas.
 
 Décision :
-- **Un code INAMI = une seule ligne de nomenclature.** Les spécialités SUPPLÉMENTAIRES autorisées
-  pour un code sont dans la table `nomenclature_shared_speciality` (une ligne par code et par
-  spécialité, contrainte unique ; migration additive `Version20261105090000`). La spécialité
-  principale (`nomenclature.speciality`), le type et la région ne changent pas.
+- **Un code INAMI = une seule ligne de nomenclature.** La spécialité principale
+  (`nomenclature.speciality`), le type et la région ne changent pas. Deux notions **séparées**, deux
+  tables (une ligne par code et par spécialité, contrainte unique, migrations additives
+  `Version20261105090000` et `Version20261106090000`) :
+  - **autorisation de saisie** (`nomenclature_shared_speciality`) : le code est proposé et accepté dans
+    cette spécialité pour une nouvelle intervention ou un favori ;
+  - **classement historique** (`nomenclature_historical_speciality`) : une intervention déjà enregistrée
+    sous cette spécialité figure à son récapitulatif ; aucun droit de saisie.
 - Alimentation par plan vérifié uniquement : `app:nomenclature:share-speciality <plan>` (dry-run par
-  défaut, `--apply` en une transaction, idempotent, `--revert` ; canal Monolog `nomenclature`).
+  défaut, `--apply` en une transaction, idempotent, `--revert` ; canal Monolog `nomenclature`), listes
+  `share`, `withdraw` et `classify`.
   Plan `data/inami/plan-partage-rachis-14n-20261101.json` produit par
-  `tools/inami/make_plan_shared.py` : codes hospitalier ET ambulant du sous-article NomenSoft `14n`
-  (version en vigueur au 01/11/2026), jamais par recherche dans les libellés. **128 lignes partagées,
-  2 exclues provisoirement** (référence non rapprochable de NomenSoft, liste `source.excluded` du
-  plan) : 6957 (code hospitalier 226542 attribué par erreur, il désigne l'acte de 6961) et 6871
-  (224431 et 224416, deux prestations distinctes). Elles restent en orthopédie, inchangées. 6961, dont
-  la paire officielle est exacte, reste partagée.
+  `tools/inami/make_plan_shared.py`, d'après NomenSoft (version en vigueur au 01/11/2026), jamais par
+  recherche dans les libellés :
+  - **130 lignes classées** : codes hospitalier ET ambulant du sous-article `14n` ;
+  - **56 lignes autorisées en neurochirurgie** (décision du 03/11/2026) : paire officielle réciproque,
+    catégories et valeur exactes ;
+  - **74 lignes NON accessibles en neurochirurgie**, provisoirement, tant que leur référence n'est pas
+    corrigée : les 72 lignes portant un code hospitalier d'un autre acte (les 69 dites inversées, 6872,
+    6950, 6968), plus 6871 et 6957. Elles restent en orthopédie, inchangées.
 - Listes de choix `GET /api/nomenclature/{speciality}` (avec ou sans `?date=`) : codes de la
-  spécialité et codes partagés avec elle, chacun une fois ; règles de validité ADR-210 inchangées.
+  spécialité et codes autorisés pour elle, chacun une fois ; règles de validité ADR-210 inchangées. Le
+  classement historique n'ouvre aucune sélection.
 - Spécialité de l'intervention : celle **choisie** (`speciality` envoyé avec l'acte), vérifiée par
   le serveur (`SurgeryNomenclatureSelection::specialityFor()`) ; absente, vide ou « favorites »
   (anciens fronts) : spécialité principale, comme avant. Spécialité non autorisée pour ce code :
@@ -310,20 +318,20 @@ Décision :
   spécialité ne change que vers une spécialité autorisée explicitement envoyée (valeur non autorisée
   ignorée).
 - Statistiques, listes et export Excel utilisent la spécialité **enregistrée** dans chaque
-  intervention. Export : un acte partagé enregistré sous une spécialité supplémentaire est listé avec
-  les interventions de cette spécialité (la région anatomique, propre à l'orthopédie, n'est pas
-  appliquée) ; les interventions orthopédiques restent dans leur région.
+  intervention. Export : une intervention enregistrée sous une spécialité autorisée OU classée pour son
+  code est listée avec les interventions de cette spécialité (la région anatomique, propre à
+  l'orthopédie, n'est pas appliquée) ; les interventions orthopédiques restent dans leur région.
 - **Changement attendu dans les exports (décision du 03/11/2026)** : les interventions historiques
-  déjà enregistrées en `neuro` sur un code partagé étaient absentes du récapitulatif. Elles y
-  apparaissent : en production, 43 interventions, 21 lignes supplémentaires (utilisateurs des années
-  225 : 1, 357 : 6, 437 : 7, 616 : 7), sans modification de ces interventions. Le récapitulatif
-  regroupant toutes les années d'un utilisateur, le changement concerne chaque export de ces quatre
-  utilisateurs. Carnet et autres feuilles inchangés. Aucune de ces interventions n'est sur une ligne
-  exclue. Les interventions `neuro` sur un code de région rachis non partagé restent traitées comme
-  avant.
+  déjà enregistrées en `neuro` sur un code 14 n) étaient absentes du récapitulatif. Elles y
+  apparaissent, par le classement historique, que leur code soit autorisé à la saisie ou non : en
+  production, 43 interventions, 21 lignes supplémentaires (utilisateurs des années 225 : 1, 357 : 6,
+  437 : 7, 616 : 7), sans modification de ces interventions. Le récapitulatif regroupant toutes les
+  années d'un utilisateur, le changement concerne chaque export de ces quatre utilisateurs. Carnet et
+  autres feuilles inchangés. Les interventions `neuro` sur un code de région rachis hors 14 n) restent
+  traitées comme avant.
 
-Conséquences : le retrait d'un partage (`--revert`) ne modifie aucune intervention déjà enregistrée
-en neurochirurgie. Hors périmètre : doublon 226542, inversions orthopédiques, anciens libellés.
-Limite connue : 72 des 128 lignes partagées portent, comme en orthopédie aujourd'hui, un code hospitalier
-qui désigne officiellement un autre acte (les 69 lignes dites inversées, plus 6872, 6950 et 6968) ;
-leur correction relève de l'intervention distincte sur les anciens numéros.
+Conséquences : retirer une autorisation ou un classement ne modifie aucune intervention. Hors
+périmètre : doublon 226542, inversions orthopédiques, anciens libellés.
+Restriction provisoire : les 72 lignes au code hospitalier erroné restent saisissables en orthopédie
+comme aujourd'hui, mais ne sont pas accessibles en neurochirurgie. Leur correction est la priorité
+suivant la 3.7.0 ; chaque ligne corrigée pourra alors être autorisée par plan.

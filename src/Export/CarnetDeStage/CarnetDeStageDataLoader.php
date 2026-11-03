@@ -3,6 +3,7 @@
 namespace App\Export\CarnetDeStage;
 
 use App\Entity\Nomenclature;
+use App\Entity\NomenclatureHistoricalSpeciality;
 use App\Entity\NomenclatureSharedSpeciality;
 use App\Entity\Surgeries;
 use App\Export\ExportFailure;
@@ -123,16 +124,19 @@ final class CarnetDeStageDataLoader
             foreach ($rows as $row) {
                 $nomenclatures[$row['id']] = $row + ['shared' => []];
             }
-            // ADR-211 : spécialités supplémentaires des codes partagés (ex. article 14 n)).
-            $shared = $this->em->createQueryBuilder()
-                ->select('IDENTITY(s.nomenclature) AS id, s.speciality')
-                ->from(NomenclatureSharedSpeciality::class, 's')
-                ->where('s.nomenclature IN (:ids)')
-                ->setParameter('ids', $chunk)
-                ->getQuery()
-                ->getArrayResult();
-            foreach ($shared as $row) {
-                $nomenclatures[(int) $row['id']]['shared'][] = $row['speciality'];
+            // ADR-211 : spécialités sous lesquelles une intervention enregistrée est classée hors de la
+            // région du code : autorisation de saisie, ou classement historique sans droit de saisie.
+            foreach ([NomenclatureSharedSpeciality::class, NomenclatureHistoricalSpeciality::class] as $entity) {
+                $others = $this->em->createQueryBuilder()
+                    ->select('IDENTITY(s.nomenclature) AS id, s.speciality')
+                    ->from($entity, 's')
+                    ->where('s.nomenclature IN (:ids)')
+                    ->setParameter('ids', $chunk)
+                    ->getQuery()
+                    ->getArrayResult();
+                foreach ($others as $row) {
+                    $nomenclatures[(int) $row['id']]['shared'][] = $row['speciality'];
+                }
             }
         }
 
@@ -144,8 +148,8 @@ final class CarnetDeStageDataLoader
             }
             $surgery['type'] = $id !== null ? $nomenclatures[$id]['type'] : null;
             $surgery['subtype'] = $id !== null ? $nomenclatures[$id]['subType'] : null;
-            // ADR-211 : acte partagé enregistré sous une spécialité SUPPLÉMENTAIRE (ex. rachis en
-            // neurochirurgie) : la région anatomique est propre à la spécialité principale ; l'acte est
+            // ADR-211 : intervention enregistrée sous une spécialité SUPPLÉMENTAIRE du code (ex. rachis
+            // en neurochirurgie) : la région anatomique est propre à la spécialité principale ; l'acte est
             // listé avec les interventions de la spécialité ENREGISTRÉE (section sans région). Les
             // interventions enregistrées sous la spécialité principale ne changent pas.
             if ($id !== null && $surgery['speciality'] !== $nomenclatures[$id]['speciality']
