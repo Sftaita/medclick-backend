@@ -335,3 +335,39 @@ périmètre : doublon 226542, inversions orthopédiques, anciens libellés.
 Restriction provisoire : les 72 lignes au code hospitalier erroné restent saisissables en orthopédie
 comme aujourd'hui, mais ne sont pas accessibles en neurochirurgie. Leur correction est la priorité
 suivant la 3.7.0 ; chaque ligne corrigée pourra alors être autorisée par plan.
+
+## ADR-212 — Correction des références de l'article 14 n) sans toucher à l'historique
+**Statut : Proposée (03/11/2026)** — complète ADR-007, ADR-210 et ADR-211.
+
+Contexte : 74 lignes 14 n) portent des codes qui ne forment pas la paire officielle. Le code hospitalier
+y désigne en général un autre acte (décalage systématique, pas une inversion des colonnes).
+
+Décision :
+- **Une intervention et un favori gardent le code copié à l'enregistrement.** Corriger la nomenclature ne
+  réécrit ni `Surgeries.code`, `name`, `speciality`, le lien, les dates, rôles et superviseurs, ni le favori.
+  Carnet, récapitulatif et statistiques lisent la copie de l'intervention ; la nomenclature n'y fournit que
+  le type, la région et les spécialités, qui ne changent pas.
+- `app:nomenclature:correct-references <plan>` (dry-run par défaut, `--apply` en une transaction,
+  idempotent, `--revert`, journal avant/après sur le canal `nomenclature`). Seules les colonnes
+  `code_hospitalisation` et `code_ambulant` changent. Tout le plan est refusé si une ligne n'est ni dans
+  l'état « avant » ni « après », si sa spécialité, sa valeur ou son libellé diffère, ou si un code se
+  retrouverait sur plusieurs lignes sans être listé dans `knownDuplicates`.
+- Plan `data/inami/plan-correction-references-14n-20261101.json`, produit par
+  `tools/inami/make_plan_correction.py` : acte officiel unique par libellé et valeur exacts, paire
+  réciproque, chaque code dans sa colonne. **72 lignes corrigées** : les 69 lignes décalées, 6872, 6968, et
+  6871 (dépendance : 6872 prend 224431, jusque-là en colonne hospitalisation de 6871).
+- **2 lignes inchangées et non partagées**, doublons d'un acte porté par une autre ligne : 6950 (même acte
+  que 6951) et 6957 (même acte que 6956). Conséquence documentée : 225632 et 226494 sont sur deux lignes
+  (`knownDuplicates`), en plus de 226542 (6957 et 6961) déjà présent.
+- Partage : `data/inami/plan-partage-rachis-14n-20261101-2-corriges.json` ajoute les 72 lignes corrigées
+  (128 lignes autorisées au total) ; le classement historique de la 3.7.0 n'est pas modifié.
+- Favoris : le code copié n'est ni affiché par la PWA ni utilisé pour une saisie (`surgeryId`) ; une saisie
+  depuis un favori prend donc le code corrigé. 84 favoris gardent un ancien code copié, renvoyé tel quel
+  par l'API ; aucune réécriture silencieuse.
+- `app:update-favorites` ne relie plus que les favoris sans nomenclature.
+
+Conséquences :
+- Le plan de partage de la 3.7.0 est refusé après correction (ses codes ne concordent plus). Retour arrière :
+  `--revert` du plan de partage 2, puis `--revert` du plan de correction.
+- Restent à traiter séparément (`docs/NOMENCLATURE-REFERENCES-14N.md`) : décision sur 6950 et 6957, doublon
+  226542, actes officiels sans ligne (225621/225610 et 225901/225890), affichage du code dans le récapitulatif.
