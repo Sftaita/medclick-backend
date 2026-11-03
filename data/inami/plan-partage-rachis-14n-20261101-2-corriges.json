@@ -1,0 +1,827 @@
+{
+ "source": {
+  "label": "Rachis, article 14 n) : lignes aux références corrigées, autorisées en neurochirurgie",
+  "url": "https://www.inami.fgov.be/SiteCollectionDocuments/TXT.zip",
+  "sha256": "e8c7c46c0525d3a34178015c78a78d2aaed3f054f461579d703f9ff91d5a7468",
+  "rule": "acte officiel unique par libellé et valeur exacts ; paire réciproque ; hospitalisé et ambulant dans leur colonne",
+  "generated": "2026-11-03T10:57:58+00:00"
+ },
+ "share": [
+  {
+   "id": 6840,
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "n": "K200",
+   "name": "(Micro)discectomie unilatérale lombaire ou décompression unilatérale (interlaminaire) en cas de sténose foraminale ou du récessus latéral ou de kyste sur 1 niveau",
+   "codeHospitalisation": "225083",
+   "codeAmbulant": "225072"
+  },
+  {
+   "id": 6841,
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "n": "K250",
+   "name": "(Micro)discectomie unilatérale lombaire ou décompression unilatérale (interlaminaire) en cas de sténose foraminale ou du récessus latéral ou de kyste sur 2 niveaux",
+   "codeHospitalisation": "225105",
+   "codeAmbulant": "225094"
+  },
+  {
+   "id": 6842,
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "n": "K300",
+   "name": "(Micro)discectomie unilatérale lombaire ou décompression unilatérale (interlaminaire) en cas de sténose foraminale ou du récessus latéral ou de kyste sur 3 niveaux ou plus",
+   "codeHospitalisation": "225120",
+   "codeAmbulant": "225116"
+  },
+  {
+   "id": 6846,
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "n": "K670",
+   "name": "Corporectomie thoraco-lombaire et reconstruction par abord postérieur sur 1 niveau",
+   "codeHospitalisation": "225761",
+   "codeAmbulant": "225750"
+  },
+  {
+   "id": 6847,
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "n": "K280",
+   "name": "Cure chirurgicale d'une spondylolyse lombaire",
+   "codeHospitalisation": "225606",
+   "codeAmbulant": "225595"
+  },
+  {
+   "id": 6848,
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "n": "K250",
+   "name": "Décompression lombaire (interlaminaire ou par laminectomie) bilatérale en cas de sténose centrale ou foraminale ou du récessus latéral ou de kyste, sur 1 niveau",
+   "codeHospitalisation": "225385",
+   "codeAmbulant": "225374"
+  },
+  {
+   "id": 6849,
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "n": "K325",
+   "name": "Décompression lombaire (interlaminaire ou par laminectomie) bilatérale en cas de sténose centrale ou foraminale ou du récessus latéral ou de kyste, sur 2 niveaux",
+   "codeHospitalisation": "225400",
+   "codeAmbulant": "225396"
+  },
+  {
+   "id": 6850,
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "n": "K400",
+   "name": "Décompression lombaire (interlaminaire ou par laminectomie) bilatérale en cas de sténose centrale ou foraminale ou du récessus latéral ou de kyste, sur 3 niveaux ou plus",
+   "codeHospitalisation": "225422",
+   "codeAmbulant": "225411"
+  },
+  {
+   "id": 6851,
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "n": "K335",
+   "name": "Décompression thoracique par voie costo-transversaire",
+   "codeHospitalisation": "224921",
+   "codeAmbulant": "224910"
+  },
+  {
+   "id": 6852,
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "n": "K390",
+   "name": "Décompression thoracique par voie costo-transversaire, y compris la reconstruction",
+   "codeHospitalisation": "224943",
+   "codeAmbulant": "224932"
+  },
+  {
+   "id": 6856,
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "n": "K225",
+   "name": "Fixation cervicale ou cervico-thoracique postérieure, y compris l'éventuelle décompression, sur 1 niveau",
+   "codeHospitalisation": "224464",
+   "codeAmbulant": "224453"
+  },
+  {
+   "id": 6857,
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "n": "K280",
+   "name": "Fixation cervicale ou cervico-thoracique postérieure, y compris l'éventuelle décompression, sur 2 niveaux",
+   "codeHospitalisation": "224486",
+   "codeAmbulant": "224475"
+  },
+  {
+   "id": 6858,
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "n": "K335",
+   "name": "Fixation cervicale ou cervico-thoracique postérieure, y compris l'éventuelle décompression, sur 3 niveaux ou plus",
+   "codeHospitalisation": "224501",
+   "codeAmbulant": "224490"
+  },
+  {
+   "id": 6861,
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "n": "K250",
+   "name": "Fixation de vertèbre(s) thoracique(s) par abord postérieur, quel que soit le nombre de niveaux",
+   "codeHospitalisation": "224884",
+   "codeAmbulant": "224873"
+  },
+  {
+   "id": 6862,
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "n": "K305",
+   "name": "Fixation du rachis thoracique par abord postérieur, y compris une laminectomie, quel que soit le nombre de niveaux",
+   "codeHospitalisation": "224906",
+   "codeAmbulant": "224895"
+  },
+  {
+   "id": 6863,
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "n": "K300",
+   "name": "Fixation lombaire au moyen de vis pédiculaires par abord postérieur et décompression, y compris une éventuelle fusion postérolatérale sur 1 niveau",
+   "codeHospitalisation": "225481",
+   "codeAmbulant": "225470"
+  },
+  {
+   "id": 6864,
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "n": "K380",
+   "name": "Fixation lombaire au moyen de vis pédiculaires par abord postérieur et décompression, y compris une éventuelle fusion postérolatérale sur 2 niveaux",
+   "codeHospitalisation": "225503",
+   "codeAmbulant": "225492"
+  },
+  {
+   "id": 6865,
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "n": "K460",
+   "name": "Fixation lombaire au moyen de vis pédiculaires par abord postérieur et décompression, y compris une éventuelle fusion postérolatérale sur 3 niveaux ou plus",
+   "codeHospitalisation": "225525",
+   "codeAmbulant": "225514"
+  },
+  {
+   "id": 6866,
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "n": "K280",
+   "name": "Fixation lombaire au moyen de vis pédiculaires par abord postérieur, sur 1 ou plusieurs niveaux",
+   "codeHospitalisation": "225466",
+   "codeAmbulant": "225455"
+  },
+  {
+   "id": 6871,
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "n": "K435",
+   "name": "Foraminotomie cervicale postérieure sur 2 niveaux",
+   "codeHospitalisation": "224420",
+   "codeAmbulant": "224416"
+  },
+  {
+   "id": 6872,
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "n": "K520",
+   "name": "Foraminotomie cervicale postérieure sur 3 niveaux ou plus",
+   "codeHospitalisation": "224442",
+   "codeAmbulant": "224431"
+  },
+  {
+   "id": 6877,
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "n": "K170",
+   "name": "Laminectomie thoracique quel que soit le nombre de niveaux",
+   "codeHospitalisation": "224862",
+   "codeAmbulant": "224851"
+  },
+  {
+   "id": 6881,
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "n": "K300",
+   "name": "Résection / debulking d'une masse thoracique rachidienne néoplasique ou inflammatoire",
+   "codeHospitalisation": "224980",
+   "codeAmbulant": "224976"
+  },
+  {
+   "id": 6883,
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "n": "K300",
+   "name": "Résection ou debulking d'une masse cervicale rachidienne néoplasique ou inflammatoire",
+   "codeHospitalisation": "224560",
+   "codeAmbulant": "224556"
+  },
+  {
+   "id": 6884,
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "n": "K300",
+   "name": "Résection ou debulking d'une masse lombaire rachidienne néoplasique ou inflammatoire",
+   "codeHospitalisation": "225665",
+   "codeAmbulant": "225654"
+  },
+  {
+   "id": 6887,
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "n": "K360",
+   "name": "Arthrodèse lombaire par abord postérieur ou transforaminal au moyen de vis pédiculaires (PLIF, TLIF), sur 1 niveau",
+   "codeHospitalisation": "225540",
+   "codeAmbulant": "225536"
+  },
+  {
+   "id": 6888,
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "n": "K450",
+   "name": "Arthrodèse lombaire par abord postérieur ou transforaminal au moyen de vis pédiculaires (PLIF, TLIF), sur 2 niveaux",
+   "codeHospitalisation": "225562",
+   "codeAmbulant": "225551"
+  },
+  {
+   "id": 6889,
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "n": "K540",
+   "name": "Arthrodèse lombaire par abord postérieur ou transforaminal au moyen de vis pédiculaires (PLIF, TLIF), sur 3 niveaux ou plus",
+   "codeHospitalisation": "225584",
+   "codeAmbulant": "225573"
+  },
+  {
+   "id": 6891,
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "n": "K560",
+   "name": "Corporectomie d'une vertèbre lombaire par abord antérieur ou latéral, y compris la reconstruction et la fixation postérieure à l'aide de vis pédiculaires sur 1 niveau",
+   "codeHospitalisation": "225326",
+   "codeAmbulant": "225315"
+  },
+  {
+   "id": 6892,
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "n": "K430",
+   "name": "Corporectomie d'une vertèbre thoracique avec reconstruction, par abord antérieur, par voie chirurgicale ouverte ou endoscopique, sur 1 niveau",
+   "codeHospitalisation": "224803",
+   "codeAmbulant": "224792"
+  },
+  {
+   "id": 6893,
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "n": "K540",
+   "name": "Corporectomie d'une vertèbre thoracique avec reconstruction, par abord antérieur, par voie chirurgicale ouverte ou endoscopique, sur 2 niveaux",
+   "codeHospitalisation": "224825",
+   "codeAmbulant": "224814"
+  },
+  {
+   "id": 6894,
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "n": "K650",
+   "name": "Corporectomie d'une vertèbre thoracique avec reconstruction, par abord antérieur, par voie chirurgicale ouverte ou endoscopique, sur 3 niveaux ou plus",
+   "codeHospitalisation": "224840",
+   "codeAmbulant": "224836"
+  },
+  {
+   "id": 6895,
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "n": "K700",
+   "name": "Corporectomie de vertèbres lombaires par abord antérieur ou latéral, y compris la reconstruction et la fixation postérieure à l'aide de vis pédiculaires sur 2 niveaux",
+   "codeHospitalisation": "225341",
+   "codeAmbulant": "225330"
+  },
+  {
+   "id": 6896,
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "n": "K840",
+   "name": "Corporectomie de vertèbres lombaires par abord antérieur ou latéral, y compris la reconstruction et la fixation postérieure à l'aide de vis pédiculaires sur 3 niveaux ou plus",
+   "codeHospitalisation": "225363",
+   "codeAmbulant": "225352"
+  },
+  {
+   "id": 6897,
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "n": "K835",
+   "name": "Corporectomie thoraco-lombaire et reconstruction par abord postérieur sur 2 niveaux",
+   "codeHospitalisation": "225783",
+   "codeAmbulant": "225772"
+  },
+  {
+   "id": 6898,
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "n": "K1000",
+   "name": "Corporectomie thoraco-lombaire et reconstruction par abord postérieur sur 3 niveaux",
+   "codeHospitalisation": "225805",
+   "codeAmbulant": "225794"
+  },
+  {
+   "id": 6899,
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "n": "K450",
+   "name": "Corporectomie y compris la reconstruction d'une vertèbre lombaire par abord antérieur ou latéral, sur 1 niveau",
+   "codeHospitalisation": "225260",
+   "codeAmbulant": "225256"
+  },
+  {
+   "id": 6900,
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "n": "K560",
+   "name": "Corporectomie y compris la reconstruction de vertèbres lombaires par abord antérieur ou latéral, sur 2 niveaux",
+   "codeHospitalisation": "225282",
+   "codeAmbulant": "225271"
+  },
+  {
+   "id": 6901,
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "n": "K670",
+   "name": "Corporectomie y compris la reconstruction de vertèbres lombaires par abord antérieur ou latéral, sur 3 niveaux ou plus",
+   "codeHospitalisation": "225304",
+   "codeAmbulant": "225293"
+  },
+  {
+   "id": 6908,
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "n": "K460",
+   "name": "Discectomie lombaire par abord antérieur ou latéral, y compris la reconstruction antérieure ou latérale et la fixation postérieure complémentaire à l'aide de vis pédiculaires sur 1 niveau",
+   "codeHospitalisation": "225201",
+   "codeAmbulant": "225190"
+  },
+  {
+   "id": 6909,
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "n": "K575",
+   "name": "Discectomie lombaire par abord antérieur ou latéral, y compris la reconstruction antérieure ou latérale et la fixation postérieure complémentaire à l'aide de vis pédiculaires sur 2 niveaux",
+   "codeHospitalisation": "225223",
+   "codeAmbulant": "225212"
+  },
+  {
+   "id": 6910,
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "n": "K690",
+   "name": "Discectomie lombaire par abord antérieur ou latéral, y compris la reconstruction antérieure ou latérale et la fixation postérieure complémentaire à l'aide de vis pédiculaires sur 3 niveaux ou plus",
+   "codeHospitalisation": "225245",
+   "codeAmbulant": "225234"
+  },
+  {
+   "id": 6911,
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "n": "K350",
+   "name": "Discectomie lombaire y compris la reconstruction, par abord antérieur ou latéral, sur 1 niveau",
+   "codeHospitalisation": "225142",
+   "codeAmbulant": "225131"
+  },
+  {
+   "id": 6912,
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "n": "K435",
+   "name": "Discectomie lombaire y compris la reconstruction, par abord antérieur ou latéral, sur 2 niveaux",
+   "codeHospitalisation": "225164",
+   "codeAmbulant": "225153"
+  },
+  {
+   "id": 6913,
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "n": "K520",
+   "name": "Discectomie lombaire y compris la reconstruction, par abord antérieur ou latéral, sur 3 niveaux ou plus",
+   "codeHospitalisation": "225186",
+   "codeAmbulant": "225175"
+  },
+  {
+   "id": 6916,
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "n": "K560",
+   "name": "Reconstruction cervicale avec une fixation tant antérieure que postérieure ou une fixation antérieure et une décompression postérieure ou une laminoplastie au cours d'une seule intervention chirurgicale",
+   "codeHospitalisation": "224523",
+   "codeAmbulant": "224512"
+  },
+  {
+   "id": 6917,
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "n": "K500",
+   "name": "Résection / debulking d'une masse thoracique rachidienne néoplasique ou inflammatoire, y compris la reconstruction",
+   "codeHospitalisation": "225002",
+   "codeAmbulant": "224991"
+  },
+  {
+   "id": 6918,
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "n": "K400",
+   "name": "Résection d'une hernie discale thoracique par abord antérieur, par voie chirurgicale ouverte ou endoscopique sur 1 niveau",
+   "codeHospitalisation": "224744",
+   "codeAmbulant": "224733"
+  },
+  {
+   "id": 6919,
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "n": "K490",
+   "name": "Résection d'une hernie discale thoracique par abord antérieur, par voie chirurgicale ouverte ou endoscopique sur 2 niveaux",
+   "codeHospitalisation": "224766",
+   "codeAmbulant": "224755"
+  },
+  {
+   "id": 6920,
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "n": "K580",
+   "name": "Résection d'une hernie discale thoracique par abord antérieur, par voie chirurgicale ouverte ou endoscopique sur 3 niveaux ou plus",
+   "codeHospitalisation": "224781",
+   "codeAmbulant": "224770"
+  },
+  {
+   "id": 6925,
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "n": "K500",
+   "name": "Résection ou debulking d'une masse cervicale rachidienne néoplasique ou inflammatoire avec reconstruction",
+   "codeHospitalisation": "224582",
+   "codeAmbulant": "224571"
+  },
+  {
+   "id": 6926,
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "n": "K500",
+   "name": "Résection ou debulking d'une masse lombaire néoplasique ou inflammatoire, y compris la reconstruction",
+   "codeHospitalisation": "225680",
+   "codeAmbulant": "225676"
+  },
+  {
+   "id": 6931,
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "n": "K670",
+   "name": "Spondylectomie cervicale totale en bloc pour une tumeur et reconstruction sur 1 niveau",
+   "codeHospitalisation": "224604",
+   "codeAmbulant": "224593"
+  },
+  {
+   "id": 6932,
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "n": "K835",
+   "name": "Spondylectomie cervicale totale en bloc pour une tumeur et reconstruction sur 2 niveaux",
+   "codeHospitalisation": "224626",
+   "codeAmbulant": "224615"
+  },
+  {
+   "id": 6933,
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "n": "K1000",
+   "name": "Spondylectomie cervicale totale en bloc pour une tumeur et reconstruction sur 3 niveaux ou plus",
+   "codeHospitalisation": "224641",
+   "codeAmbulant": "224630"
+  },
+  {
+   "id": 6934,
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "n": "K670",
+   "name": "Spondylectomie lombaire totale en bloc pour une tumeur et reconstruction sur 1 niveau",
+   "codeHospitalisation": "225702",
+   "codeAmbulant": "225691"
+  },
+  {
+   "id": 6935,
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "n": "K835",
+   "name": "Spondylectomie lombaire totale en bloc pour une tumeur et reconstruction sur 2 niveaux",
+   "codeHospitalisation": "225724",
+   "codeAmbulant": "225713"
+  },
+  {
+   "id": 6936,
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "n": "K1000",
+   "name": "Spondylectomie lombaire totale en bloc pour une tumeur et reconstruction sur 3 niveaux ou plus",
+   "codeHospitalisation": "225746",
+   "codeAmbulant": "225735"
+  },
+  {
+   "id": 6937,
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "n": "K670",
+   "name": "Spondylectomie thoracique totale en bloc pour une tumeur et reconstruction sur 1 niveau",
+   "codeHospitalisation": "225024",
+   "codeAmbulant": "225013"
+  },
+  {
+   "id": 6938,
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "n": "K835",
+   "name": "Spondylectomie thoracique totale en bloc pour une tumeur et reconstruction sur 2 niveaux",
+   "codeHospitalisation": "225046",
+   "codeAmbulant": "225035"
+  },
+  {
+   "id": 6939,
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "n": "K1000",
+   "name": "Spondylectomie thoracique totale en bloc pour une tumeur et reconstruction sur 3 niveaux ou plus",
+   "codeHospitalisation": "225061",
+   "codeAmbulant": "225050"
+  },
+  {
+   "id": 6945,
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "n": "K140",
+   "name": "Ablation chirurgicale de matériel d'ostéosynthèse au niveau de la colonne thoraco-lombaire, sur 5 niveaux maximum",
+   "codeHospitalisation": "225820",
+   "codeAmbulant": "225816"
+  },
+  {
+   "id": 6946,
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "n": "K195",
+   "name": "Ablation chirurgicale de matériel d'ostéosynthèse au niveau de la colonne thoraco-lombaire, sur 6 niveaux ou plus",
+   "codeHospitalisation": "225842",
+   "codeAmbulant": "225831"
+  },
+  {
+   "id": 6947,
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "n": "K155",
+   "name": "Ablation chirurgicale de matériel d'ostéosynthèse, au niveau de la colonne cervicale",
+   "codeHospitalisation": "224663",
+   "codeAmbulant": "224652"
+  },
+  {
+   "id": 6949,
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "n": "K95",
+   "name": "Biopsie par voie chirurgicale d'une masse cervicale extra-durale néoplasique ou inflammatoire",
+   "codeHospitalisation": "224545",
+   "codeAmbulant": "224534"
+  },
+  {
+   "id": 6951,
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "n": "K95",
+   "name": "Biopsie par voie chirurgicale d'une masse extra-durale lombaire néoplasique ou inflammatoire",
+   "codeHospitalisation": "225643",
+   "codeAmbulant": "225632"
+  },
+  {
+   "id": 6953,
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "n": "K95",
+   "name": "Biopsie par voie chirurgicale d'une masse extra-durale thoracique néoplasique ou inflammatoire",
+   "codeHospitalisation": "224965",
+   "codeAmbulant": "224954"
+  },
+  {
+   "id": 6956,
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "n": "K200",
+   "name": "Fermeture d'une brèche de la dure mère",
+   "codeHospitalisation": "226505",
+   "codeAmbulant": "226494"
+  },
+  {
+   "id": 6958,
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "n": "K80",
+   "name": "Placement chirurgical d'un fixateur ou d'une traction externe pour l'immobilisation de fractures, de luxations ou de fractures-luxations de la colonne cervicale et/ou thoracique haute",
+   "codeHospitalisation": "224700",
+   "codeAmbulant": "224696"
+  },
+  {
+   "id": 6960,
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "n": "K120",
+   "name": "Réduction fermée de fractures, luxations ou fractures-luxations, y compris, le cas échéant, le fixateur ou la traction externe pour l'immobilisation de la colonne cervicale et/ou thoracique haute",
+   "codeHospitalisation": "224722",
+   "codeAmbulant": "224711"
+  },
+  {
+   "id": 6968,
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "n": "K120",
+   "name": "Traitement non-chirurgical de fractures, luxations ou fractures-luxations de la colonne thoraco-lombaire avec réduction",
+   "codeHospitalisation": "225886",
+   "codeAmbulant": "225875"
+  },
+  {
+   "id": 6969,
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "n": "K50",
+   "name": "Traitement non-chirurgical de fractures, luxations ou fractures-luxations de la colonne thoraco-lombaire sans réduction",
+   "codeHospitalisation": "225864",
+   "codeAmbulant": "225853"
+  }
+ ],
+ "withdraw": [
+  {
+   "id": 6950,
+   "codeHospitalisation": "225890",
+   "codeAmbulant": "225632",
+   "n": "K95",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "reason": "même acte officiel (225643/225632) que la ligne 6951 : décision à prendre, ligne inchangée et non partagée"
+  },
+  {
+   "id": 6957,
+   "codeHospitalisation": "226542",
+   "codeAmbulant": "226494",
+   "n": "K200",
+   "speciality": "ortho",
+   "specialities": [
+    "neuro"
+   ],
+   "reason": "même acte officiel (226505/226494) que la ligne 6956 : décision à prendre, ligne inchangée et non partagée"
+  }
+ ]
+}

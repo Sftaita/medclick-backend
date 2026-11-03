@@ -52,6 +52,12 @@ class UpdateFavoritesCommand extends Command
 
         // Boucle sur chaque chirurgie
         foreach ($favorites as $favorite) {
+            // ADR-212 : un favori déjà lié n'est jamais relié à nouveau (un libellé en double ou un code
+            // corrigé le ferait changer d'acte en silence).
+            if ($favorite->getSurgery() !== null) {
+                continue;
+            }
+
             // Tentative de trouver une nomenclature qui correspond au nom de la chirurgie
             $nomenclature = $nomenclatureRepository->findOneBy(['name' => $favorite->getSurgeryName()]);
 

@@ -41,6 +41,8 @@ class NomenclatureController extends AbstractController{
             // dates de l'administration).
             'inamiRepealedAt' => $nomenclature->getInamiRepealedAt()?->format('Y-m-d'),
             'deactivatedAt' => $nomenclature->getDeactivatedAt()?->format('Y-m-d H:i:s'),
+            // Justification d'une désactivation administrative (ADR-212), distincte d'une abrogation.
+            'deactivationReason' => $nomenclature->getDeactivationReason(),
             // Vérification de la date officielle (source citée, date de vérification) : seule une
             // date vérifiée autorise la saisie tardive d'un acte réalisé avant l'abrogation.
             'inamiRepealSource' => $nomenclature->getInamiRepealSource(),

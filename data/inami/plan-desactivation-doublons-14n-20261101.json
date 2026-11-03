@@ -1,0 +1,37 @@
+{
+ "source": {
+  "label": "Lignes 14 n) en doublon : désactivation administrative, sans abrogation officielle",
+  "correctionPlan": "e8c7c46c0525d3a34178015c78a78d2aaed3f054f461579d703f9ff91d5a7468",
+  "generated": "2026-11-03T12:18:48+00:00"
+ },
+ "deactivate": [
+  {
+   "id": 6950,
+   "codeHospitalisation": "225890",
+   "codeAmbulant": "225632",
+   "n": "K95",
+   "speciality": "ortho",
+   "name": "Biopsie par voie chirurgicale d'une masse extra-durale lombaire néoplasique ou inflammatoire",
+   "sameActAs": 6951,
+   "sameActCodes": {
+    "codeHospitalisation": "225643",
+    "codeAmbulant": "225632"
+   },
+   "reason": "Désactivation administrative (non abrogée INAMI) : doublon de la ligne 6951 (225643/225632)"
+  },
+  {
+   "id": 6957,
+   "codeHospitalisation": "226542",
+   "codeAmbulant": "226494",
+   "n": "K200",
+   "speciality": "ortho",
+   "name": "Fermeture d'une brèche de la dure mère",
+   "sameActAs": 6956,
+   "sameActCodes": {
+    "codeHospitalisation": "226505",
+    "codeAmbulant": "226494"
+   },
+   "reason": "Désactivation administrative (non abrogée INAMI) : doublon de la ligne 6956 (226505/226494)"
+  }
+ ]
+}
