@@ -15,6 +15,12 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class NomenclatureRepository extends ServiceEntityRepository
 {
+    /**
+     * Listes de sélection d'une spécialité (`:val`) : ses propres codes et les codes partagés avec
+     * elle (ADR-211, ex. article 14 n) proposé aussi en neurochirurgie). Une seule ligne par code.
+     */
+    private const OFFERED_TO_SPECIALITY = 'u.speciality = :val OR EXISTS (SELECT s.id FROM App\Entity\NomenclatureSharedSpeciality s WHERE s.nomenclature = u AND s.speciality = :val)';
+
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Nomenclature::class);
@@ -33,7 +39,7 @@ class NomenclatureRepository extends ServiceEntityRepository
     public function fetchBySpeciality($speciality, ?\DateTimeInterface $today = null)
     {
         return $this->createQueryBuilder('u')
-            ->andWhere('u.speciality = :val')
+            ->andWhere(self::OFFERED_TO_SPECIALITY)
             ->andWhere('u.active = :active')
             ->andWhere('u.inamiRepealVerifiedAt IS NULL OR u.inamiRepealedAt > :today')
             ->setParameter('val', $speciality)
@@ -57,7 +63,7 @@ class NomenclatureRepository extends ServiceEntityRepository
     public function fetchUsableBySpecialityOn(string $speciality, \DateTimeInterface $date): array
     {
         $rows = $this->createQueryBuilder('u')
-            ->andWhere('u.speciality = :val')
+            ->andWhere(self::OFFERED_TO_SPECIALITY)
             ->andWhere('(u.inamiRepealVerifiedAt IS NOT NULL AND u.inamiRepealedAt > :date) OR (u.inamiRepealVerifiedAt IS NULL AND u.active = true)')
             ->setParameter('val', $speciality)
             ->setParameter('date', self::day($date), Types::DATE_IMMUTABLE)

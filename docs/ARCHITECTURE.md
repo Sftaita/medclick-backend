@@ -75,13 +75,15 @@ Points notables :
   maître de stage « structuré » est le `Surgeons` avec `boss = true`.
 - `Surgeries` : `position` (1 = 1re main, 2 = 2e main, 3 = 1re main aidée), `firstHand` /
   `secondHand` = id de user (résident) **ou** id de `Surgeons`, stockés en string ;
-  `code` = `Nomenclature.codeHospitalisation . Nomenclature.n` ; `name` et `speciality`
-  sont copiés depuis la nomenclature (dénormalisation).
+  `code` = `Nomenclature.codeHospitalisation . Nomenclature.n` ; `name` est copié depuis la
+  nomenclature (dénormalisation) ; `speciality` est la spécialité choisie, principale ou partagée
+  (ADR-211), vérifiée par le serveur.
 - `Favorites` copie aussi nom/code/spécialité de la nomenclature.
 - `Nomenclature` : `speciality`, `codeAmbulant`, `codeHospitalisation`, `n`, `name`,
   `type`, `subType`, `active` (code proposé aux nouvelles saisies), `inamiRepealedAt` (date
   officielle d'abrogation), `deactivatedAt` (date technique de désactivation). Un code obsolète est
-  désactivé, jamais supprimé (ADR-210).
+  désactivé, jamais supprimé (ADR-210). `NomenclatureSharedSpeciality` : spécialités
+  supplémentaires d'un code (ex. article 14 n) en neurochirurgie), une seule ligne par code (ADR-211).
 
 ## 4. Authentification et autorisation
 

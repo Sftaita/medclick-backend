@@ -8,6 +8,8 @@ use App\Repository\FavoritesRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use App\Repository\NomenclatureRepository;
 use App\Service\InactiveNomenclatureException;
+use App\Service\SpecialityNotAllowedException;
+use App\Service\SurgeryNomenclatureSelection;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Routing\Attribute\Route;
@@ -119,6 +121,13 @@ class FavoritesController extends AbstractController
             ], 400);
         }
 
+        // ADR-211 : spécialité choisie (acte partagé, ex. rachis en neurochirurgie), vérifiée pour ce code.
+        try {
+            $speciality = SurgeryNomenclatureSelection::specialityFor($surgery, $data['speciality'] ?? null);
+        } catch (SpecialityNotAllowedException $e) {
+            return new JsonResponse(['error' => $e->getMessage(), 'reason' => SpecialityNotAllowedException::REASON], 400);
+        }
+
         $favorite = new Favorites;
 
         
@@ -126,7 +135,7 @@ class FavoritesController extends AbstractController
                 ->setShortcut($data['shortcut'])
                 ->setSurgeryName($surgery->getName())
                 ->setCodeHospitalisation($surgery->getCodeHospitalisation()."".$surgery->getN())
-                ->setSpeciality($surgery->getSpeciality())
+                ->setSpeciality($speciality)
                 ->setSurgery($surgery);
 
         $entityManager = $this->doctrine->getManager();   
@@ -192,16 +201,30 @@ class FavoritesController extends AbstractController
                 ], 400);
             }
 
+            try {
+                $speciality = SurgeryNomenclatureSelection::specialityFor($surgery, $data['speciality'] ?? null);
+            } catch (SpecialityNotAllowedException $e) {
+                return new JsonResponse(['error' => $e->getMessage(), 'reason' => SpecialityNotAllowedException::REASON], 400);
+            }
+
             // Update favorite with new surgery information
             $favorite->setShortcut($data['shortcut'])
                 ->setSurgeryName($surgery->getName())
                 ->setCodeHospitalisation($surgery->getCodeHospitalisation() . "" . $surgery->getN())
-                ->setSpeciality($surgery->getSpeciality())
+                ->setSpeciality($speciality)
                 ->setSurgery($surgery);
         } else {
             // Update only the shortcut if surgery hasn't changed (même si son code est devenu inactif :
             // le favori reste enregistré, seul son nom est modifié)
             $favorite->setShortcut($data['shortcut']);
+            // ADR-211 : même acte choisi depuis une autre spécialité autorisée (ex. rachis repris
+            // depuis la neurochirurgie) : seule la spécialité du favori change. Une valeur non
+            // autorisée (ancienne donnée renvoyée telle quelle) est ignorée : rien d'autre ne change.
+            $requested = $data['speciality'] ?? null;
+            $linked = $favorite->getSurgery();
+            if ($linked && is_string($requested) && $requested !== $favorite->getSpeciality() && $linked->allowsSpeciality($requested)) {
+                $favorite->setSpeciality($requested);
+            }
         }
 
        // Save the updated favorite

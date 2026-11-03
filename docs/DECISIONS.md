@@ -270,3 +270,42 @@ Décision :
 
 Conséquences : aucune désactivation réelle avant validation de la liste officielle ; questions
 fonctionnelles restantes dans `docs/RECETTE-NOMENCLATURE-ETAPE4.md`.
+
+## ADR-211 — Actes partagés entre spécialités (rachis : orthopédie et neurochirurgie)
+**Statut : Proposée (03/11/2026)** — complète ADR-007 et ADR-210.
+
+Contexte : l'article 14 n) de la nomenclature INAMI (« prestations relevant de la spécialité de
+chirurgie orthopédique (DP) et neurochirurgie (DA) », 130 prestations, 260 codes) est classé en
+`ortho` dans MedClick : un assistant en neurochirurgie ne les trouve pas.
+
+Décision :
+- **Un code INAMI = une seule ligne de nomenclature.** Les spécialités SUPPLÉMENTAIRES autorisées
+  pour un code sont dans la table `nomenclature_shared_speciality` (une ligne par code et par
+  spécialité, contrainte unique ; migration additive `Version20261105090000`). La spécialité
+  principale (`nomenclature.speciality`), le type et la région ne changent pas.
+- Alimentation par plan vérifié uniquement : `app:nomenclature:share-speciality <plan>` (dry-run par
+  défaut, `--apply` en une transaction, idempotent, `--revert` ; canal Monolog `nomenclature`).
+  Plan `data/inami/plan-partage-rachis-14n-20261101.json` produit par
+  `tools/inami/make_plan_shared.py` : codes hospitalier ET ambulant du sous-article NomenSoft `14n`
+  (version en vigueur au 01/11/2026), jamais par recherche dans les libellés.
+- Listes de choix `GET /api/nomenclature/{speciality}` (avec ou sans `?date=`) : codes de la
+  spécialité et codes partagés avec elle, chacun une fois ; règles de validité ADR-210 inchangées.
+- Spécialité de l'intervention : celle **choisie** (`speciality` envoyé avec l'acte), vérifiée par
+  le serveur (`SurgeryNomenclatureSelection::specialityFor()`) ; absente, vide ou « favorites »
+  (anciens fronts) : spécialité principale, comme avant. Spécialité non autorisée pour ce code :
+  400 `reason: speciality_not_allowed` (contrôleurs custom) ou 422 sur `speciality` (API Platform).
+  Le code, la nomenclature liée et l'intitulé restent ceux de l'unique ligne.
+  Routes : `/api/surgeries/addNewSurgery`, `/api/surgeries/add`, `POST /api/surgeries`, changement
+  d'acte (`PUT`/`PATCH /api/surgeries/{id}`, `PUT /api/surgeries/update/{id}`), favoris
+  (`/api/favorites/addNew`, `/api/favorites/updateNew`).
+- **Historique** : acte inchangé ⇒ spécialité enregistrée conservée, même si une autre spécialité est
+  envoyée ; aucune intervention existante n'est modifiée. Favori renommé avec le même acte : la
+  spécialité ne change que vers une spécialité autorisée explicitement envoyée (valeur non autorisée
+  ignorée).
+- Statistiques, listes et export Excel utilisent la spécialité **enregistrée** dans chaque
+  intervention. Export : un acte partagé enregistré sous une spécialité supplémentaire est listé avec
+  les interventions de cette spécialité (la région anatomique, propre à l'orthopédie, n'est pas
+  appliquée) ; les interventions orthopédiques restent dans leur région.
+
+Conséquences : le retrait d'un partage (`--revert`) ne modifie aucune intervention déjà enregistrée
+en neurochirurgie. Hors périmètre : doublon 226542, inversions orthopédiques, anciens libellés.

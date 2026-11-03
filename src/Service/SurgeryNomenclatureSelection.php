@@ -110,12 +110,35 @@ final class SurgeryNomenclatureSelection
         );
     }
 
-    /** Recopie ensemble la relation, le code, l'intitulé et la spécialité de l'acte choisi. */
-    public static function applyAct(Surgeries $surgery, Nomenclature $reference): void
+    /**
+     * Spécialité sous laquelle enregistrer l'acte choisi (ADR-211), vérifiée par le serveur :
+     * - aucune spécialité envoyée (anciens fronts), chaîne vide ou « favorites » (ancienne valeur
+     *   du sélecteur) : spécialité principale du code, comme avant ;
+     * - sinon : la spécialité demandée, si le code l'autorise (principale ou partagée) ; refus sinon.
+     *
+     * @throws SpecialityNotAllowedException
+     */
+    public static function specialityFor(Nomenclature $reference, mixed $requested): string
+    {
+        if ($requested === null || $requested === '' || $requested === 'favorites') {
+            return (string) $reference->getSpeciality();
+        }
+        if (!is_string($requested) || !$reference->allowsSpeciality($requested)) {
+            throw new SpecialityNotAllowedException($reference, is_scalar($requested) ? (string) $requested : '?');
+        }
+
+        return $requested;
+    }
+
+    /**
+     * Recopie ensemble la relation, le code, l'intitulé et la spécialité de l'acte choisi. La
+     * spécialité est celle résolue par specialityFor() (par défaut, la spécialité principale).
+     */
+    public static function applyAct(Surgeries $surgery, Nomenclature $reference, ?string $speciality = null): void
     {
         $surgery->setNomenclature($reference)
             ->setCode($reference->getCodeHospitalisation() . '' . $reference->getN())
             ->setName($reference->getName())
-            ->setSpeciality($reference->getSpeciality());
+            ->setSpeciality($speciality ?? $reference->getSpeciality());
     }
 }
