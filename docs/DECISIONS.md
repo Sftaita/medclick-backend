@@ -356,9 +356,16 @@ Décision :
   `tools/inami/make_plan_correction.py` : acte officiel unique par libellé et valeur exacts, paire
   réciproque, chaque code dans sa colonne. **72 lignes corrigées** : les 69 lignes décalées, 6872, 6968, et
   6871 (dépendance : 6872 prend 224431, jusque-là en colonne hospitalisation de 6871).
-- **2 lignes inchangées et non partagées**, doublons d'un acte porté par une autre ligne : 6950 (même acte
-  que 6951) et 6957 (même acte que 6956). Conséquence documentée : 225632 et 226494 sont sur deux lignes
-  (`knownDuplicates`), en plus de 226542 (6957 et 6961) déjà présent.
+- **2 lignes désactivées administrativement** (décision du 03/11/2026), doublons d'un acte porté par une autre
+  ligne : 6950 (même acte que 6951) et 6957 (même acte que 6956). Ce ne sont **pas des abrogations officielles** :
+  `active` passe à false, les champs `inami_repeal*` restent vides, la justification est dans
+  `deactivation_reason` (migration additive `Version20261107090000`), effacée à la réactivation.
+  `app:nomenclature:deactivate-duplicates <plan>` : dry-run par défaut, idempotent, `--revert` exact, refus si la
+  ligne porte des données d'abrogation, si elle est partagée, ou si la ligne conservée n'a pas le même acte actif
+  et ses codes corrigés. Aucune suppression, fusion ni recodage. Sans abrogation vérifiée, ces lignes ne sont
+  proposées à aucune date ; leurs interventions restent consultables, modifiables sans recodage et exportées.
+  Leurs codes restent en base : 225632 et 226494 sont sur deux lignes (`knownDuplicates`), en plus de 226542
+  (6957 et 6961), mais une seule ligne active porte chacun d'eux.
 - Partage : `data/inami/plan-partage-rachis-14n-20261101-2-corriges.json` ajoute les 72 lignes corrigées
   (128 lignes autorisées au total) ; le classement historique de la 3.7.0 n'est pas modifié.
 - Favoris : le code copié n'est ni affiché par la PWA ni utilisé pour une saisie (`surgeryId`) ; une saisie
@@ -367,7 +374,9 @@ Décision :
 - `app:update-favorites` ne relie plus que les favoris sans nomenclature.
 
 Conséquences :
-- Le plan de partage de la 3.7.0 est refusé après correction (ses codes ne concordent plus). Retour arrière :
-  `--revert` du plan de partage 2, puis `--revert` du plan de correction.
-- Restent à traiter séparément (`docs/NOMENCLATURE-REFERENCES-14N.md`) : décision sur 6950 et 6957, doublon
-  226542, actes officiels sans ligne (225621/225610 et 225901/225890), affichage du code dans le récapitulatif.
+- Comptages attendus : 1 797 codes, 1 347 actifs, 450 inactifs (448 abrogations officielles et 2 désactivations
+  administratives).
+- Le plan de partage de la 3.7.0 est refusé après correction (ses codes ne concordent plus). Retour arrière, dans
+  cet ordre : `--revert` du plan de désactivation, du plan de partage 2, puis du plan de correction.
+- Restent à traiter séparément (`docs/NOMENCLATURE-REFERENCES-14N.md`) : actes officiels sans ligne
+  (225621/225610 et 225901/225890), affichage du code dans le récapitulatif.

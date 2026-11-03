@@ -56,6 +56,13 @@ class Nomenclature
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
     private ?\DateTimeImmutable $deactivatedAt = null;
 
+    /**
+     * Justification d'une désactivation ADMINISTRATIVE (ex. doublon d'une autre ligne), distincte d'une
+     * abrogation officielle INAMI (ADR-212). Effacée à la réactivation.
+     */
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private ?string $deactivationReason = null;
+
     /** Référence de la publication officielle de l'abrogation (ex. « Moniteur belge du … »). */
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private ?string $inamiRepealSource = null;
@@ -302,8 +309,23 @@ class Nomenclature
     {
         $this->active = true;
         $this->deactivatedAt = null;
+        $this->deactivationReason = null;
 
         return $this;
+    }
+
+    /** Désactivation administrative justifiée : aucune donnée d'abrogation officielle n'est écrite (ADR-212). */
+    public function deactivateAdministratively(\DateTimeImmutable $at, string $reason): self
+    {
+        $this->deactivate($at);
+        $this->deactivationReason = $reason;
+
+        return $this;
+    }
+
+    public function getDeactivationReason(): ?string
+    {
+        return $this->deactivationReason;
     }
 
     public function getInamiRepealedAt(): ?\DateTimeImmutable

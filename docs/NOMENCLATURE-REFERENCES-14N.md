@@ -8,7 +8,7 @@ Source : NomenSoft, tableaux applicables au 01/11/2026. Détail ligne par ligne,
 | | Lignes | Effet |
 |---|---|---|
 | Corrigées | 72 | 69 lignes décalées, 6872, 6968, et 6871 (dépendance de 6872) |
-| Inchangées, non partagées | 2 | 6950 et 6957 : doublons d'un acte porté par une autre ligne |
+| Désactivées administrativement | 2 | 6950 et 6957 : doublons d'un acte porté par une autre ligne, non abrogées INAMI |
 | Autorisées en neurochirurgie après correction | 128 | 56 de la 3.7.0 + les 72 corrigées |
 
 Aucune des 72 corrections n'est une simple inversion des colonnes. Exemple, ligne 6840 (K200) :
@@ -44,18 +44,16 @@ acte. Proposition pour plus tard : renvoyer aussi le code courant, sans réécri
 
 ## Corrections distinctes, non traitées ici
 
-1. **6950 et 6957, à décider** (une intervention chacune, aucun favori). Elles dupliquent 6951 et 6956 et gardent leurs
-   anciens codes. Une saisie en orthopédie sur ces lignes copie donc encore un code inexact. Recommandation : les
-   désactiver, sans suppression, ce qui les retire des listes en conservant leur historique.
-2. **Doublon 226542** : 6957 et 6961. Disparaît des listes si 6957 est désactivée ; 6961 est exacte.
-3. **Deux actes officiels sans ligne MedClick** : 225621/225610 (cure de spondylolisthèse, K560) et 225901/225890
+1. **Codes 225632, 226494 et 226542** : encore en base sur deux lignes, car 6950 et 6957 gardent leurs anciens codes
+   pour leur historique. Une seule ligne active porte chacun d'eux (6951, 6956, 6961).
+2. **Deux actes officiels sans ligne MedClick** : 225621/225610 (cure de spondylolisthèse, K560) et 225901/225890
    (scoliose thoraco-lombaire de plus de 6 niveaux, K670).
-4. **Code affiché au récapitulatif** : une ligne regroupe par nomenclature et affiche le code de la première
+3. **Code affiché au récapitulatif** : une ligne regroupe par nomenclature et affiche le code de la première
    intervention. Après correction, une nouvelle intervention s'additionne donc sur la ligne de l'ancien code. Les
    compteurs restent justes, mais le code affiché peut être l'ancien.
-5. **Messages** : l'avertissement d'abrogation et les refus citent le code de la nomenclature, pas celui de
+4. **Messages** : l'avertissement d'abrogation et les refus citent le code de la nomenclature, pas celui de
    l'intervention. Sans effet aujourd'hui : aucune des 72 lignes n'est abrogée.
-6. **Erreur `error_log` n° 10** : voir ci-dessous.
+5. **Erreur `error_log` n° 10** : voir ci-dessous.
 
 ## Erreur Webpack (`error_log` n° 10)
 
