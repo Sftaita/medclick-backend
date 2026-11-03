@@ -275,8 +275,8 @@ fonctionnelles restantes dans `docs/RECETTE-NOMENCLATURE-ETAPE4.md`.
 **Statut : Proposée (03/11/2026)** — complète ADR-007 et ADR-210.
 
 Contexte : l'article 14 n) de la nomenclature INAMI (« prestations relevant de la spécialité de
-chirurgie orthopédique (DP) et neurochirurgie (DA) », 130 prestations, 260 codes) est classé en
-`ortho` dans MedClick : un assistant en neurochirurgie ne les trouve pas.
+chirurgie orthopédique (DP) et neurochirurgie (DA) », 130 lignes MedClick, 260 codes officiels) est
+classé en `ortho` dans MedClick : un assistant en neurochirurgie ne les trouve pas.
 
 Décision :
 - **Un code INAMI = une seule ligne de nomenclature.** Les spécialités SUPPLÉMENTAIRES autorisées
@@ -287,7 +287,11 @@ Décision :
   défaut, `--apply` en une transaction, idempotent, `--revert` ; canal Monolog `nomenclature`).
   Plan `data/inami/plan-partage-rachis-14n-20261101.json` produit par
   `tools/inami/make_plan_shared.py` : codes hospitalier ET ambulant du sous-article NomenSoft `14n`
-  (version en vigueur au 01/11/2026), jamais par recherche dans les libellés.
+  (version en vigueur au 01/11/2026), jamais par recherche dans les libellés. **128 lignes partagées,
+  2 exclues provisoirement** (référence non rapprochable de NomenSoft, liste `source.excluded` du
+  plan) : 6957 (code hospitalier 226542 attribué par erreur, il désigne l'acte de 6961) et 6871
+  (224431 et 224416, deux prestations distinctes). Elles restent en orthopédie, inchangées. 6961, dont
+  la paire officielle est exacte, reste partagée.
 - Listes de choix `GET /api/nomenclature/{speciality}` (avec ou sans `?date=`) : codes de la
   spécialité et codes partagés avec elle, chacun une fois ; règles de validité ADR-210 inchangées.
 - Spécialité de l'intervention : celle **choisie** (`speciality` envoyé avec l'acte), vérifiée par
@@ -298,6 +302,9 @@ Décision :
   Routes : `/api/surgeries/addNewSurgery`, `/api/surgeries/add`, `POST /api/surgeries`, changement
   d'acte (`PUT`/`PATCH /api/surgeries/{id}`, `PUT /api/surgeries/update/{id}`), favoris
   (`/api/favorites/addNew`, `/api/favorites/updateNew`).
+- Favoris : `POST`, `PUT` et `PATCH` bruts d'API Platform sont **fermés** (405) : ils acceptaient un
+  code et une spécialité quelconques, et ni la PWA ni l'ancien front ne les utilisent. Lectures et
+  `DELETE` inchangés.
 - **Historique** : acte inchangé ⇒ spécialité enregistrée conservée, même si une autre spécialité est
   envoyée ; aucune intervention existante n'est modifiée. Favori renommé avec le même acte : la
   spécialité ne change que vers une spécialité autorisée explicitement envoyée (valeur non autorisée
@@ -306,6 +313,17 @@ Décision :
   intervention. Export : un acte partagé enregistré sous une spécialité supplémentaire est listé avec
   les interventions de cette spécialité (la région anatomique, propre à l'orthopédie, n'est pas
   appliquée) ; les interventions orthopédiques restent dans leur région.
+- **Changement attendu dans les exports (décision du 03/11/2026)** : les interventions historiques
+  déjà enregistrées en `neuro` sur un code partagé étaient absentes du récapitulatif. Elles y
+  apparaissent : en production, 43 interventions, 21 lignes supplémentaires (utilisateurs des années
+  225 : 1, 357 : 6, 437 : 7, 616 : 7), sans modification de ces interventions. Le récapitulatif
+  regroupant toutes les années d'un utilisateur, le changement concerne chaque export de ces quatre
+  utilisateurs. Carnet et autres feuilles inchangés. Aucune de ces interventions n'est sur une ligne
+  exclue. Les interventions `neuro` sur un code de région rachis non partagé restent traitées comme
+  avant.
 
 Conséquences : le retrait d'un partage (`--revert`) ne modifie aucune intervention déjà enregistrée
 en neurochirurgie. Hors périmètre : doublon 226542, inversions orthopédiques, anciens libellés.
+Limite connue : 72 des 128 lignes partagées portent, comme en orthopédie aujourd'hui, un code hospitalier
+qui désigne officiellement un autre acte (les 69 lignes dites inversées, plus 6872, 6950 et 6968) ;
+leur correction relève de l'intervention distincte sur les anciens numéros.

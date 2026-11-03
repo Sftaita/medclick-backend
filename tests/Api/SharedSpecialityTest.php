@@ -243,6 +243,35 @@ class SharedSpecialityTest extends ApiTestBase
         $this->assertSame(['neuro', '226542K225', $this->spineOther->getId()], [$row['speciality'], $row['code_hospitalisation'], (int) $row['surgery_id']]);
     }
 
+    /** ADR-211 : écritures brutes fermées ; lecture et suppression conservées, propriétaire vérifié. */
+    public function testRawFavoriteWritesAreClosedAndLegitimateAccessIsKept(): void
+    {
+        $client = $this->clientFor($this->alice);
+        $client->request('POST', '/api/favorites/addNew', ['json' => ['shortcut' => 'Disque', 'surgeryId' => $this->spine->getId(), 'speciality' => 'neuro']]);
+        $this->assertResponseIsSuccessful();
+        $id = $client->request('GET', '/api/favorites/getMyList')->toArray()[0]['id'];
+        $before = $this->favorite($id);
+
+        $forged = ['shortcut' => 'x', 'SurgeryName' => 'x', 'codeHospitalisation' => '000000', 'speciality' => 'dig'];
+        $client->request('POST', '/api/favorites', ['json' => $forged]);
+        $this->assertResponseStatusCodeSame(405);
+        $client->request('PUT', '/api/favorites/' . $id, ['json' => $forged]);
+        $this->assertResponseStatusCodeSame(405);
+        $client->request('PATCH', '/api/favorites/' . $id, ['json' => $forged, 'headers' => ['Content-Type' => 'application/merge-patch+json']]);
+        $this->assertResponseStatusCodeSame(405);
+        $this->assertSame($before, $this->favorite($id));
+        $this->assertSame(1, (int) $this->em->getConnection()->fetchOne('SELECT COUNT(*) FROM favorites'));
+
+        $this->assertSame('neuro', $client->request('GET', '/api/favorites/' . $id)->toArray()['speciality']);
+        $this->assertCount(1, $client->request('GET', '/api/favorites')->toArray()['hydra:member']);
+
+        $this->clientFor($this->createUser('bob@test.be'))->request('DELETE', '/api/favorites/' . $id);
+        $this->assertResponseStatusCodeSame(404);
+        $this->assertSame($before, $this->favorite($id));
+        $response = $this->clientFor($this->alice)->request('DELETE', '/api/favorites/' . $id);
+        $this->assertSame(204, $response->getStatusCode(), $response->getContent(false));
+    }
+
     // ------------------------------------------------- Validité historique (ADR-210)
 
     public function testRepealRulesApplyIdenticallyFromNeurosurgery(): void
@@ -342,14 +371,19 @@ class SharedSpecialityTest extends ApiTestBase
     public function testTheShippedPlanSharesTheOfficialArticle14nCodesWithNeurosurgery(): void
     {
         $plan = json_decode(file_get_contents(static::getContainer()->getParameter('kernel.project_dir') . '/data/inami/plan-partage-rachis-14n-20261101.json'), true);
-        $this->assertCount(130, $plan['share']);
+        $this->assertCount(128, $plan['share']);
         $this->assertSame(260, $plan['source']['officialCodes']);
+        // Références non rapprochables de NomenSoft : exclues provisoirement ; 6961 (paire officielle exacte) reste.
+        $this->assertSame([6871, 6957], array_column($plan['source']['excluded'], 'id'));
+        $this->assertNotContains(6871, array_column($plan['share'], 'id'));
+        $this->assertNotContains(6957, array_column($plan['share'], 'id'));
+        $this->assertContains(6961, array_column($plan['share'], 'id'));
         $this->assertStringContainsString('14n', $plan['source']['label']);
         foreach ($plan['share'] as $item) {
             $this->assertSame('ortho', $item['speciality']);
             $this->assertSame(['neuro'], $item['specialities']);
         }
-        $this->assertCount(130, array_unique(array_column($plan['share'], 'id')));
+        $this->assertCount(128, array_unique(array_column($plan['share'], 'id')));
     }
 
     // ------------------------------------------------- Helpers

@@ -6,7 +6,23 @@
   "page": "https://www.inami.fgov.be/fr/nomenclature/tableaux-de-reference",
   "rule": "codes hospitalier et ambulant du sous-article 14n (NOMEN_SUMMARY_EXT.nomen_sub_art, version en vigueur) ; spécialité principale ortho conservée, spécialités supplémentaires neuro",
   "officialCodes": 260,
-  "generated": "2026-11-03T05:33:04+00:00"
+  "excluded": [
+   {
+    "id": 6871,
+    "codeHospitalisation": "224431",
+    "codeAmbulant": "224416",
+    "n": "K435",
+    "reason": "224431 (K520, 3 niveaux ou plus) et 224416 (K435, 2 niveaux) : deux codes ambulants de deux prestations distinctes"
+   },
+   {
+    "id": 6957,
+    "codeHospitalisation": "226542",
+    "codeAmbulant": "226494",
+    "n": "K200",
+    "reason": "code hospitalier 226542 attribué par erreur : il désigne l'acte de la ligne 6961 (K140) ; le code officiel de cet acte est 226505"
+   }
+  ],
+  "generated": "2026-11-03T07:18:50+00:00"
  },
  "share": [
   {
@@ -349,17 +365,6 @@
     "neuro"
    ],
    "name": "Foraminotomie cervicale postérieure sur 1 niveau"
-  },
-  {
-   "id": 6871,
-   "codeHospitalisation": "224431",
-   "codeAmbulant": "224416",
-   "n": "K435",
-   "speciality": "ortho",
-   "specialities": [
-    "neuro"
-   ],
-   "name": "Foraminotomie cervicale postérieure sur 2 niveaux"
   },
   {
    "id": 6872,
@@ -1289,17 +1294,6 @@
    "id": 6956,
    "codeHospitalisation": "224453",
    "codeAmbulant": "226505",
-   "n": "K200",
-   "speciality": "ortho",
-   "specialities": [
-    "neuro"
-   ],
-   "name": "Fermeture d'une brèche de la dure mère"
-  },
-  {
-   "id": 6957,
-   "codeHospitalisation": "226542",
-   "codeAmbulant": "226494",
    "n": "K200",
    "speciality": "ortho",
    "specialities": [

@@ -8,6 +8,9 @@ son code hospitalier ET son code ambulant relèvent, dans la version officielle 
 chirurgie orthopédique (DP) et neurochirurgie (DA) ». Ces codes sont en `ortho` dans MedClick ; la
 neurochirurgie est ajoutée comme spécialité supplémentaire, sans dupliquer la ligne.
 
+Exclusions provisoires (EXCLUDED) : lignes dont la référence ne peut pas être rapprochée de NomenSoft.
+Elles restent en orthopédie, inchangées, jusqu'à la correction distincte des anciens numéros.
+
 L'export TSV (sans en-tête) : id, speciality, code_ambulant, code_hospitalisation, n, name, type, sub_type.
 """
 import csv
@@ -20,6 +23,10 @@ REFERENCE = dt.date(2026, 11, 1)
 SUB_ARTICLE = '14n'
 PRIMARY, SHARED = 'ortho', ['neuro']
 COLUMNS = ['id', 'speciality', 'code_ambulant', 'code_hospitalisation', 'n', 'name', 'type', 'sub_type']
+EXCLUDED = {
+    6871: "224431 (K520, 3 niveaux ou plus) et 224416 (K435, 2 niveaux) : deux codes ambulants de deux prestations distinctes",
+    6957: "code hospitalier 226542 attribué par erreur : il désigne l'acte de la ligne 6961 (K140) ; le code officiel de cet acte est 226505",
+}
 
 
 def day(text):
@@ -40,7 +47,7 @@ if __name__ == '__main__':
                 description = r['nomen_sub_art_desc_fr'].strip()
 
     medclick = [dict(zip(COLUMNS, r)) for r in csv.reader(open(tsv, encoding='utf-8', newline=''), delimiter='\t')]
-    share, mismatches = [], []
+    share, mismatches, excluded = [], [], []
     for m in medclick:
         hosp, amb = m['code_hospitalisation'], m['code_ambulant']
         in_hosp, in_amb = current.get(hosp) == SUB_ARTICLE, current.get(amb) == SUB_ARTICLE
@@ -48,6 +55,9 @@ if __name__ == '__main__':
             continue
         if not (in_hosp and in_amb) or m['speciality'] != PRIMARY:
             mismatches.append(f"{m['id']} {m['speciality']} {hosp}/{amb} : hosp {current.get(hosp)}, amb {current.get(amb)}")
+            continue
+        if int(m['id']) in EXCLUDED:
+            excluded.append({'id': int(m['id']), 'codeHospitalisation': hosp, 'codeAmbulant': amb, 'n': m['n'], 'reason': EXCLUDED[int(m['id'])]})
             continue
         share.append({
             'id': int(m['id']), 'codeHospitalisation': hosp, 'codeAmbulant': amb, 'n': m['n'],
@@ -65,11 +75,12 @@ if __name__ == '__main__':
             'page': 'https://www.inami.fgov.be/fr/nomenclature/tableaux-de-reference',
             'rule': f"codes hospitalier et ambulant du sous-article {SUB_ARTICLE} (NOMEN_SUMMARY_EXT.nomen_sub_art, version en vigueur) ; spécialité principale {PRIMARY} conservée, spécialités supplémentaires {', '.join(SHARED)}",
             'officialCodes': len(officials),
+            'excluded': sorted(excluded, key=lambda e: e['id']),
             'generated': dt.datetime.now(dt.timezone.utc).isoformat(timespec='seconds'),
         },
         'share': sorted(share, key=lambda s: s['id']),
     }
-    covered = {s['codeHospitalisation'] for s in share} | {s['codeAmbulant'] for s in share}
+    if {e['id'] for e in excluded} != set(EXCLUDED):
+        sys.exit('exclusions introuvables dans l\'export MedClick')
     json.dump(plan, open(out, 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
-    print(f'plan : {len(share)} prestation(s) partagée(s) ; codes officiels {SUB_ARTICLE} en vigueur : {len(officials)} ; '
-          f'absents de MedClick : {sorted(set(officials) - covered)}')
+    print(f'plan : {len(share)} ligne(s) partagée(s), {len(excluded)} exclue(s) ; codes officiels {SUB_ARTICLE} en vigueur : {len(officials)}')
