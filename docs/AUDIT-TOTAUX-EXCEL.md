@@ -41,7 +41,7 @@ distincts : le carnet compte des interventions, le récapitulatif une ligne par 
 | C7 | Décompte par superviseur (assistances, opérateur + aîné, %), y compris > 26 superviseurs | conforme (sauf H9) |
 | C8 | Total du décompte (plage et valeur) | conforme (sauf H9) |
 | C9 | Assistances attribuées à un superviseur = assistances du candidat | conforme ; des interventions réelles ont un aîné absent des superviseurs de l'année (donnée) |
-| R1 | Récapitulatif : une ligne par code et par section, comptes par année | conforme en orthopédie et traumatologie ; écart H1, H10 en chirurgie générale |
+| R1 | Récapitulatif : par section, une ligne par acte, code, spécialité et libellé enregistrés (ADR-213), comptes par année | conforme en orthopédie et traumatologie ; écart H1, H10 en chirurgie générale |
 | R2 | Récapitulatif : totaux de ligne et % | conformes |
 | R3 | Récapitulatif : sous-totaux (plage et valeur) | écarts H3, H4 |
 | R4 | Récapitulatif : TOTAL GENERAL de chaque bloc | conformes en orthopédie et traumatologie ; écarts H2, H4 |
@@ -125,8 +125,8 @@ Prévalence (qualitative, chiffres dans le rapport transmis) : copie de préprod
 
 ### H10 — Interventions sans nomenclature
 - En chirurgie générale, toutes les interventions sans nomenclature (toutes spécialités, y compris
-  l'orthopédie sans nomenclature) sont regroupées sur **une seule ligne**, au libellé et dans la
-  section de la première.
+  l'orthopédie sans nomenclature) restent dans la section de la première. Depuis ADR-213, elles n'y
+  sont plus regroupées sur une seule ligne : une ligne par code, spécialité et libellé.
 - Prévalence : occasionnelle.
 
 ### H11 — Interventions absentes du récapitulatif (données de référence)

@@ -33,12 +33,12 @@ final class CarnetTotalsAuditor
         'C8' => 'Carnet : la ligne « Total » du décompte couvre toutes les lignes de superviseurs et vaut leur somme.',
         'C9' => 'Carnet : toutes les assistances du candidat sont attribuées à un superviseur (total décompte = total candidat).',
         // Liste récapitulative (feuille 3)
-        'R1' => 'Récapitulatif : une ligne par code de nomenclature et par section (région ou spécialité), assistant = positions 2, opérateur = positions 1 et 3, par année de formation, toutes années de l\'utilisateur.',
+        'R1' => 'Récapitulatif : par section (région ou spécialité), une ligne par acte, code, spécialité et libellé enregistrés (ADR-213), assistant = positions 2, opérateur = positions 1 et 3, par année de formation, toutes années de l\'utilisateur.',
         'R2' => 'Récapitulatif : sur chaque ligne, total assistant = somme des années, total opérateur = somme des années, A+O = assistant + opérateur, % = opérateur / (A+O) à 0,01 près.',
         'R3' => 'Récapitulatif : chaque « Sous total » couvre toutes les lignes de sa section et vaut leur somme.',
         'R4' => 'Récapitulatif : chaque « TOTAL GENERAL » additionne TOUS les sous-totaux de son bloc, dans chaque colonne.',
         'R5' => 'Récapitulatif : toutes les interventions (positions 1 à 3) de toutes les années figurent dans une ligne (aucune exclue).',
-        'R6' => 'Récapitulatif : une ligne ne regroupe que des interventions du même code (pas de regroupement sous le libellé d\'un autre acte).',
+        'R6' => 'Récapitulatif : une ligne ne regroupe que des interventions du même code enregistré (ADR-213).',
         // Consultations (feuille 4)
         'K1' => 'Consultations : chaque date de consultation apparaît dans la ligne de son mois, avec la somme des patients de cette date.',
         'K2' => 'Consultations : le total d\'un mois couvre toutes les dates du mois et vaut la somme des patients du mois.',
@@ -257,6 +257,11 @@ final class CarnetTotalsAuditor
 
     /*------------------------------------------------------------ Liste récapitulative */
 
+    private function lineText(?string $text): string
+    {
+        return mb_strtolower(trim((string) preg_replace('/[\s\x{00A0}]+/u', ' ', strtr((string) $text, ['’' => "'", '‘' => "'", 'ʼ' => "'", '´' => "'", '`' => "'"]))));
+    }
+
     private function summary(Spreadsheet $book, Worksheet $sheet, array $data): void
     {
         $maxYear = $data['maxYear'];
@@ -300,10 +305,12 @@ final class CarnetTotalsAuditor
             }
             // La ligne existe dès la première intervention de ce code dans la section (son libellé),
             // mais seules les positions 1, 2 et 3 sont comptées.
-            $key = $s['nid'] ?? 'sans-nomenclature';
-            $row = &$expected[$block][$section][$key];
+            // ADR-213 : dans un acte, une ligne par code, spécialité et libellé enregistrés (espaces, casse et apostrophes ignorés).
+            $act = $s['nid'] ?? 'sans-nomenclature';
+            $line = implode('|', [$this->lineText($s['code']), $s['speciality'], $this->lineText($s['name'])]);
+            $row = &$expected[$block][$section][$act][$line];
             $row ??= ['code' => (string) $s['code'], 'name' => (string) $s['name'], 'a' => array_fill(1, $maxYear, 0), 'o' => array_fill(1, $maxYear, 0), 'codes' => []];
-            $row['codes'][(string) $s['code'] . '|' . $s['name']] = true;
+            $row['codes'][$this->lineText($s['code'])] = true;
             if ($invalidPosition) {
                 unset($row);
                 $excluded['position « ' . $position . ' » (ni 1, ni 2, ni 3), non comptée'] = ($excluded['position « ' . $position . ' » (ni 1, ni 2, ni 3), non comptée'] ?? 0) + 1;
@@ -348,7 +355,7 @@ final class CarnetTotalsAuditor
         $listed = 0;
         foreach ($blocks as $block) {
             foreach ($sections[$block] ?? [] as $title => $info) {
-                $exp = array_values($expected[$block][$title] ?? []);
+                $exp = array_merge(...array_map(fn (array $lines) => array_values($lines), array_values($expected[$block][$title] ?? [])));
                 $this->check('R1', "Récapitulatif $block/$title : nombre de lignes", count($exp), count($info['rows']));
                 foreach ($info['rows'] as $i => $r) {
                     $e = $exp[$i] ?? null;
