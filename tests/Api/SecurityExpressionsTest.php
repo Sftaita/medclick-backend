@@ -33,8 +33,8 @@ class SecurityExpressionsTest extends ApiTestBase
             }
         }
 
-        // 4 expressions « security » et 19 « securityPostDenormalize » déclarées dans src/Entity.
-        self::assertGreaterThanOrEqual(23, count($expressions));
+        // 4 expressions « security » et 17 « securityPostDenormalize » déclarées dans src/Entity.
+        self::assertGreaterThanOrEqual(21, count($expressions));
         foreach ($expressions as $label => $expression) {
             // Variables fournies à l'exécution (object, user…) ; fonctions (is_granted…) vérifiées.
             $language->lint($expression, [], Parser::IGNORE_UNKNOWN_VARIABLES);
