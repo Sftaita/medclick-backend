@@ -33,8 +33,8 @@ final class TotalsAuditTest extends ExcelTestCase
         'audit-annees-6-7' => ['R3' => 18, 'R4' => 5],
         // H4 : plus de 7 années.
         'audit-neuf-annees' => ['R3' => 322, 'R4' => 29],
-        // H10 / H11 : sans nomenclature, données de référence hors liste.
-        'audit-sans-nomenclature' => ['R1' => 3, 'R3' => 16, 'R4' => 5, 'R5' => 4],
+        // H1, H10 / H11 : sans nomenclature, données de référence hors liste (ADR-213 : lignes distinctes, section de la première).
+        'audit-sans-nomenclature' => ['R1' => 5, 'R3' => 16, 'R4' => 5, 'R5' => 4],
         // H5 (plus de 9 dates de consultation dans un mois) ; H13 (#DIV/0! sans intervention) ; H15 (type « plastic »).
         'audit-consultations-10-dates' => ['C6' => 4, 'K1' => 1, 'K2' => 1, 'K3' => 1, 'K4' => 2, 'R3' => 16, 'R4' => 5],
         // H6 : plus de 9 gardes dans un mois.

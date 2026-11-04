@@ -321,9 +321,7 @@ class SharedSpecialityTest extends ApiTestBase
         $book = IOFactory::load($file);
         unlink($file);
 
-        // Récapitulatif : une ligne en orthopédie (élective, région rachis) ET une ligne dans la
-        // section des autres spécialités (neurochirurgie). Sans le correctif, l'intervention neuro
-        // gardait la région « rachis » hors orthopédie et n'apparaissait nulle part.
+        // Récapitulatif (ADR-214) : deux lignes dans la rubrique Rachis, une par spécialité enregistrée.
         $withCode = fn ($book, int $sheet) => array_values(array_filter($book->getSheet($sheet)->toArray(), fn ($row) => in_array('225094K200', array_map(fn ($v) => trim((string) $v), $row), true)));
         $this->assertCount(2, $withCode($book, 1), 'carnet : une ligne par intervention');
         $this->assertCount(2, $withCode($book, 2), 'récapitulatif : acte listé une fois par spécialité enregistrée');

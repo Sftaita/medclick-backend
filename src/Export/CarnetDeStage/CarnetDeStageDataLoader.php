@@ -148,13 +148,16 @@ final class CarnetDeStageDataLoader
             }
             $surgery['type'] = $id !== null ? $nomenclatures[$id]['type'] : null;
             $surgery['subtype'] = $id !== null ? $nomenclatures[$id]['subType'] : null;
-            // ADR-211 : intervention enregistrée sous une spécialité SUPPLÉMENTAIRE du code (ex. rachis
-            // en neurochirurgie) : la région anatomique est propre à la spécialité principale ; l'acte est
-            // listé avec les interventions de la spécialité ENREGISTRÉE (section sans région). Les
-            // interventions enregistrées sous la spécialité principale ne changent pas.
+            // ADR-214 : la spécialité enregistrée ne change pas, mais un acte de l'article 14 n) enregistré
+            // en neurochirurgie est PRÉSENTÉ dans la rubrique Rachis, comme en orthopédie.
+            $surgery['spineRubric'] = false;
+            // ADR-211 : autre spécialité supplémentaire du code : l'acte reste listé avec les interventions
+            // de la spécialité ENREGISTRÉE (section sans région).
             if ($id !== null && $surgery['speciality'] !== $nomenclatures[$id]['speciality']
                 && in_array($surgery['speciality'], $nomenclatures[$id]['shared'], true)) {
-                $surgery['subtype'] = null;
+                $surgery['spineRubric'] = $surgery['speciality'] === 'neuro' && $nomenclatures[$id]['speciality'] === 'ortho'
+                    && in_array((string) $nomenclatures[$id]['type'], ['1', '2'], true);
+                $surgery['subtype'] = $surgery['spineRubric'] ? 'back' : null;
             }
         }
         unset($surgery);

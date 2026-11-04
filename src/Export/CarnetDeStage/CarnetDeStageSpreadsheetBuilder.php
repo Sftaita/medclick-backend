@@ -401,11 +401,13 @@ final class CarnetDeStageSpreadsheetBuilder
             $nomenclatureId = $surgery['nomenclatureId'];
             $position = $surgery['position'];
 
+            // ADR-214 : rubrique d'après la nature de l'acte ; 14 n) en neurochirurgie = rubrique Rachis.
+            $isOrtho = $surgery['speciality'] == 'ortho' || $surgery['spineRubric'];
             switch (true) {
-                case $surgery['speciality'] == 'ortho' && $surgery['type'] == '2':
+                case $isOrtho && $surgery['type'] == '2':
                     $group = &$orthoTrauma;
                     break;
-                case $surgery['speciality'] == 'ortho' && $surgery['type'] == '1':
+                case $isOrtho && $surgery['type'] == '1':
                     $group = &$orthoElective;
                     break;
                 default:
@@ -415,21 +417,24 @@ final class CarnetDeStageSpreadsheetBuilder
             if (!isset($group[$subtype])) {
                 $group[$subtype] = [];
             }
+            // La section reste celle de la première intervention de l'acte, comme le format historique :
+            // aucune intervention n'entre dans une section, n'en sort ni n'en change (sous-totaux inchangés).
             if (!isset($group[$subtype][$nomenclatureId])) {
-                $group[$subtype][$nomenclatureId] = [
-                    'name' => $surgery['name'],
-                    'nomenclature' => $surgery['code'],
-                    'speciality' => $surgery['speciality'],
-                    'years' => [],
-                ];
+                $group[$subtype][$nomenclatureId] = ['speciality' => $surgery['speciality'], 'lines' => []];
+            }
+            // ADR-213 : dans cette section, une ligne par code réellement enregistré.
+            $lineKey = self::summaryLineKey($surgery);
+            if (!isset($group[$subtype][$nomenclatureId]['lines'][$lineKey])) {
+                $line = ['name' => $surgery['name'], 'nomenclature' => $surgery['code'], 'speciality' => $surgery['speciality'], 'years' => []];
                 for ($i = 1; $i <= $maxYearOfFormation; $i++) {
-                    $group[$subtype][$nomenclatureId]['years'][$i] = ['firstHand' => 0, 'secondHand' => 0];
+                    $line['years'][$i] = ['firstHand' => 0, 'secondHand' => 0];
                 }
+                $group[$subtype][$nomenclatureId]['lines'][$lineKey] = $line;
             }
             if ($position == 1 || $position == 3) {
-                $group[$subtype][$nomenclatureId]['years'][$yearOfFormation]['firstHand']++;
+                $group[$subtype][$nomenclatureId]['lines'][$lineKey]['years'][$yearOfFormation]['firstHand']++;
             } elseif ($position == 2) {
-                $group[$subtype][$nomenclatureId]['years'][$yearOfFormation]['secondHand']++;
+                $group[$subtype][$nomenclatureId]['lines'][$lineKey]['years'][$yearOfFormation]['secondHand']++;
             }
             unset($group);
         }
@@ -444,7 +449,7 @@ final class CarnetDeStageSpreadsheetBuilder
             }
             foreach (self::ANATOMIC_REGIONS as $anatomic) {
                 if (isset($group[$anatomic['value']])) {
-                    $plan[] = $group[$anatomic['value']];
+                    $plan[] = self::summaryLines($group[$anatomic['value']]);
                     $plan[] = 3;
                 } else {
                     $plan[] = 4;
@@ -455,14 +460,14 @@ final class CarnetDeStageSpreadsheetBuilder
         // Interventions générales : seules celles sans sous-type (clé ""), comme le format historique.
         $plan[] = 10;
         foreach (self::SPECIALITIES as $speciality) {
-            $detailsList = array_values(array_filter($general[''] ?? [], fn ($details) => $details['speciality'] === $speciality['value']));
+            $detailsList = self::summaryLines(array_filter($general[''] ?? [], fn ($details) => $details['speciality'] === $speciality['value']));
             if ($detailsList) {
                 $plan[] = $detailsList;
                 $plan[] = 3;
             }
         }
 
-        // Étape : nombre réel de lignes de la liste récapitulative (codes distincts retenus).
+        // Étape : nombre réel de lignes de la liste récapitulative.
         $rows = array_sum(array_map(fn ($entry) => is_array($entry) ? count($entry) : 0, $plan));
         $progress->step(ExportStep::Summary, $rows);
 
@@ -521,6 +526,58 @@ final class CarnetDeStageSpreadsheetBuilder
             $written += count($entry);
             $progress->advance($written);
         }
+    }
+
+    /**
+     * ADR-213 : clé d'une ligne du récapitulatif à l'intérieur d'un acte : code, spécialité et libellé
+     * enregistrés sur l'intervention. Espaces, casse et apostrophes typographiques ne distinguent pas deux lignes.
+     *
+     * @param array<string, mixed> $surgery
+     */
+    private static function summaryLineKey(array $surgery): string
+    {
+        return implode("\0", [self::summaryLineText($surgery['code']), (string) $surgery['speciality'], self::summaryLineText($surgery['name'])]);
+    }
+
+    private static function summaryLineText(?string $text): string
+    {
+        $text = str_replace(['’', '‘', 'ʼ', '´', '`'], "'", (string) $text);
+
+        return mb_strtolower(trim(preg_replace('/[\s\x{00A0}]+/u', ' ', $text) ?? $text));
+    }
+
+    /**
+     * Lignes d'une section, dans l'ordre historique des actes ; les lignes d'un même acte restent voisines.
+     * ADR-214 : deux lignes de même code et de même libellé, de spécialités enregistrées différentes, portent
+     * chacune leur spécialité entre parenthèses (affichage seul, le libellé enregistré ne change pas).
+     *
+     * @param array<int|string, array{lines: array<string, array<string, mixed>>}> $acts
+     *
+     * @return list<array<string, mixed>>
+     */
+    private static function summaryLines(array $acts): array
+    {
+        $lines = array_merge(...array_map(fn (array $act) => array_values($act['lines']), array_values($acts)));
+
+        $specialities = [];
+        foreach ($lines as $line) {
+            $specialities[self::summaryLineText($line['nomenclature']) . "\0" . self::summaryLineText($line['name'])][(string) $line['speciality']] = true;
+        }
+        foreach ($lines as &$line) {
+            if (count($specialities[self::summaryLineText($line['nomenclature']) . "\0" . self::summaryLineText($line['name'])]) > 1) {
+                $line['name'] .= ' (' . self::specialityLabel((string) $line['speciality']) . ')';
+            }
+        }
+        unset($line);
+
+        return $lines;
+    }
+
+    private static function specialityLabel(string $speciality): string
+    {
+        $titles = ['ortho' => 'Orthopédie', 'favorites' => 'Favoris', ...array_column(self::SPECIALITIES, 'title', 'value')];
+
+        return $titles[$speciality] ?? ($speciality !== '' ? $speciality : 'Spécialité non renseignée');
     }
 
     /**

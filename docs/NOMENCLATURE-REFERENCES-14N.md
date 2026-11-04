@@ -48,9 +48,8 @@ acte. Proposition pour plus tard : renvoyer aussi le code courant, sans réécri
    pour leur historique. Une seule ligne active porte chacun d'eux (6951, 6956, 6961).
 2. **Deux actes officiels sans ligne MedClick** : 225621/225610 (cure de spondylolisthèse, K560) et 225901/225890
    (scoliose thoraco-lombaire de plus de 6 niveaux, K670).
-3. **Code affiché au récapitulatif** : une ligne regroupe par nomenclature et affiche le code de la première
-   intervention. Après correction, une nouvelle intervention s'additionne donc sur la ligne de l'ancien code. Les
-   compteurs restent justes, mais le code affiché peut être l'ancien.
+3. **Code affiché au récapitulatif** : corrigé par ADR-213. Une ligne correspond à un code réellement enregistré ;
+   un ancien code et le code corrigé apparaissent sur deux lignes voisines.
 4. **Messages** : l'avertissement d'abrogation et les refus citent le code de la nomenclature, pas celui de
    l'intervention. Sans effet aujourd'hui : aucune des 72 lignes n'est abrogée.
 5. **Erreur `error_log` n° 10** : voir ci-dessous.

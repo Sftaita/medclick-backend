@@ -184,13 +184,13 @@
         ]
     },
     "audit-sans-nomenclature": {
-        "generatedAt": "2026-10-28T17:15:29+01:00",
-        "engine": "ExcelNewVersion@b659514 (copie figée tests/Excel/Legacy)",
+        "generatedAt": "2026-11-03T22:46:00+01:00",
+        "engine": "CarnetDeStageSpreadsheetBuilder (ADR-213 : lignes du récapitulatif)",
         "exportDate": "28-10-2026",
-        "sha256": "a6fa742287e54e64a53204846832b0c3359102f476188f64caf4f75f1efbc7f2",
-        "bytes": 157072,
-        "seconds": 6.36,
-        "peakMemoryMb": 29.2,
+        "sha256": "773cfe5f0e372e8c0e8a4db30352c353d3c08b0a21225e1d5ceb7f6ae8af7389",
+        "bytes": 157225,
+        "seconds": 1.182,
+        "peakMemoryMb": 79.0,
         "warnings": []
     },
     "audit-specialites-generales": {
@@ -217,13 +217,13 @@
         ]
     },
     "cas-limites": {
-        "generatedAt": "2026-10-26T11:04:41+01:00",
-        "engine": "ExcelNewVersion@b659514 (copie figée tests/Excel/Legacy)",
+        "generatedAt": "2026-11-03T22:46:00+01:00",
+        "engine": "CarnetDeStageSpreadsheetBuilder (ADR-213 : lignes du récapitulatif)",
         "exportDate": "26-10-2026",
-        "sha256": "eb36401bef432c839c455b62bd1324b580e1c8d4ee8821f5bbf937959d5a2c74",
-        "bytes": 168592,
-        "seconds": 14.191,
-        "peakMemoryMb": 30.3,
+        "sha256": "559220880ac5eb10fa1d93cccf7b4dab338487b0e25c47eb86b7fe0b3ab00553",
+        "bytes": 170597,
+        "seconds": 5.402,
+        "peakMemoryMb": 84.3,
         "warnings": []
     },
     "consultations-denses": {
