@@ -41,7 +41,7 @@ distincts : le carnet compte des interventions, le récapitulatif une ligne par 
 | C7 | Décompte par superviseur (assistances, opérateur + aîné, %), y compris > 26 superviseurs | conforme (sauf H9) |
 | C8 | Total du décompte (plage et valeur) | conforme (sauf H9) |
 | C9 | Assistances attribuées à un superviseur = assistances du candidat | conforme ; des interventions réelles ont un aîné absent des superviseurs de l'année (donnée) |
-| R1 | Récapitulatif : par section, une ligne par acte, code, spécialité et libellé enregistrés (ADR-213), comptes par année | conforme en orthopédie et traumatologie ; écart H1, H10 en chirurgie générale |
+| R1 | Récapitulatif : par section (acte 14 n) en neurochirurgie = Rachis, ADR-214), une ligne par acte, code, spécialité et libellé enregistrés (ADR-213), comptes par année | conforme en orthopédie et traumatologie ; écart H1, H10 en chirurgie générale |
 | R2 | Récapitulatif : totaux de ligne et % | conformes |
 | R3 | Récapitulatif : sous-totaux (plage et valeur) | écarts H3, H4 |
 | R4 | Récapitulatif : TOTAL GENERAL de chaque bloc | conformes en orthopédie et traumatologie ; écarts H2, H4 |
@@ -136,7 +136,7 @@ Ces interventions sont dans le carnet mais n'apparaissent dans aucune ligne du r
 | Orthopédie, sous-type vide |
 | Orthopédie, sous-type tronqué `proximalFe` / `distalFemu` (au lieu de `proximalFemur` / `distalFemur`) |
 | Spécialité `favorites` |
-| Chirurgie générale avec sous-type (ex. neurochirurgie « back ») |
+| Chirurgie générale avec sous-type (ex. neurochirurgie « back » hors 14 n), voir ADR-214) |
 | Orthopédie avec nomenclature sans type électif/trauma |
 Correction possible côté données (référentiel), sans changer le moteur ; à décider.
 

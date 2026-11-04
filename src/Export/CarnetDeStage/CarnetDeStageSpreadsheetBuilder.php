@@ -401,11 +401,13 @@ final class CarnetDeStageSpreadsheetBuilder
             $nomenclatureId = $surgery['nomenclatureId'];
             $position = $surgery['position'];
 
+            // ADR-214 : rubrique d'après la nature de l'acte ; 14 n) en neurochirurgie = rubrique Rachis.
+            $isOrtho = $surgery['speciality'] == 'ortho' || $surgery['spineRubric'];
             switch (true) {
-                case $surgery['speciality'] == 'ortho' && $surgery['type'] == '2':
+                case $isOrtho && $surgery['type'] == '2':
                     $group = &$orthoTrauma;
                     break;
-                case $surgery['speciality'] == 'ortho' && $surgery['type'] == '1':
+                case $isOrtho && $surgery['type'] == '1':
                     $group = &$orthoElective;
                     break;
                 default:
@@ -423,7 +425,7 @@ final class CarnetDeStageSpreadsheetBuilder
             // ADR-213 : dans cette section, une ligne par code réellement enregistré.
             $lineKey = self::summaryLineKey($surgery);
             if (!isset($group[$subtype][$nomenclatureId]['lines'][$lineKey])) {
-                $line = ['name' => $surgery['name'], 'nomenclature' => $surgery['code'], 'years' => []];
+                $line = ['name' => $surgery['name'], 'nomenclature' => $surgery['code'], 'speciality' => $surgery['speciality'], 'years' => []];
                 for ($i = 1; $i <= $maxYearOfFormation; $i++) {
                     $line['years'][$i] = ['firstHand' => 0, 'secondHand' => 0];
                 }
@@ -546,6 +548,8 @@ final class CarnetDeStageSpreadsheetBuilder
 
     /**
      * Lignes d'une section, dans l'ordre historique des actes ; les lignes d'un même acte restent voisines.
+     * ADR-214 : deux lignes de même code et de même libellé, de spécialités enregistrées différentes, portent
+     * chacune leur spécialité entre parenthèses (affichage seul, le libellé enregistré ne change pas).
      *
      * @param array<int|string, array{lines: array<string, array<string, mixed>>}> $acts
      *
@@ -553,7 +557,27 @@ final class CarnetDeStageSpreadsheetBuilder
      */
     private static function summaryLines(array $acts): array
     {
-        return array_merge(...array_map(fn (array $act) => array_values($act['lines']), array_values($acts)));
+        $lines = array_merge(...array_map(fn (array $act) => array_values($act['lines']), array_values($acts)));
+
+        $specialities = [];
+        foreach ($lines as $line) {
+            $specialities[self::summaryLineText($line['nomenclature']) . "\0" . self::summaryLineText($line['name'])][(string) $line['speciality']] = true;
+        }
+        foreach ($lines as &$line) {
+            if (count($specialities[self::summaryLineText($line['nomenclature']) . "\0" . self::summaryLineText($line['name'])]) > 1) {
+                $line['name'] .= ' (' . self::specialityLabel((string) $line['speciality']) . ')';
+            }
+        }
+        unset($line);
+
+        return $lines;
+    }
+
+    private static function specialityLabel(string $speciality): string
+    {
+        $titles = ['ortho' => 'Orthopédie', 'favorites' => 'Favoris', ...array_column(self::SPECIALITIES, 'title', 'value')];
+
+        return $titles[$speciality] ?? ($speciality !== '' ? $speciality : 'Spécialité non renseignée');
     }
 
     /**

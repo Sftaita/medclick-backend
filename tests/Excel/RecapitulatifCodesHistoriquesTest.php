@@ -72,21 +72,89 @@ final class RecapitulatifCodesHistoriquesTest extends ExcelTestCase
         self::assertSame(1, $this->sectionsWithLines($sheet));
     }
 
-    public function testNeuroInterventionsOfAnOrthoActKeepTheirClassificationAndTheirOwnCodes(): void
+    /** ADR-214 : un acte 14 n) enregistré en neurochirurgie est présenté dans la rubrique Rachis, avec ses propres codes. */
+    public function testSharedSpineActsRecordedInNeurosurgeryAreInTheSpineRubric(): void
     {
         [$user, $yearId, $year] = $this->year();
         $act = $this->act('ortho', '1', 'back', 'Discectomie');
-        $this->em->persist((new NomenclatureHistoricalSpeciality($act, 'neuro')));
+        $this->em->persist(new NomenclatureHistoricalSpeciality($act, 'neuro'));
         $this->surgery($year, $act, 'ortho', self::B, 'Discectomie', '1');
         $this->surgery($year, $act, 'neuro', self::B, 'Discectomie', '1');
         $this->surgery($year, $act, 'neuro', self::A, 'Discectomie', '2');
         $this->em->flush();
+        $query = 'SELECT id, code, name, speciality, position, nomenclature_id FROM surgeries ORDER BY id';
+        $before = $this->em->getConnection()->fetchAllAssociative($query);
 
         $sheet = $this->summary($user, $yearId);
         $lines = $this->lines($sheet);
-        self::assertSame([self::B, self::B, self::A], array_column($lines, 'code'), 'Rachis orthopédique, puis les deux codes en neurochirurgie');
+        self::assertSame([self::B, self::B, self::A], array_column($lines, 'code'));
+        self::assertSame(['Discectomie (Orthopédie)', 'Discectomie (Neurochirurgie)', 'Discectomie'], array_column($lines, 'name'), 'Mention seulement là où elle distingue deux lignes');
+        self::assertSame(3, $this->sectionTotal($sheet, 'U', 'Rachis'));
+        self::assertSame($before, $this->em->getConnection()->fetchAllAssociative($query), 'Spécialité et libellé enregistrés inchangés');
+    }
+
+    /** Traumatologie du rachis : l'acte reste dans le bloc de son type. */
+    public function testSharedSpineTraumaActGoesToTheTraumaSpineRubric(): void
+    {
+        [$user, $yearId, $year] = $this->year();
+        $act = $this->act('ortho', '2', 'back', 'Fracture vertébrale');
+        $this->em->persist(new NomenclatureHistoricalSpeciality($act, 'neuro'));
+        $this->surgery($year, $act, 'neuro', self::A, 'Fracture vertébrale', '1');
+        $this->em->flush();
+
+        $sheet = $this->summary($user, $yearId);
+        self::assertSame(['Fracture vertébrale'], array_column($this->lines($sheet), 'name'), 'Sans ligne orthopédique : aucune mention');
+        $row = $this->lines($sheet)[0]['row'];
+        self::assertGreaterThan($this->rowOf($sheet, 'TOTAL GENERAL'), $row, 'Bloc traumatologie, après le total du bloc électif');
+    }
+
+    /** Un code 14 n) dont la région MedClick n'est pas le rachis : la neurochirurgie va en Rachis, l'orthopédie garde sa région. */
+    public function testSharedActWithAnotherRegionKeepsOrthopaedicsWhereItWas(): void
+    {
+        [$user, $yearId, $year] = $this->year();
+        $act = $this->act('ortho', '1', 'wristhand', 'Drainage rachidien');
+        $this->em->persist(new NomenclatureHistoricalSpeciality($act, 'neuro'));
+        $this->surgery($year, $act, 'ortho', self::A, 'Autre libellé historique', '1');
+        $this->surgery($year, $act, 'neuro', self::A, 'Drainage rachidien', '1');
+        $this->em->flush();
+
+        $sheet = $this->summary($user, $yearId);
+        self::assertSame(1, $this->sectionTotal($sheet, 'U', 'Poignet-Main'));
         self::assertSame(1, $this->sectionTotal($sheet, 'U', 'Rachis'));
-        self::assertSame(3, array_sum(array_column($lines, 'total')));
+    }
+
+    /** L'exception est ciblée : le reste ne bouge pas. */
+    public function testOtherActsStayWhereTheyWere(): void
+    {
+        [$user, $yearId, $year] = $this->year();
+        $notShared = $this->act('ortho', '1', 'back', 'Rachis non partagé');
+        $this->surgery($year, $notShared, 'neuro', self::A, 'Rachis non partagé', '1');
+        $favorite = $this->act('ortho', '1', 'back', 'Rachis en favori');
+        $this->em->persist(new NomenclatureHistoricalSpeciality($favorite, 'neuro'));
+        $this->surgery($year, $favorite, 'favorites', self::B, 'Rachis en favori', '1');
+        $brain = $this->act('neuro', null, null, 'Tumeur intracrânienne');
+        $this->surgery($year, $brain, 'neuro', self::A, 'Tumeur intracrânienne', '1');
+        $bowel = $this->act('dig', null, null, 'Colectomie');
+        $this->surgery($year, $bowel, 'dig', self::B, 'Colectomie', '1');
+        $this->em->flush();
+
+        $sheet = $this->summary($user, $yearId);
+        // Sections générales remplies dans l'ordre (écart H1 connu) : digestif, puis neurochirurgie.
+        self::assertSame(['Colectomie', 'Tumeur intracrânienne'], array_column($this->lines($sheet), 'name'));
+        self::assertGreaterThan($this->rowOf($sheet, 'TOTAL GENERAL', 2), $this->lines($sheet)[0]['row']);
+    }
+
+    /** Seule la spécialité distingue les lignes d'un acte, hors rachis : même mention. */
+    public function testSpecialityMentionOnlyWhenItDistinguishesTwoLines(): void
+    {
+        [$user, $yearId, $year] = $this->year();
+        $act = $this->act('dig', null, null, 'Hernie');
+        $this->surgery($year, $act, 'dig', self::A, 'Hernie', '1');
+        $this->surgery($year, $act, 'general', self::A, 'Hernie', '2');
+        $this->surgery($year, $act, 'general', self::B, 'Hernie', '2');
+        $this->em->flush();
+
+        self::assertSame(['Hernie (Chirurgie digestive)', 'Hernie (Chirurgie générale)', 'Hernie'], array_column($this->lines($this->summary($user, $yearId)), 'name'));
     }
 
     public function testExportingChangesNothingInTheInterventions(): void
@@ -177,6 +245,16 @@ final class RecapitulatifCodesHistoriquesTest extends ExcelTestCase
             }
         }
         self::fail("Section absente : $title");
+    }
+
+    private function rowOf(Worksheet $sheet, string $text, int $occurrence = 1): int
+    {
+        for ($row = 14, $max = $sheet->getHighestRow(); $row <= $max; $row++) {
+            if (trim((string) $sheet->getCell("A$row")->getValue()) === $text && --$occurrence === 0) {
+                return $row;
+            }
+        }
+        self::fail("Absent : $text");
     }
 
     private function sectionsWithLines(Worksheet $sheet): int

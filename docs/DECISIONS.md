@@ -318,7 +318,8 @@ Décision :
   spécialité ne change que vers une spécialité autorisée explicitement envoyée (valeur non autorisée
   ignorée).
 - Statistiques, listes et export Excel utilisent la spécialité **enregistrée** dans chaque
-  intervention. Export : une intervention enregistrée sous une spécialité autorisée OU classée pour son
+  intervention (récapitulatif : voir ADR-214, qui place désormais les actes 14 n) en neurochirurgie dans la rubrique
+  Rachis). Export : une intervention enregistrée sous une spécialité autorisée OU classée pour son
   code est listée avec les interventions de cette spécialité (la région anatomique, propre à
   l'orthopédie, n'est pas appliquée) ; les interventions orthopédiques restent dans leur région.
 - **Changement attendu dans les exports (décision du 03/11/2026)** : les interventions historiques
@@ -403,3 +404,26 @@ Conséquences :
 - Deux lignes peuvent sembler identiques si seule la spécialité enregistrée les distingue (donnée non affichée).
 - Les écarts H1, H10 et H11 (`docs/AUDIT-TOTAUX-EXCEL.md`) restent à décider séparément.
 - Références `cas-limites` et `audit-sans-nomenclature` remplacées : seules les lignes de leur récapitulatif changent.
+
+## ADR-214 — Récapitulatif Excel : rubrique Rachis pour les actes 14 n) enregistrés en neurochirurgie
+**Statut : Proposée (04/11/2026)** — remplace, pour le récapitulatif, le classement sans région d'ADR-211 ; complète ADR-213.
+
+Contexte : deux notions étaient confondues. La **spécialité enregistrée** appartient à l'intervention ; la **rubrique du
+récapitulatif** présente la nature de l'acte. Une microdiscectomie lombaire relève de la rubrique Rachis, qu'elle soit
+enregistrée en orthopédie ou en neurochirurgie.
+
+Décision :
+- Une intervention enregistrée en `neuro` sur un code orthopédique de l'article 14 n) (autorisé ou classé pour `neuro`)
+  est présentée dans la rubrique **Rachis** du bloc de son type (électif ou traumatologie), quelle que soit la région
+  MedClick du code. La spécialité enregistrée n'est jamais modifiée et reste dans la clé de ligne (ADR-213).
+- Deux lignes d'une même section, de même code et de même libellé, mais de spécialités différentes, portent chacune leur
+  spécialité entre parenthèses. Le libellé enregistré ne change pas ; sans ambiguïté, aucune mention.
+- Rien d'autre ne bouge : interventions orthopédiques (y compris sur les codes 14 n) dont la région MedClick n'est pas le
+  rachis), neurochirurgie hors 14 n), chirurgie digestive et autres spécialités, valeur `favorites` (H11).
+
+Conséquences :
+- Les compteurs par année et par rôle de l'ensemble des lignes ne changent pas. Les sous-totaux Rachis, ceux de la chirurgie
+  générale et les TOTAL GENERAL de bloc concernés évoluent chez les seuls utilisateurs reclassés.
+- Les formules du modèle omettent certaines sections (H2) : la somme des TOTAL GENERAL affichés peut donc changer alors
+  que les lignes sont identiques.
+- Aucune donnée modifiée, aucune migration ; les autres feuilles ne changent pas.

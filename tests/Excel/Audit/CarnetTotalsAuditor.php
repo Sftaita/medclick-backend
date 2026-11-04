@@ -33,7 +33,7 @@ final class CarnetTotalsAuditor
         'C8' => 'Carnet : la ligne « Total » du décompte couvre toutes les lignes de superviseurs et vaut leur somme.',
         'C9' => 'Carnet : toutes les assistances du candidat sont attribuées à un superviseur (total décompte = total candidat).',
         // Liste récapitulative (feuille 3)
-        'R1' => 'Récapitulatif : par section (région ou spécialité), une ligne par acte, code, spécialité et libellé enregistrés (ADR-213), assistant = positions 2, opérateur = positions 1 et 3, par année de formation, toutes années de l\'utilisateur.',
+        'R1' => 'Récapitulatif : par section (région ou spécialité ; acte 14 n) en neurochirurgie = Rachis, ADR-214), une ligne par acte, code, spécialité et libellé enregistrés (ADR-213), spécialité en mention si elle seule distingue deux lignes, assistant = positions 2, opérateur = positions 1 et 3, par année de formation, toutes années de l\'utilisateur.',
         'R2' => 'Récapitulatif : sur chaque ligne, total assistant = somme des années, total opérateur = somme des années, A+O = assistant + opérateur, % = opérateur / (A+O) à 0,01 près.',
         'R3' => 'Récapitulatif : chaque « Sous total » couvre toutes les lignes de sa section et vaut leur somme.',
         'R4' => 'Récapitulatif : chaque « TOTAL GENERAL » additionne TOUS les sous-totaux de son bloc, dans chaque colonne.',
@@ -120,7 +120,10 @@ final class CarnetTotalsAuditor
         $current = array_values(array_filter($years, fn ($y) => (int) $y['id'] === $yearId))[0];
         $yearOf = array_column($years, 'year_of_formation', 'id');
         $surgeries = $db->fetchAllAssociative('SELECT s.id, s.date, s.position, s.first_hand, s.second_hand, s.code, s.name, s.speciality, s.year_id,
-                n.id AS nid, n.type, n.sub_type FROM surgeries s LEFT JOIN nomenclature n ON n.id = s.nomenclature_id
+                n.id AS nid, n.type, n.sub_type, n.speciality AS principal,
+                ((SELECT COUNT(*) FROM nomenclature_shared_speciality a WHERE a.nomenclature_id = n.id AND a.speciality = s.speciality)
+                    + (SELECT COUNT(*) FROM nomenclature_historical_speciality h WHERE h.nomenclature_id = n.id AND h.speciality = s.speciality)) AS shared
+                FROM surgeries s LEFT JOIN nomenclature n ON n.id = s.nomenclature_id
                 WHERE s.year_id IN (SELECT id FROM years WHERE user_id = ?) ORDER BY s.year_id, s.id', [$userId]);
         foreach ($surgeries as &$s) {
             $s['yearOfFormation'] = $yearOf[$s['year_id']];
@@ -257,6 +260,25 @@ final class CarnetTotalsAuditor
 
     /*------------------------------------------------------------ Liste récapitulative */
 
+    /**
+     * ADR-214 : même code et même libellé, spécialités différentes dans la section : mention entre parenthèses.
+     *
+     * @param list<array<string, mixed>> $lines
+     *
+     * @return list<array<string, mixed>>
+     */
+    private function withSpecialityMention(array $lines): array
+    {
+        $key = fn (array $line) => $this->lineText($line['code']) . '|' . $this->lineText($line['name']);
+        $specialities = [];
+        foreach ($lines as $line) {
+            $specialities[$key($line)][$line['speciality']] = true;
+        }
+        $labels = ['ortho' => 'Orthopédie', 'favorites' => 'Favoris', 'dig' => 'Chirurgie digestive', 'general' => 'Chirurgie générale', 'uro' => 'Chirurgie urologique', 'vasc' => 'Chirurgie vasculaire', 'thor' => 'Chirurgie thoracique', 'plastic' => 'Chirurgie plastique', 'neuro' => 'Neurochirurgie', 'transp' => 'Transplantation'];
+
+        return array_map(fn (array $line) => count($specialities[$key($line)]) > 1 ? ['name' => $line['name'] . ' (' . ($labels[$line['speciality']] ?? $line['speciality']) . ')'] + $line : $line, $lines);
+    }
+
     private function lineText(?string $text): string
     {
         return mb_strtolower(trim((string) preg_replace('/[\s\x{00A0}]+/u', ' ', strtr((string) $text, ['’' => "'", '‘' => "'", 'ʼ' => "'", '´' => "'", '`' => "'"]))));
@@ -280,10 +302,12 @@ final class CarnetTotalsAuditor
         $merged = [];
         foreach ($data['surgeries'] as $s) {
             $position = trim((string) $s['position']);
-            $isOrtho = $s['speciality'] === 'ortho' && in_array((string) $s['type'], ['1', '2'], true);
+            // ADR-214 : acte 14 n) enregistré en neurochirurgie : rubrique Rachis.
+            $isSpine = $s['speciality'] === 'neuro' && $s['principal'] === 'ortho' && (int) $s['shared'] > 0;
+            $isOrtho = ($s['speciality'] === 'ortho' || $isSpine) && in_array((string) $s['type'], ['1', '2'], true);
             if ($isOrtho) {
                 $block = $s['type'] === '1' ? 'elective' : 'trauma';
-                $section = self::ELECTIVE[$s['sub_type']] ?? null;
+                $section = self::ELECTIVE[$isSpine ? 'back' : $s['sub_type']] ?? null;
                 $reason = $section === null ? 'orthopédie : sous-type « ' . $s['sub_type'] . ' » hors des 15 régions' : null;
             } else {
                 $block = 'general';
@@ -309,7 +333,7 @@ final class CarnetTotalsAuditor
             $act = $s['nid'] ?? 'sans-nomenclature';
             $line = implode('|', [$this->lineText($s['code']), $s['speciality'], $this->lineText($s['name'])]);
             $row = &$expected[$block][$section][$act][$line];
-            $row ??= ['code' => (string) $s['code'], 'name' => (string) $s['name'], 'a' => array_fill(1, $maxYear, 0), 'o' => array_fill(1, $maxYear, 0), 'codes' => []];
+            $row ??= ['code' => (string) $s['code'], 'name' => (string) $s['name'], 'speciality' => (string) $s['speciality'], 'a' => array_fill(1, $maxYear, 0), 'o' => array_fill(1, $maxYear, 0), 'codes' => []];
             $row['codes'][$this->lineText($s['code'])] = true;
             if ($invalidPosition) {
                 unset($row);
@@ -355,7 +379,7 @@ final class CarnetTotalsAuditor
         $listed = 0;
         foreach ($blocks as $block) {
             foreach ($sections[$block] ?? [] as $title => $info) {
-                $exp = array_merge(...array_map(fn (array $lines) => array_values($lines), array_values($expected[$block][$title] ?? [])));
+                $exp = $this->withSpecialityMention(array_merge(...array_map(fn (array $lines) => array_values($lines), array_values($expected[$block][$title] ?? []))));
                 $this->check('R1', "Récapitulatif $block/$title : nombre de lignes", count($exp), count($info['rows']));
                 foreach ($info['rows'] as $i => $r) {
                     $e = $exp[$i] ?? null;
