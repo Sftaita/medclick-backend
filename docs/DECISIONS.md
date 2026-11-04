@@ -383,7 +383,7 @@ Conséquences :
   (225621/225610 et 225901/225890), affichage du code dans le récapitulatif.
 
 ## ADR-213 — Récapitulatif Excel : une ligne par code réellement enregistré
-**Statut : Proposée (03/11/2026)** — complète ADR-007, ADR-211 et ADR-212.
+**Statut : Adoptée (04/11/2026, en production depuis `6ad8004`)** — complète ADR-007, ADR-211 et ADR-212.
 
 Contexte : la liste récapitulative regroupait les interventions par lien de nomenclature et affichait le code et le
 libellé de la première. Plusieurs codes ou actes enregistrés pouvaient donc être additionnés sous un seul.
@@ -406,7 +406,7 @@ Conséquences :
 - Références `cas-limites` et `audit-sans-nomenclature` remplacées : seules les lignes de leur récapitulatif changent.
 
 ## ADR-214 — Récapitulatif Excel : rubrique Rachis pour les actes 14 n) enregistrés en neurochirurgie
-**Statut : Proposée (04/11/2026)** — remplace, pour le récapitulatif, le classement sans région d'ADR-211 ; complète ADR-213.
+**Statut : Adoptée (04/11/2026, en production depuis `6ad8004`)** — remplace, pour le récapitulatif, le classement sans région d'ADR-211 ; complète ADR-213.
 
 Contexte : deux notions étaient confondues. La **spécialité enregistrée** appartient à l'intervention ; la **rubrique du
 récapitulatif** présente la nature de l'acte. Une microdiscectomie lombaire relève de la rubrique Rachis, qu'elle soit
@@ -427,3 +427,7 @@ Conséquences :
 - Les formules du modèle omettent certaines sections (H2) : la somme des TOTAL GENERAL affichés peut donc changer alors
   que les lignes sont identiques.
 - Aucune donnée modifiée, aucune migration ; les autres feuilles ne changent pas.
+- Variation constatée et acceptée à la mise en production : pour un utilisateur, la somme des TOTAL GENERAL affichés
+  passe de 432 à 449 (+17, assistant de 1re année). Ces 17 interventions existaient déjà ; elles étaient rangées dans une
+  section omise par la formule du modèle (H2). La somme des lignes (542) ne change pas. Détail :
+  `docs/AUDIT-TOTAUX-EXCEL.md`.

@@ -53,6 +53,21 @@ distincts : le carnet compte des interventions, le récapitulatif une ligne par 
 | A4, A5 | Rapport : totaux mensuels et annuels (plages, 12 mois) | conformes (reportent H7, H8, H14) |
 | E1 | Évaluation : un jour par jour de formation, dans la bonne section | conforme |
 
+## Mise en production du récapitulatif (ADR-213, ADR-214)
+
+En production depuis le 04/11/2026 (`6ad8004`). Sur 27 années comparées, 21 utilisateurs : compteurs des lignes par année
+et par rôle identiques, autres feuilles identiques, 5 322 lignes conformes au recalcul depuis la base, 10 témoins sur 10
+identiques.
+
+Seule variation de la somme des TOTAL GENERAL : **432 → 449 (+17)**, un utilisateur, colonne assistant de 1re année (359 →
+376). Les interventions reclassées en Rachis sortent d'une section omise par la formule de ce total (H2) : le total
+affiché se rapproche de la somme des lignes, qui reste à 542. Variation acceptée le 04/11/2026.
+
+Restent connus après cette livraison : H1, H2, H3 et H4 (récapitulatif) ; H5 à H9, H12 et H13 (autres feuilles et cas
+limites) ; H10 et H11 (interventions sans nomenclature ou absentes du récapitulatif, dont la valeur `favorites`) ; lignes
+6890 et 6955 (actes 14 n) de région MedClick autre que le rachis) ; interventions de neurochirurgie sur une région rachis
+hors 14 n) ; erreur Webpack de la page d'accueil de l'API. Les sections suivantes détaillent les écarts H.
+
 ## Écarts historiques
 
 Prévalence (qualitative, chiffres dans le rapport transmis) : copie de préproduction.
