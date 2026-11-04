@@ -560,9 +560,12 @@ final class CarnetDeStageSpreadsheetBuilder
     }
 
     /**
-     * ADR-215 : les TOTAL GENERAL « assistant » de chirurgie générale du modèle omettent des sous-totaux selon la colonne
-     * (urologie, neurologie, thoracique). Chaque formule existante qui en omet est réécrite sur toutes les rubriques ;
-     * une colonne sans formule (plus de 7 années, écart H4) n'est pas créée.
+     * ADR-215 : formules « assistant » de chirurgie générale du modèle, corrigées à l'export ; une colonne sans formule
+     * (plus de 7 années, écart H4) n'en reçoit pas.
+     * - H3 : les sous-totaux des années 6 et 7 additionnent d'autres colonnes (SUM(H:I), SUM(I:J)) au lieu des lignes
+     *   de leur rubrique : ils reprennent la plage de lignes de la colonne de l'année 1.
+     * - H2 : les TOTAL GENERAL omettent des sous-totaux selon la colonne (urologie, neurologie, thoracique) : ils sont
+     *   réécrits sur toutes les rubriques.
      *
      * @param array<int, string> $assistantColumns
      */
@@ -577,6 +580,7 @@ final class CarnetDeStageSpreadsheetBuilder
             $label = trim((string) $sheet->getCell('A' . $row)->getValue());
             if ($label === 'Sous total' && $block === 2) {
                 $subtotals[] = $row;
+                $this->completeGeneralSubtotal($sheet, $row, $assistantColumns);
             } elseif ($label === 'TOTAL GENERAL' && ++$block === 3) {
                 foreach ($assistantColumns as $column) {
                     $formula = $sheet->getCell($column . $row)->getValue();
@@ -590,6 +594,26 @@ final class CarnetDeStageSpreadsheetBuilder
                 }
 
                 return;
+            }
+        }
+    }
+
+    /**
+     * H3 : toute formule de sous-total d'une colonne d'année qui n'additionne pas ses propres lignes prend la plage de
+     * lignes de la première année.
+     *
+     * @param array<int, string> $assistantColumns
+     */
+    private function completeGeneralSubtotal(Worksheet $sheet, int $row, array $assistantColumns): void
+    {
+        $first = $assistantColumns[1];
+        if (preg_match('/^=SUM\(' . $first . '(\d+):' . $first . '(\d+)\)$/', (string) $sheet->getCell($first . $row)->getValue(), $range) !== 1) {
+            return;
+        }
+        foreach ($assistantColumns as $column) {
+            $formula = $sheet->getCell($column . $row)->getValue();
+            if (is_string($formula) && str_starts_with($formula, '=') && preg_match('/^=SUM\(' . $column . '\d+:' . $column . '\d+\)$/', $formula) !== 1) {
+                $sheet->setCellValue($column . $row, '=SUM(' . $column . $range[1] . ':' . $column . $range[2] . ')');
             }
         }
     }

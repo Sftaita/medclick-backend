@@ -21,29 +21,29 @@ final class TotalsAuditTest extends ExcelTestCase
      * dans docs/AUDIT-TOTAUX-EXCEL.md. Toutes les autres règles : 0 écart.
      */
     private const KNOWN = [
-        // H3 (sous-totaux années 6-7 de chirurgie générale) est présent dans tout fichier : formules du gabarit.
-        'audit-reference' => ['R3' => 16],
-        'audit-trente-superviseurs' => ['R3' => 16],
+        // Sans écart connu : H1, H2 et H3 corrigés (ADR-215).
+        'audit-reference' => [],
+        'audit-trente-superviseurs' => [],
         // H9 : deux maîtres de stage.
-        'audit-deux-maitres' => ['C1' => 1, 'C3' => 4, 'C4' => 3, 'C5' => 1, 'C6' => 3, 'C7' => 1, 'C8' => 2, 'C9' => 2, 'R3' => 16],
+        'audit-deux-maitres' => ['C1' => 1, 'C3' => 4, 'C4' => 3, 'C5' => 1, 'C6' => 3, 'C7' => 1, 'C8' => 2, 'C9' => 2],
         // H1 corrigé (ADR-215) : spécialités générales sous leur rubrique.
-        'audit-specialites-generales' => ['R3' => 16],
-        // H3 avec des valeurs (années 6-7 de chirurgie générale).
-        'audit-annees-6-7' => ['R3' => 18],
+        'audit-specialites-generales' => [],
+        // H3 corrigé (ADR-215) : années 6-7 de chirurgie générale.
+        'audit-annees-6-7' => [],
         // H4 : plus de 7 années.
-        'audit-neuf-annees' => ['R3' => 322, 'R4' => 24],
+        'audit-neuf-annees' => ['R3' => 304, 'R4' => 24],
         // H10 / H11 : sans nomenclature, données de référence hors liste (lignes distinctes, section de la première).
-        'audit-sans-nomenclature' => ['R1' => 2, 'R3' => 16, 'R5' => 4],
+        'audit-sans-nomenclature' => ['R1' => 2, 'R5' => 4],
         // H5 (plus de 9 dates de consultation dans un mois) ; H13 (#DIV/0! sans intervention) ; H15 (type « plastic »).
-        'audit-consultations-10-dates' => ['C6' => 4, 'K1' => 1, 'K2' => 1, 'K3' => 1, 'K4' => 2, 'R3' => 16],
+        'audit-consultations-10-dates' => ['C6' => 4, 'K1' => 1, 'K2' => 1, 'K3' => 1, 'K4' => 2],
         // H6 : plus de 9 gardes dans un mois.
-        'audit-gardes-10-par-mois' => ['C6' => 4, 'G2' => 2, 'G3' => 1, 'R3' => 16],
+        'audit-gardes-10-par-mois' => ['C6' => 4, 'G2' => 2, 'G3' => 1],
         // H7 : garde finissant à minuit.
-        'audit-garde-minuit' => ['A3' => 1, 'A5' => 1, 'C6' => 4, 'R3' => 16],
+        'audit-garde-minuit' => ['A3' => 1, 'A5' => 1, 'C6' => 4],
         // H8 : évènement à cheval sur le nouvel an.
-        'audit-nouvel-an' => ['A3' => 2, 'A5' => 1, 'C6' => 4, 'R3' => 16],
+        'audit-nouvel-an' => ['A3' => 2, 'A5' => 1, 'C6' => 4],
         // H12 : positions hors 1, 2, 3.
-        'audit-positions' => ['C5' => 1, 'R3' => 16, 'R5' => 3],
+        'audit-positions' => ['C5' => 1, 'R5' => 3],
     ];
 
     public static function scenarios(): iterable

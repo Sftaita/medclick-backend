@@ -91,7 +91,7 @@ Prévalence (qualitative, chiffres dans le rapport transmis) : copie de préprod
 - Prévalence : fréquente (tout utilisateur ayant de l'urologie, de la neurochirurgie ou de la
   chirurgie thoracique en assistance ; aggravée par H1, qui déplace les données entre sections).
 
-### H3 — Chirurgie générale : sous-totaux des années 6 et 7 ⚠️
+### H3 — Chirurgie générale : sous-totaux des années 6 et 7 (corrigé par ADR-215)
 - Formules du gabarit, dans chaque section du bloc : `J = SUM(H:I)` et `K = SUM(I:J)` sur la ligne
   « Sous total » (somme horizontale des sous-totaux des années 4 et 5) au lieu de `SUM(J16:J17)`.
 - Ex. (`audit-annees-6-7`, une aide digestive par année) : année 6 = 2 (attendu 1), année 7 = 3

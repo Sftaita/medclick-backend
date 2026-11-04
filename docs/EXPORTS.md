@@ -216,7 +216,7 @@ exports » du front (`/admin/exports`). Aucun accès aux fichiers.
   se régénère pas : une différence est une régression, ou un changement de format décidé
   explicitement (nouvelles références, nouvelle validation). Changements à ce jour : ADR-213,
   `cas-limites` et `audit-sans-nomenclature` (lignes du récapitulatif, totaux et autres feuilles identiques) ; ADR-215,
-  les 30 références (rubriques et TOTAL GENERAL de chirurgie générale, autres feuilles identiques).
+  les 30 références (rubriques, sous-totaux et TOTAL GENERAL de chirurgie générale, autres feuilles identiques).
 - Comparateur `tests/Excel/XlsxComparator.php` : (1) parties du paquet identiques à l'octet ou après
   canonisation XML (seules les dates de `docProps/core.xml` tolérées), (2) sémantique : feuilles,
   chaque cellule (valeur, type, formule, style résolu), fusions, dimensions, mise en page et

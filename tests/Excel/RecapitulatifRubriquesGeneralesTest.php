@@ -11,7 +11,7 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 /**
- * ADR-215 : rubriques de chirurgie générale (H1) et formules des TOTAL GENERAL (H2).
+ * ADR-215 : rubriques de chirurgie générale (H1), TOTAL GENERAL (H2) et sous-totaux des années 6 et 7 (H3).
  */
 final class RecapitulatifRubriquesGeneralesTest extends ExcelTestCase
 {
@@ -88,6 +88,38 @@ final class RecapitulatifRubriquesGeneralesTest extends ExcelTestCase
             preg_match_all('/' . $column . '(\d+)/', (string) $sheet->getCell("$column$total")->getValue(), $m);
             self::assertSame([], array_values(array_diff($subtotals, array_map('intval', $m[1]))), "Colonne $column");
         }
+    }
+
+    /** H3 : chaque sous-total de chaque année additionne les lignes de sa rubrique, dans sa colonne. */
+    public function testEverySubtotalSumsItsOwnLines(): void
+    {
+        [$user, $yearId, $year] = $this->year();
+        $this->surgery($year, $this->act('uro', 'Acte'), 'uro', 'Acte', '1');
+        $this->em->flush();
+
+        $sheet = $this->summary($user, $yearId);
+        foreach ($this->generalRows($sheet)[0] as $row) {
+            foreach (['E', 'F', 'G', 'H', 'I', 'J', 'K'] as $column) {
+                self::assertMatchesRegularExpression('/^=SUM\\(' . $column . '\\d+:' . $column . '\\d+\\)$/', (string) $sheet->getCell("$column$row")->getValue(), "$column$row");
+            }
+        }
+    }
+
+    /** H3 : une aide digestive par année : chaque colonne vaut 1, le total de la rubrique 7. */
+    public function testYearsSixAndSevenAreNoLongerInflated(): void
+    {
+        [$user, $yearId] = $this->seed('audit-annees-6-7');
+
+        $sheet = $this->summary($user, $yearId);
+        $row = $this->generalRows($sheet)[0][0];
+        $total = $this->generalRows($sheet)[1];
+        foreach (['E', 'F', 'G', 'H', 'I', 'J', 'K'] as $column) {
+            self::assertSame(1, (int) $sheet->getCell("$column$row")->getCalculatedValue(), "Sous-total $column");
+            self::assertSame(1, (int) $sheet->getCell("$column$total")->getCalculatedValue(), "TOTAL GENERAL $column");
+        }
+        self::assertSame(7, (int) $sheet->getCell("L$row")->getCalculatedValue());
+        self::assertSame(7, (int) $sheet->getCell("L$total")->getCalculatedValue());
+        self::assertSame(7, (int) $sheet->getCell("U$total")->getCalculatedValue());
     }
 
     /** ADR-214 : le rachis 14 n) en neurochirurgie reste sous Rachis ; l'intracrânien sous Neurologie, le digestif sous Digestive. */
