@@ -458,12 +458,15 @@ final class CarnetDeStageSpreadsheetBuilder
         }
 
         // Interventions générales : seules celles sans sous-type (clé ""), comme le format historique.
+        // ADR-215 : chaque spécialité reste sous sa rubrique, une rubrique vide ne décale pas les suivantes.
         $plan[] = 10;
+        $generalLines = self::generalLinesBySpeciality($general[''] ?? []);
         foreach (self::SPECIALITIES as $speciality) {
-            $detailsList = self::summaryLines(array_filter($general[''] ?? [], fn ($details) => $details['speciality'] === $speciality['value']));
-            if ($detailsList) {
-                $plan[] = $detailsList;
+            if (isset($generalLines[$speciality['value']])) {
+                $plan[] = self::withSpecialityMention($generalLines[$speciality['value']]);
                 $plan[] = 3;
+            } else {
+                $plan[] = 4;
             }
         }
 
@@ -526,6 +529,69 @@ final class CarnetDeStageSpreadsheetBuilder
             $written += count($entry);
             $progress->advance($written);
         }
+
+        $this->completeGeneralTotals($sheet, $formationYearColumns);
+    }
+
+    /**
+     * ADR-215 : une ligne va sous la rubrique de sa spécialité enregistrée. Exceptions inchangées : un acte
+     * sans section (première intervention sous une valeur hors liste, écart H11) reste absent ; une valeur hors liste,
+     * ou une intervention sans nomenclature (écart H10), reste dans la section de la première intervention de l'acte.
+     *
+     * @param array<int|string, array{speciality: string, lines: array<string, array<string, mixed>>}> $acts
+     *
+     * @return array<string, list<array<string, mixed>>>
+     */
+    private static function generalLinesBySpeciality(array $acts): array
+    {
+        $known = array_column(self::SPECIALITIES, 'value', 'value');
+        $bySpeciality = [];
+        foreach ($acts as $nomenclatureId => $act) {
+            if (!isset($known[$act['speciality']])) {
+                continue;
+            }
+            foreach ($act['lines'] as $line) {
+                $own = $nomenclatureId !== '' && isset($known[$line['speciality']]);
+                $bySpeciality[$own ? $line['speciality'] : $act['speciality']][] = $line;
+            }
+        }
+
+        return $bySpeciality;
+    }
+
+    /**
+     * ADR-215 : les TOTAL GENERAL « assistant » de chirurgie générale du modèle omettent des sous-totaux selon la colonne
+     * (urologie, neurologie, thoracique). Chaque formule existante qui en omet est réécrite sur toutes les rubriques ;
+     * une colonne sans formule (plus de 7 années, écart H4) n'est pas créée.
+     *
+     * @param array<int, string> $assistantColumns
+     */
+    private function completeGeneralTotals(Worksheet $sheet, array $assistantColumns): void
+    {
+        $block = 0;
+        $subtotals = [];
+        for ($row = 16, $max = $sheet->getHighestRow(); $row <= $max; $row++) {
+            if (!$sheet->cellExists('A' . $row)) {
+                continue;
+            }
+            $label = trim((string) $sheet->getCell('A' . $row)->getValue());
+            if ($label === 'Sous total' && $block === 2) {
+                $subtotals[] = $row;
+            } elseif ($label === 'TOTAL GENERAL' && ++$block === 3) {
+                foreach ($assistantColumns as $column) {
+                    $formula = $sheet->getCell($column . $row)->getValue();
+                    if (!is_string($formula) || !str_starts_with($formula, '=')) {
+                        continue;
+                    }
+                    preg_match_all('/' . $column . '(\d+)/', $formula, $references);
+                    if (array_diff($subtotals, array_map('intval', $references[1])) !== []) {
+                        $sheet->setCellValue($column . $row, '=SUM(' . implode(',', array_map(fn (int $subtotal) => $column . $subtotal, $subtotals)) . ')');
+                    }
+                }
+
+                return;
+            }
+        }
     }
 
     /**
@@ -557,8 +623,16 @@ final class CarnetDeStageSpreadsheetBuilder
      */
     private static function summaryLines(array $acts): array
     {
-        $lines = array_merge(...array_map(fn (array $act) => array_values($act['lines']), array_values($acts)));
+        return self::withSpecialityMention(array_merge(...array_map(fn (array $act) => array_values($act['lines']), array_values($acts))));
+    }
 
+    /**
+     * @param list<array<string, mixed>> $lines
+     *
+     * @return list<array<string, mixed>>
+     */
+    private static function withSpecialityMention(array $lines): array
+    {
         $specialities = [];
         foreach ($lines as $line) {
             $specialities[self::summaryLineText($line['nomenclature']) . "\0" . self::summaryLineText($line['name'])][(string) $line['speciality']] = true;

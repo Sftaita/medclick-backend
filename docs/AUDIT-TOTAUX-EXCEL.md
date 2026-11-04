@@ -41,7 +41,7 @@ distincts : le carnet compte des interventions, le récapitulatif une ligne par 
 | C7 | Décompte par superviseur (assistances, opérateur + aîné, %), y compris > 26 superviseurs | conforme (sauf H9) |
 | C8 | Total du décompte (plage et valeur) | conforme (sauf H9) |
 | C9 | Assistances attribuées à un superviseur = assistances du candidat | conforme ; des interventions réelles ont un aîné absent des superviseurs de l'année (donnée) |
-| R1 | Récapitulatif : par section (acte 14 n) en neurochirurgie = Rachis, ADR-214), une ligne par acte, code, spécialité et libellé enregistrés (ADR-213), comptes par année | conforme en orthopédie et traumatologie ; écart H1, H10 en chirurgie générale |
+| R1 | Récapitulatif : par section (acte 14 n) en neurochirurgie = Rachis, ADR-214), une ligne par acte, code, spécialité et libellé enregistrés (ADR-213), comptes par année | conforme, hors écart H10 en chirurgie générale |
 | R2 | Récapitulatif : totaux de ligne et % | conformes |
 | R3 | Récapitulatif : sous-totaux (plage et valeur) | écarts H3, H4 |
 | R4 | Récapitulatif : TOTAL GENERAL de chaque bloc | conformes en orthopédie et traumatologie ; écarts H2, H4 |
@@ -72,7 +72,7 @@ hors 14 n) ; erreur Webpack de la page d'accueil de l'API. Les sections suivante
 
 Prévalence (qualitative, chiffres dans le rapport transmis) : copie de préproduction.
 
-### H1 — Chirurgie générale : interventions rangées sous une autre spécialité ⚠️ majeur
+### H1 — Chirurgie générale : interventions rangées sous une autre spécialité (corrigé par ADR-215)
 - Règle : un acte de chirurgie vasculaire doit figurer sous « VASCULAIRE ».
 - Actuel : le moteur remplit les sections dans l'ordre (DIGESTIVE, GENERAL, UROLOGIE…) avec les
   seules spécialités présentes : dès qu'une spécialité manque, les suivantes glissent d'une section.
@@ -81,7 +81,7 @@ Prévalence (qualitative, chiffres dans le rapport transmis) : copie de préprod
 - Conséquence : répartition par spécialité fausse dans la liste récapitulative (totaux par section).
 - Prévalence : **majorité** des utilisateurs ayant de la chirurgie générale.
 
-### H2 — Chirurgie générale : « TOTAL GENERAL » incomplet ⚠️
+### H2 — Chirurgie générale : « TOTAL GENERAL » incomplet (corrigé par ADR-215)
 - Formules du gabarit (ligne TOTAL GENERAL du bloc, ex. ligne 187 sans colonne ajoutée) :
   - année 1 `E187 = SUM(E158,E162,E170,E174,E178,E182,E186)` : **omet UROLOGIE (E166)** ;
   - année 2 `F187` : omet UROLOGIE et NEUROLOGIE ;

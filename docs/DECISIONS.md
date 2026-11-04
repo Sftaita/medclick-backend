@@ -431,3 +431,26 @@ Conséquences :
   passe de 432 à 449 (+17, assistant de 1re année). Ces 17 interventions existaient déjà ; elles étaient rangées dans une
   section omise par la formule du modèle (H2). La somme des lignes (542) ne change pas. Détail :
   `docs/AUDIT-TOTAUX-EXCEL.md`.
+
+## ADR-215 — Récapitulatif Excel : rubriques et TOTAL GENERAL de chirurgie générale (H1, H2)
+**Statut : Proposée (04/11/2026)** — complète ADR-213 et ADR-214.
+
+Contexte : les spécialités présentes étaient écrites dans les premières rubriques, sous un titre qui n'était pas le leur
+(H1), et le TOTAL GENERAL « assistant » omettait selon la colonne l'urologie, la neurologie ou la thoracique (H2).
+
+Décision :
+- Chaque rubrique garde sa place dans le modèle, y compris vide. Une ligne figure sous la rubrique de sa spécialité
+  enregistrée, sauf les actes de l'exception ADR-214, qui restent sous Rachis.
+- Restent dans la section de la première intervention de l'acte, comme avant : les valeurs hors liste (`favorites`,
+  `ortho`) et les interventions sans nomenclature (H10). Les actes dont la première intervention n'a pas de section
+  restent absents (H11).
+- Le modèle n'est pas modifié : au moment de l'export, une formule existante qui omet un sous-total est réécrite sur les
+  huit rubriques. Une colonne sans formule (plus de 7 années, H4) n'en reçoit pas.
+- Le titre officiel « NEUROLOGIE » du modèle est conservé pour la neurochirurgie.
+
+Conséquences :
+- Changement voulu du format : sous-totaux et TOTAL GENERAL de chirurgie générale changent. Aucune donnée modifiée, aucune
+  migration ; orthopédie, traumatologie et autres feuilles inchangées.
+- H3 reste : en années 6 et 7, le sous-total d'une rubrique additionne d'autres colonnes ; les colonnes concernées du
+  TOTAL GENERAL et ses totaux (L, U) restent donc supérieurs à la somme des lignes quand il y a des aides en années 4 à 6.
+- Les 30 références sont remplacées : seules les cellules du récapitulatif de chirurgie générale changent.
