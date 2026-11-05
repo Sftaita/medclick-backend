@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\Advertising\Emplacements;
 use App\Entity\Marketing;
 use App\Entity\MarketingView;
 use App\Repository\MarketingRepository;
@@ -12,16 +13,17 @@ use Psr\Clock\ClockInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
- * Diffusion des campagnes sponsors (docs/SPONSORS.md) : campagnes affichées par emplacement et
- * enregistrement des impressions et des clics.
+ * Diffusion des publicités (docs/PUBLICITES-PARTENAIRES.md) : publicités affichées par
+ * emplacement et enregistrement des impressions et des clics.
  *
- * Sélection d'un emplacement :
- * - campagnes actives ce jour (Europe/Brussels, dates incluses), ciblant l'emplacement et ayant un
- *   visuel pour lui ;
- * - une campagne exclusive l'emporte : elle est seule (la plus prioritaire s'il y en a plusieurs) ;
- * - sinon MAX_ROTATION campagnes au plus. Au-delà, tirage pondéré par la priorité : à priorité égale
- *   chacune a la même chance (rotation équitable), une priorité double est tirée deux fois plus
- *   souvent. Ordre d'affichage : priorité décroissante.
+ * Sélection d'un placement, un jour donné (Europe/Brussels, dates incluses) :
+ * - emplacement désactivé dans l'administration : rien ;
+ * - publicités publiées (statut actif) dont la période couvre le jour, ciblant le placement et
+ *   ayant un visuel pour lui ;
+ * - ordre fixé dans l'administration (glisser-déposer), puis priorité, puis ancienneté ;
+ * - une publicité « seule dans le carrousel » (exclusive) est affichée seule ;
+ * - sinon la capacité de l'emplacement au plus (3 pour les carrousels, 1 pour le plein écran).
+ *   La publication refuse un dépassement : aucun tirage au sort, l'affichage est prévisible.
  *
  * Mesure : une impression = publicité visible à au moins 50 % pendant 1 seconde (contrôlé par le
  * front) ; un même visiteur n'est compté qu'une fois par campagne, emplacement et type
@@ -31,21 +33,18 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
  */
 class SponsorDelivery
 {
+    /** Capacité des carrousels (Emplacements : capacity). */
     public const MAX_ROTATION = 3;
     public const DEDUP_WINDOW = 'PT30M';
     public const VIEWER_RETENTION = 'P1D';
-
-    /** @var \Closure(): float */
-    private \Closure $random;
 
     public function __construct(
         private readonly MarketingRepository $campaigns,
         private readonly EntityManagerInterface $em,
         private readonly ClockInterface $clock,
+        private readonly EmplacementSettings $settings,
         #[Autowire('%kernel.secret%')] private readonly string $secret,
-        ?\Closure $random = null,
     ) {
-        $this->random = $random ?? static fn (): float => random_int(1, PHP_INT_MAX) / PHP_INT_MAX;
     }
 
     /** Heure de Belgique (jours de diffusion, dédoublonnage). */
@@ -60,7 +59,7 @@ class SponsorDelivery
     }
 
     /**
-     * Campagnes affichées, par emplacement de carte. Visiteur non connecté : jamais de campagne
+     * Publicités affichées, par placement en carte. Visiteur non connecté : jamais de publicité
      * réservée aux professionnels.
      *
      * @return array<string, list<Marketing>>
@@ -70,55 +69,76 @@ class SponsorDelivery
         $live = $this->audience($this->campaigns->findLiveOn($this->today()), $authenticated);
         $slots = [];
         foreach (Marketing::CARD_PLACEMENTS as $placement) {
-            $slots[$placement] = $this->select($live, $placement);
+            $slots[$placement] = $this->selectFor($live, $placement, $this->today());
         }
 
         return $slots;
     }
 
     /**
-     * @param list<Marketing> $live
+     * Sélection d'un placement avec les réglages publiés de son emplacement (activé, ordre).
+     *
+     * @param list<Marketing> $campaigns
      * @return list<Marketing>
      */
-    public function select(array $live, string $placement): array
+    public function selectFor(array $campaigns, string $placement, string $day, ?array $order = null, bool $ignoreEnabled = false): array
     {
-        $candidates = array_values(array_filter($live, fn (Marketing $m) => $m->hasPlacement($placement) && self::hasVisualFor($m, $placement)));
-        $exclusive = array_values(array_filter($candidates, fn (Marketing $m) => $m->isExclusive()));
-        if ($exclusive !== []) {
-            return [self::byPriority($exclusive)[0]];
+        $emplacement = Emplacements::forCampaignPlacement($placement);
+        if ($emplacement === null) {
+            return [];
         }
-        if (count($candidates) > self::MAX_ROTATION) {
-            // Tirage pondéré sans remise (Efraimidis-Spirakis) : clé = u^(1/poids), on garde les plus grandes.
-            $keyed = array_map(fn (Marketing $m) => [$m, ($this->random)() ** (1 / max(1, $m->getPriority()))], $candidates);
-            usort($keyed, static fn (array $a, array $b) => $b[1] <=> $a[1]);
-            $candidates = array_map(static fn (array $pair) => $pair[0], array_slice($keyed, 0, self::MAX_ROTATION));
+        $setting = $this->settings->get($emplacement);
+        if (!$ignoreEnabled && !$setting->isEnabled()) {
+            return [];
         }
 
-        return self::byPriority($candidates);
+        return self::pick($campaigns, $placement, $day, $order ?? $setting->getDisplayOrder(), Emplacements::get($emplacement)['capacity']);
     }
 
     /**
-     * Plein écran après la connexion : mêmes règles que les carrousels (une exclusive l'emporte,
-     * sinon tirage pondéré par la priorité), une seule campagne.
+     * @param list<Marketing> $campaigns
+     * @param list<int> $order
+     * @return list<Marketing>
      */
-    public function interstitial(): ?Marketing
+    public static function pick(array $campaigns, string $placement, string $day, array $order, int $capacity): array
     {
-        $placement = Marketing::PLACEMENT_LOGIN_INTERSTITIAL;
-        $candidates = array_values(array_filter($this->campaigns->findLiveOn($this->today()), fn (Marketing $m) => $m->hasPlacement($placement) && self::hasVisualFor($m, $placement)));
-        $exclusive = array_values(array_filter($candidates, fn (Marketing $m) => $m->isExclusive()));
-        if ($exclusive !== []) {
-            return self::byPriority($exclusive)[0];
-        }
-        $best = null;
-        $bestKey = -1.0;
+        $candidates = array_values(array_filter($campaigns, static fn (Marketing $m) => $m->isLiveOn($day) && $m->hasPlacement($placement) && self::hasVisualFor($m, $placement)));
+        $candidates = self::ordered($candidates, $order);
         foreach ($candidates as $campaign) {
-            $key = ($this->random)() ** (1 / max(1, $campaign->getPriority()));
-            if ($key > $bestKey) {
-                [$best, $bestKey] = [$campaign, $key];
+            if ($campaign->isExclusive()) {
+                return [$campaign];
             }
         }
 
-        return $best;
+        return array_slice($candidates, 0, $capacity);
+    }
+
+    /**
+     * Ordre de l'administration, puis priorité décroissante, puis ancienneté.
+     *
+     * @param list<Marketing> $campaigns
+     * @param list<int> $order
+     * @return list<Marketing>
+     */
+    public static function ordered(array $campaigns, array $order): array
+    {
+        $rank = array_flip($order);
+        usort($campaigns, static fn (Marketing $a, Marketing $b) => [$rank[$a->getId()] ?? PHP_INT_MAX, $b->getPriority(), $a->getId() ?? PHP_INT_MAX]
+            <=> [$rank[$b->getId()] ?? PHP_INT_MAX, $a->getPriority(), $b->getId() ?? PHP_INT_MAX]);
+
+        return $campaigns;
+    }
+
+    /** Plein écran après la connexion : une seule publicité (capacité 1), ou null. */
+    public function interstitial(): ?Marketing
+    {
+        return $this->selectFor($this->campaigns->findLiveOn($this->today()), Marketing::PLACEMENT_LOGIN_INTERSTITIAL, $this->today())[0] ?? null;
+    }
+
+    /** Fréquence du plein écran (Emplacements::FREQUENCIES). */
+    public function interstitialFrequency(): string
+    {
+        return $this->settings->get(Emplacements::AFTER_LOGIN)->getFrequency();
     }
 
     /**
@@ -136,7 +156,10 @@ class SponsorDelivery
      */
     public function isServable(Marketing $campaign, string $placement, bool $authenticated = true): bool
     {
+        $emplacement = Emplacements::forCampaignPlacement($placement);
+
         return in_array($placement, Marketing::PLACEMENTS, true)
+            && $emplacement !== null && $this->settings->isEnabled($emplacement)
             && ($authenticated || !$campaign->isProfessionalsOnly())
             && $campaign->isLiveOn($this->today())
             && $campaign->hasPlacement($placement)
@@ -194,17 +217,44 @@ class SponsorDelivery
     {
         return [
             'id' => $campaign->getId(),
-            'sponsor' => $campaign->getSponsorName(),
+            'sponsor' => $campaign->getPartner()?->getName() ?? $campaign->getSponsorName(),
             'title' => $campaign->getTitle(),
             'description' => $campaign->getDescription(),
             // Nom de fichier : le front le sert via <API>/partner/logo/<logo>.
-            'logo' => $campaign->getLogo(),
+            'logo' => $campaign->getLogo() ?? $campaign->getPartner()?->getLogo()?->getFileName(),
             'imageDesktop' => $campaign->getBannerDesktop(),
             'imageMobile' => $campaign->getBannerMobile(),
             'url' => $campaign->getRedirectUrl(),
-            'cta' => $campaign->hasCta() && $campaign->getRedirectUrl() !== null,
-            // Exclusive : le front masque aussi le partenaire de la barre latérale sur cet écran.
+            // Bouton « Découvrir » : toujours présent quand un lien est configuré (jamais inactif).
+            'cta' => $campaign->getRedirectUrl() !== null,
             'exclusive' => $campaign->isExclusive(),
+        ];
+    }
+
+    /** Données publiques du plein écran (GET /api/marketing/active, aperçu de l'administration). */
+    public function toInterstitialArray(Marketing $campaign): array
+    {
+        return [
+            'id' => $campaign->getId(),
+            'campaign_name' => $campaign->getCampaignName(),
+            'status' => $campaign->getStatus(),
+            'start_date' => $campaign->getStartDate()?->format('Y-m-d'),
+            'end_date' => $campaign->getEndDate()?->format('Y-m-d'),
+            'views' => $campaign->getViews(), // Compteur historique (figé)
+            'clicks' => $campaign->getClicks(),
+            'duration' => $campaign->getDuration(),
+            'formats' => [
+                'smartphone' => $campaign->getSmartphoneFormat(),
+                'tablet_portrait' => $campaign->getTabletPortraitFormat(),
+                'tablet_landscape' => $campaign->getTabletLandscapeFormat(),
+                'screen_14_inch' => $campaign->getScreen14InchFormat(),
+                'large_screen' => $campaign->getLargeScreenFormat(),
+            ],
+            'redirect_url' => $campaign->getRedirectUrl(),
+            // Fréquence d'affichage par navigateur (every_login, daily, weekly), réglée dans
+            // l'administration ; appliquée par le front.
+            'frequency' => $this->interstitialFrequency(),
+            'sponsor' => $campaign->getPartner()?->getName() ?? $campaign->getSponsorName(),
         ];
     }
 
@@ -218,16 +268,5 @@ class SponsorDelivery
         }
 
         return $campaign->getBannerDesktop() !== null || $campaign->getBannerMobile() !== null;
-    }
-
-    /**
-     * @param list<Marketing> $campaigns
-     * @return list<Marketing>
-     */
-    private static function byPriority(array $campaigns): array
-    {
-        usort($campaigns, static fn (Marketing $a, Marketing $b) => [$b->getPriority(), $a->getId()] <=> [$a->getPriority(), $b->getId()]);
-
-        return $campaigns;
     }
 }

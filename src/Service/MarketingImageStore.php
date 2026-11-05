@@ -59,6 +59,13 @@ class MarketingImageStore
                 preg_match(MarketingImage::PATH_PATTERN, $path, $match);
                 $used[$match[1]] = true;
             }
+            // Visuels de modifications pas encore publiées : conservés jusqu'à la publication.
+            $pending = $marketing->getPendingChanges() ?? [];
+            array_walk_recursive($pending, static function ($value) use (&$used): void {
+                if (is_string($value) && preg_match(MarketingImage::PATH_PATTERN, $value, $match)) {
+                    $used[$match[1]] = true;
+                }
+            });
         }
         // Visuels des fiches partenaires (même stockage).
         foreach ($this->em->getRepository(Partner::class)->findAll() as $partner) {

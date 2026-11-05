@@ -80,6 +80,11 @@ Doc OpenAPI générée par API Platform : `GET /api` (ne couvre pas les contrôl
   `tests/Fixtures/excel-reference/`. Voir `docs/EXPORTS.md`.
 - Contrôle d'accès : `config/packages/security.yaml` (`access_control` par préfixe d'URL).
 
+- **Publicités & partenaires** : `docs/PUBLICITES-PARTENAIRES.md` — huit emplacements
+  (`src/Advertising/Emplacements.php`), brouillons et publication par emplacement
+  (`src/Service/EmplacementManager.php`, `/api/admin/emplacements`), entreprises
+  (`/api/admin/companies`), statistiques (`src/Service/AdStats.php`). Aucune modification
+  enregistrée ne doit changer l'affichage public avant la publication.
 - **Espaces sponsors** : `docs/SPONSORS.md` — campagnes par emplacement (`src/Service/SponsorDelivery.php`),
   impressions réellement vues et clics dédoublonnés (`marketing_view`), statistiques (`SponsorStats.php`).
   Ne jamais compter une impression côté serveur sur un simple appel d'API.
