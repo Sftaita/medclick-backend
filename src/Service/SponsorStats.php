@@ -25,6 +25,7 @@ class SponsorStats
         Marketing::PLACEMENT_DASHBOARD_DESKTOP => 'Tableau de bord (ordinateur)',
         Marketing::PLACEMENT_DASHBOARD_MOBILE => 'Tableau de bord (mobile)',
         Marketing::PLACEMENT_LOGIN_INTERSTITIAL => 'Plein écran à la connexion',
+        Marketing::PLACEMENT_INAMI_SEARCH => 'Recherche INAMI',
     ];
 
     public function __construct(

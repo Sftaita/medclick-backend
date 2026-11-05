@@ -20,9 +20,20 @@ class Marketing
     public const PLACEMENT_DASHBOARD_DESKTOP = 'dashboard_desktop';
     public const PLACEMENT_DASHBOARD_MOBILE = 'dashboard_mobile';
     public const PLACEMENT_LOGIN_INTERSTITIAL = 'login_interstitial';
-    public const PLACEMENTS = [self::PLACEMENT_LOGIN, self::PLACEMENT_DASHBOARD_DESKTOP, self::PLACEMENT_DASHBOARD_MOBILE, self::PLACEMENT_LOGIN_INTERSTITIAL];
+    // Recherche publique des codes INAMI (/codes-inami) : bannière 1200 × 150 / 640 × 200
+    // (bannerDesktop / bannerMobile de la campagne), docs/Design/recherche-inami/SPECIFICATIONS.md.
+    public const PLACEMENT_INAMI_SEARCH = 'inami_search';
+    public const PLACEMENTS = [self::PLACEMENT_LOGIN, self::PLACEMENT_DASHBOARD_DESKTOP, self::PLACEMENT_DASHBOARD_MOBILE, self::PLACEMENT_LOGIN_INTERSTITIAL, self::PLACEMENT_INAMI_SEARCH];
     /** Emplacements en carte (visuel bannière), par opposition au plein écran. */
-    public const CARD_PLACEMENTS = [self::PLACEMENT_LOGIN, self::PLACEMENT_DASHBOARD_DESKTOP, self::PLACEMENT_DASHBOARD_MOBILE];
+    public const CARD_PLACEMENTS = [self::PLACEMENT_LOGIN, self::PLACEMENT_DASHBOARD_DESKTOP, self::PLACEMENT_DASHBOARD_MOBILE, self::PLACEMENT_INAMI_SEARCH];
+    /**
+     * Pages publiques où la déclaration « professionnel de la santé » n'est pas une
+     * authentification : une campagne réservée aux professionnels n'y est JAMAIS servie, même à
+     * un utilisateur connecté.
+     */
+    public const PUBLIC_ONLY_PLACEMENTS = [self::PLACEMENT_INAMI_SEARCH];
+    /** Formats propres (8:1, 16:5) : une campagne de ces emplacements n'en cible aucun autre. */
+    public const STANDALONE_PLACEMENTS = [self::PLACEMENT_INAMI_SEARCH];
 
     // Offres commerciales (libellé des rapports ; les emplacements restent choisis librement).
     public const OFFERS = ['premium', 'login', 'secondary'];

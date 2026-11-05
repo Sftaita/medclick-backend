@@ -60,17 +60,19 @@ class SponsorDelivery
     }
 
     /**
-     * Campagnes affichées, par emplacement de carte. Visiteur non connecté : jamais de campagne
-     * réservée aux professionnels.
+     * Campagnes affichées, par emplacement de carte. Visiteur non connecté, ou emplacement public
+     * (PUBLIC_ONLY_PLACEMENTS) : jamais de campagne réservée aux professionnels.
      *
      * @return array<string, list<Marketing>>
      */
     public function slots(bool $authenticated = false): array
     {
-        $live = $this->audience($this->campaigns->findLiveOn($this->today()), $authenticated);
+        $all = $this->campaigns->findLiveOn($this->today());
+        $live = $this->audience($all, $authenticated);
+        $public = $this->audience($all, false);
         $slots = [];
         foreach (Marketing::CARD_PLACEMENTS as $placement) {
-            $slots[$placement] = $this->select($live, $placement);
+            $slots[$placement] = $this->select(in_array($placement, Marketing::PUBLIC_ONLY_PLACEMENTS, true) ? $public : $live, $placement);
         }
 
         return $slots;
@@ -132,12 +134,14 @@ class SponsorDelivery
 
     /**
      * Campagne pouvant s'afficher sur l'emplacement aujourd'hui (événement accepté). Visiteur
-     * non connecté : jamais une campagne réservée aux professionnels.
+     * non connecté, ou emplacement public : jamais une campagne réservée aux professionnels.
      */
     public function isServable(Marketing $campaign, string $placement, bool $authenticated = true): bool
     {
+        $publicOnly = !$authenticated || in_array($placement, Marketing::PUBLIC_ONLY_PLACEMENTS, true);
+
         return in_array($placement, Marketing::PLACEMENTS, true)
-            && ($authenticated || !$campaign->isProfessionalsOnly())
+            && (!$publicOnly || !$campaign->isProfessionalsOnly())
             && $campaign->isLiveOn($this->today())
             && $campaign->hasPlacement($placement)
             && self::hasVisualFor($campaign, $placement);

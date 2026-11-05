@@ -30,9 +30,10 @@ class MarketingImageStore
     }
 
     /** @throws \InvalidArgumentException message lisible */
-    public function store(string $upload): MarketingImage
+    /** @param ?string $format MarketingImageProcessor::FORMAT_BANNER pour une bannière étroite */
+    public function store(string $upload, ?string $format = null): MarketingImage
     {
-        $result = $this->processor->process($upload);
+        $result = $this->processor->process($upload, $format);
         $image = $this->images->findOneBy(['sha256' => hash('sha256', $result['data'])]);
         if ($image === null) {
             $image = new MarketingImage($result['data'], $result['width'], $result['height'], strlen($upload));
