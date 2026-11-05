@@ -1,0 +1,74 @@
+/* Réplique simplifiée de Administration › Publicités — aperçu uniquement. */
+.ad { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color: #0B1F4D; display: grid; grid-template-columns: 220px 1fr; min-height: 100vh; background: #F7F9FD; -webkit-font-smoothing: antialiased; }
+.ad * { box-sizing: border-box; }
+.ad-side { background: #fff; border-right: 1px solid #E3EAF3; padding: 20px 14px; display: flex; flex-direction: column; gap: 4px; }
+.ad-enc { margin: 18px 0 14px; background: #2F5BEA; color: #fff; font-weight: 700; padding: 13px 16px; border-radius: 14px; font-size: 15px; }
+.ad-nav { padding: 10px 12px; border-radius: 10px; font-size: 14px; font-weight: 600; color: #33435F; }
+.ad-nav--on { background: #E6EDFF; color: #2447C8; }
+.ad-main { padding: 18px 28px 40px; min-width: 0; }
+.ad-head { display: flex; gap: 16px; align-items: flex-start; }
+.ad-head > div { flex: 1; }
+.ad-head h1 { margin: 0; font-size: 24px; font-weight: 800; }
+.ad-head p { margin: 4px 0 0; font-size: 13px; color: #3E4E73; }
+.ad-links { display: flex; gap: 22px; font-size: 13px; font-weight: 700; color: #2F5BEA; padding-top: 10px; }
+.ad-tabs { display: grid; grid-template-columns: repeat(3, minmax(0, 250px)); gap: 10px; margin: 16px 0 14px; }
+.ad-tab { background: #fff; border: 1.5px solid #E3EAF3; border-radius: 14px; padding: 12px 14px; display: flex; flex-direction: column; gap: 4px; }
+.ad-tab strong { font-size: 15px; display: flex; align-items: center; gap: 8px; }
+.ad-tab small { font-size: 12px; color: #3E4E73; }
+.ad-tab em { font-style: normal; font-size: 10.5px; font-weight: 800; color: #11704A; background: #E2F5EB; padding: 2px 7px; border-radius: 999px; }
+.ad-tab--on { border-color: #2F5BEA; background: #EEF3FF; box-shadow: 0 0 0 3px rgba(47, 91, 234, 0.1); }
+.ad-tab--on strong { color: #2447C8; }
+.ad-grid { display: grid; grid-template-columns: minmax(0, 1fr) 330px; gap: 18px; align-items: start; }
+.ad-count { margin: 0 0 10px; font-size: 12.5px; color: #3E4E73; }
+.ad-drop { border: 1.5px dashed #8FAEF5; border-radius: 16px; background: #F4F8FF; padding: 18px; display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; font-size: 12.5px; color: #3E4E73; }
+.ad-drop strong { font-size: 17px; color: #2F5BEA; }
+.ad-drop b { color: #0B1F4D; }
+.ad-card { margin-top: 14px; background: #fff; border-radius: 18px; box-shadow: 0 8px 24px rgba(30, 58, 158, 0.07); padding: 16px; }
+.ad-card-h { display: flex; justify-content: space-between; gap: 12px; }
+.ad-card-h strong { font-size: 15px; }
+.ad-card-h small { display: block; font-size: 12.5px; color: #3E4E73; }
+.ad-live { font-size: 11px; font-weight: 800; color: #fff; background: #0F8A5A; padding: 3px 8px; border-radius: 999px; }
+.ad-stats { text-align: right; font-size: 12px; color: #3E4E73; }
+.ad-meta { font-size: 12.5px; color: #3E4E73; margin: 8px 0 12px; }
+.ad-vis { display: grid; grid-template-columns: 1.6fr 1fr; gap: 14px; }
+.ad-vis p { margin: 0 0 6px; font-size: 12px; color: #3E4E73; }
+.ad-vis p b { color: #0B1F4D; font-size: 13px; margin-right: 4px; }
+.ad-vis small { display: block; margin-top: 6px; font-size: 11.5px; color: #3E4E73; }
+.ad-frame { border-radius: 10px; overflow: hidden; background: #0F2A66; }
+.ad-frame img { display: block; width: 100%; height: 100%; object-fit: contain; }
+.ad-frame--d { aspect-ratio: 8 / 1; }
+.ad-frame--m { aspect-ratio: 16 / 5; }
+.ad-acts { display: flex; gap: 14px; margin-top: 12px; font-size: 13px; font-weight: 700; color: #2F5BEA; }
+.ad-acts span:first-child { border: 1.5px solid #D6E4FB; padding: 7px 14px; border-radius: 10px; }
+.ad-del { color: #C93030; padding: 7px 0; }
+.ad-note { font-size: 12.5px; color: #3E4E73; background: #fff; border: 1px solid #E3EAF3; border-radius: 12px; padding: 10px 12px; margin: 12px 0 0; }
+.ad-note--warn { background: #FFF4DF; border-color: #F3D9A6; color: #6B4A00; }
+.ad-note--warn b { color: #A35F00; }
+.ad-prev { background: #fff; border-radius: 18px; box-shadow: 0 8px 24px rgba(30, 58, 158, 0.07); padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+.ad-prev-h { display: flex; justify-content: space-between; font-size: 16px; }
+.ad-prev-h span { font-size: 13px; font-weight: 700; color: #2F5BEA; }
+.ad-seg { display: grid; grid-template-columns: 1fr 1fr; border: 1px solid #E3EAF3; border-radius: 12px; overflow: hidden; font-size: 12px; text-align: center; }
+.ad-seg span { padding: 9px 6px; color: #3E4E73; }
+.ad-seg .on { background: #EEF2F8; color: #0B1F4D; font-weight: 700; }
+.ad-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.ad-btns button { border: 1.5px solid #8FAEF5; background: #fff; color: #2447C8; font: inherit; font-size: 12px; font-weight: 700; padding: 8px 4px; border-radius: 10px; cursor: pointer; }
+.ad-btns button.on { background: #2F5BEA; border-color: #2F5BEA; color: #fff; }
+.ad-mini { margin: 4px auto 0; background: #F7F9FD; border: 1px solid #E3EAF3; border-radius: 12px; padding: 10px; display: flex; flex-direction: column; gap: 7px; width: 100%; }
+.ad-mini--mobile { width: 170px; }
+.ad-mini-ban { position: relative; border-radius: 6px; overflow: hidden; background: #0F2A66; aspect-ratio: 8 / 1; }
+.ad-mini--mobile .ad-mini-ban { aspect-ratio: 16 / 5; }
+.ad-mini-ban img { width: 100%; height: 100%; object-fit: contain; display: block; }
+.ad-mini-ban span { position: absolute; top: 3px; left: 3px; font-size: 7px; font-weight: 700; color: #fff; background: rgba(11, 31, 77, 0.6); padding: 1px 4px; border-radius: 999px; }
+.ad-mini-h1 { height: 10px; width: 60%; border-radius: 4px; background: #0B1F4D; opacity: .8; }
+.ad-mini-l { height: 6px; width: 80%; border-radius: 4px; background: #C9D3E3; }
+.ad-mini-in { height: 18px; border-radius: 6px; background: #fff; border: 1px solid #E3EAF3; }
+.ad-mini-row { height: 12px; border-radius: 4px; background: #fff; border: 1px solid #EDF1F8; }
+.ad-prev-n { margin: 0; font-size: 12px; color: #3E4E73; line-height: 1.45; }
+@media (max-width: 900px) {
+  .ad { grid-template-columns: 1fr; }
+  .ad-side { display: none; }
+  .ad-main { padding: 14px 16px 32px; }
+  .ad-tabs { grid-template-columns: 1fr; }
+  .ad-grid, .ad-vis { grid-template-columns: 1fr; }
+  .ad-links { display: none; }
+}

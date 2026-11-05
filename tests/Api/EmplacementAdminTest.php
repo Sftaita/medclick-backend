@@ -28,12 +28,13 @@ final class EmplacementAdminTest extends ApiTestBase
         $this->admin = $this->clientFor($this->createUser('admin-emplacements@test.be', ['ROLE_ADMIN']));
     }
 
-    public function testTheEightRealEmplacementsAreListedByScreen(): void
+    public function testTheNineRealEmplacementsAreListedByScreen(): void
     {
         $data = $this->admin->request('GET', '/api/admin/emplacements')->toArray();
 
+        // Huit emplacements de la refonte, puis la recherche INAMI (page publique).
         $this->assertSame(
-            ['login', 'after_login', 'dashboard_carousel', 'dashboard_partner', 'sidebar', 'mobile_menu', 'public_home', 'partners_page'],
+            ['login', 'after_login', 'dashboard_carousel', 'dashboard_partner', 'sidebar', 'mobile_menu', 'public_home', 'partners_page', 'inami_search'],
             array_column($data['emplacements'], 'key'),
         );
         $labels = array_column($data['emplacements'], 'label', 'key');
@@ -45,6 +46,41 @@ final class EmplacementAdminTest extends ApiTestBase
         $this->assertSame(['desktop', 'mobile'], $carousel['supports']);
         $this->assertSame(1, $data['emplacements'][1]['capacity']);
         $this->assertTrue($data['emplacements'][7]['shared']);
+        $inami = $data['emplacements'][8];
+        $this->assertSame(['Recherche INAMI — Bannière', 'pages_publiques', true, 3, ['desktop', 'mobile']], [$inami['label'], $inami['screen'], $inami['public'], $inami['capacity'], $inami['supports']]);
+    }
+
+    public function testInamiSearchIsAPublicEmplacementNeverServingProfessionalAds(): void
+    {
+        $firm = $this->firm('OrthoLab');
+        $this->assertSame(['ratio' => '8:1', 'width' => 1200, 'height' => 150, 'label' => 'Ordinateur et tablette'], $this->detail('inami_search')['recommended']['desktop'] ?? null);
+
+        // Refus en administration : page publique (la déclaration n'est pas une vérification).
+        $this->admin->request('POST', '/api/admin/emplacements/inami_search/contents', ['json' => $this->ad($firm, ['professionalsOnly' => true])]);
+        $this->assertSame(400, $this->code());
+        $this->assertStringContainsString('La recherche INAMI est une page publique', $this->admin->getResponse()->toArray(false)['message']);
+
+        $id = $this->create('inami_search', $this->ad($firm))['contents'][0]['id'];
+        $this->publish('inami_search');
+        $this->assertSame(['OrthoLab'], array_column($this->slots()['inami_search'], 'sponsor'));
+        $this->assertSame([], $this->slots()['login'], 'Aucune autre page ne reçoit cette publicité.');
+
+        // Formats propres : la même publicité ne peut pas être reprise sur un autre emplacement.
+        $campaign = $this->em->getRepository(Marketing::class)->find($id);
+        $this->admin->request('PUT', "/api/admin/emplacements/login/contents/ad/$id", ['json' => $this->ad($firm)]);
+        $this->assertContains($this->code(), [400, 404]);
+        $this->assertSame(['inami_search'], $campaign->getPlacements());
+
+        // Garantie de diffusion, indépendante de l'administration : campagne réservée enregistrée en base.
+        $pro = (new Marketing())->setCampaignName('Réservée')->setSponsorName('PharmaPro')->setStatus('active')
+            ->setStartDate(new \DateTime($this->day()))->setBannerDesktop('https://cdn.example/pro.png')
+            ->setPlacements(['inami_search'])->setPriority(10)->setExclusive(true)->setProfessionalsOnly(true);
+        $this->em->persist($pro);
+        $this->em->flush();
+        $doctor = $this->clientFor($this->createUser('medecin-inami@test.be'));
+        $this->assertNotContains('PharmaPro', array_column($doctor->request('GET', '/api/marketing/slots')->toArray()['inami_search'], 'sponsor'));
+        $event = ['campaign' => $pro->getId(), 'placement' => 'inami_search', 'type' => 'impression', 'visitor' => self::VISITOR];
+        $this->assertFalse($doctor->request('POST', '/api/marketing/events', ['json' => $event])->toArray()['recorded']);
     }
 
     public function testNonAdminIsRefused(): void

@@ -55,7 +55,8 @@ class SponsorSpacesTest extends ApiTestBase
         $this->assertFalse($campaign->isExclusive());
         $this->doctor()->request('GET', '/api/marketing/active');
         $this->assertResponseIsSuccessful();
-        $this->assertSame(['login' => [], 'dashboard_desktop' => [], 'dashboard_mobile' => []], $this->slots());
+        // inami_search : ajout de la recherche INAMI (clé supplémentaire, ignorée par les anciens fronts).
+        $this->assertSame(['login' => [], 'dashboard_desktop' => [], 'dashboard_mobile' => [], 'inami_search' => []], $this->slots());
     }
 
     public function testCardCampaignIsServedOnItsPlacementsOnlyWithPublicFieldsOnly(): void

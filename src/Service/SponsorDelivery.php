@@ -59,17 +59,19 @@ class SponsorDelivery
     }
 
     /**
-     * Publicités affichées, par placement en carte. Visiteur non connecté : jamais de publicité
-     * réservée aux professionnels.
+     * Publicités affichées, par placement en carte. Visiteur non connecté, ou emplacement public
+     * (PUBLIC_ONLY_PLACEMENTS : recherche INAMI) : jamais de publicité réservée aux professionnels.
      *
      * @return array<string, list<Marketing>>
      */
     public function slots(bool $authenticated = false): array
     {
-        $live = $this->audience($this->campaigns->findLiveOn($this->today()), $authenticated);
+        $all = $this->campaigns->findLiveOn($this->today());
+        $live = $this->audience($all, $authenticated);
+        $public = $this->audience($all, false);
         $slots = [];
         foreach (Marketing::CARD_PLACEMENTS as $placement) {
-            $slots[$placement] = $this->selectFor($live, $placement, $this->today());
+            $slots[$placement] = $this->selectFor(in_array($placement, Marketing::PUBLIC_ONLY_PLACEMENTS, true) ? $public : $live, $placement, $this->today());
         }
 
         return $slots;
@@ -152,15 +154,16 @@ class SponsorDelivery
 
     /**
      * Campagne pouvant s'afficher sur l'emplacement aujourd'hui (événement accepté). Visiteur
-     * non connecté : jamais une campagne réservée aux professionnels.
+     * non connecté, ou emplacement public : jamais une campagne réservée aux professionnels.
      */
     public function isServable(Marketing $campaign, string $placement, bool $authenticated = true): bool
     {
         $emplacement = Emplacements::forCampaignPlacement($placement);
+        $publicOnly = !$authenticated || in_array($placement, Marketing::PUBLIC_ONLY_PLACEMENTS, true);
 
         return in_array($placement, Marketing::PLACEMENTS, true)
             && $emplacement !== null && $this->settings->isEnabled($emplacement)
-            && ($authenticated || !$campaign->isProfessionalsOnly())
+            && (!$publicOnly || !$campaign->isProfessionalsOnly())
             && $campaign->isLiveOn($this->today())
             && $campaign->hasPlacement($placement)
             && self::hasVisualFor($campaign, $placement);

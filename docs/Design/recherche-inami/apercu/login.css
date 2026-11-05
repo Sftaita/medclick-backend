@@ -1,0 +1,47 @@
+/* Réplique de la connexion actuelle (AuthLayout v2) — aperçu uniquement. */
+.lp { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color: #0B1F4D; min-height: 100vh; background: linear-gradient(180deg, #F7F9FE 0%, #F1F5FD 50%, #F6F8FD 100%); -webkit-font-smoothing: antialiased; }
+.lp * { box-sizing: border-box; }
+.lp a { text-decoration: none; }
+.lp-top { height: 61px; display: flex; align-items: center; gap: 8px; padding: 0 24px; background: #fff; border-bottom: 1px solid #E3EAF3; }
+.lp-brand { display: flex; }
+.lp-sp { flex: 1; }
+.lp-link { color: #2F5BEA; font-weight: 700; font-size: 15px; padding: 8px 12px; white-space: nowrap; }
+.lp-cta { background: #2447C8; color: #fff; font-weight: 700; font-size: 15px; padding: 9px 16px; border-radius: 12px; }
+
+.lp-grid { display: grid; grid-template-columns: 1fr; min-height: calc(100vh - 61px); }
+.lp-photo { display: none; position: relative; }
+.lp-photo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.lp-photo-fade { position: absolute; top: 0; right: 0; width: 120px; height: 100%; background: linear-gradient(90deg, rgba(242, 246, 253, 0) 0%, #F2F6FD 100%); }
+.lp-partner--photo { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: 40px; }
+.lp-partner--photo .lp-pcard { width: min(500px, 100%); background: rgba(255, 255, 255, 0.92); }
+
+.lp-col { position: relative; display: flex; flex-direction: column; align-items: center; padding: 20px 16px 32px; overflow: clip; }
+.lp-blob { position: absolute; right: -150px; top: 45%; width: 330px; height: 330px; border-radius: 50%; background: radial-gradient(circle at 30% 40%, rgba(120, 224, 214, 0.45) 0%, rgba(150, 210, 240, 0.2) 55%, transparent 72%); pointer-events: none; }
+.lp-card { position: relative; width: 100%; max-width: 440px; background: rgba(255, 255, 255, 0.97); border-radius: 24px; box-shadow: 0 14px 34px rgba(16, 44, 122, 0.1); border: 1px solid #EDF1F8; padding: 20px; }
+.lp-h1 { margin: 0 0 4px; font-size: 31px; font-weight: 800; letter-spacing: -0.8px; text-align: center; }
+.lp-sub { margin: 0 0 24px; text-align: center; font-size: 14px; color: #3E4E73; }
+.lp-sub a, .lp-row a { color: #2F5BEA; font-weight: 700; text-decoration: underline; }
+.lp-form { display: grid; gap: 16px; }
+.lp-input { height: 56px; border: 1px solid #DDE5F0; border-radius: 14px; padding: 0 14px; font: inherit; font-size: 16px; color: #0B1F4D; background: #fff; }
+.lp-input::placeholder { color: #3E4E73; }
+.lp-row { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; font-size: 12.5px; color: #33435F; }
+.lp-btn { height: 52px; border: 0; border-radius: 14px; background: #2F5BEA; color: #fff; font: inherit; font-weight: 700; font-size: 16px; cursor: pointer; }
+
+.lp-or { display: flex; align-items: center; gap: 12px; margin: 18px 0 14px; color: #6A7894; font-size: 12.5px; font-weight: 600; }
+.lp-or::before, .lp-or::after { content: ""; flex: 1; height: 1px; background: #E3EAF3; }
+
+.lp-partner--below { position: relative; width: 100%; max-width: 440px; margin-top: 20px; }
+.lp-pcard { border-radius: 24px; background: #fff; box-shadow: 0 14px 34px rgba(16, 44, 122, 0.1); padding: 22px; display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center; }
+.lp-pcard small { font-size: 12px; letter-spacing: 0.6px; color: #33435F; font-weight: 600; }
+.lp-plogo { width: 180px; height: 70px; border-radius: 10px; border: 1.5px dashed #B9CCF4; display: flex; align-items: center; justify-content: center; color: #3E4E73; font-size: 13px; font-weight: 600; }
+.lp-pcard p { margin: 0; font-size: 14px; color: #33435F; }
+.lp-pbtn { background: #2F5BEA; color: #fff; font-weight: 700; font-size: 14px; padding: 11px 18px; border-radius: 999px; }
+
+@media (min-width: 600px) { .lp-card { padding: 28px; } }
+@media (min-width: 1200px) {
+  .lp-grid { grid-template-columns: 52% 48%; }
+  .lp-photo { display: block; }
+  .lp-col { justify-content: center; }
+  .lp-partner--below { display: none; }
+}
+@media (max-width: 420px) { .lp-top { padding: 0 14px; } .lp-link { font-size: 14px; padding: 8px; } .lp-cta { font-size: 14px; padding: 9px 12px; } }

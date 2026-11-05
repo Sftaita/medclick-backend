@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="150" viewBox="0 0 1200 150">
+  <defs><linearGradient id="g" x1="0" x2="1"><stop offset="0" stop-color="#0F2A66"/><stop offset="1" stop-color="#1D4FB8"/></linearGradient></defs>
+  <rect width="1200" height="150" fill="url(#g)"/>
+  <circle cx="1110" cy="20" r="120" fill="#5FD6C8" opacity=".18"/>
+  <rect x="120" y="45" width="60" height="60" rx="14" fill="#fff" opacity=".9"/>
+  <text x="210" y="70" font-family="Segoe UI, Arial" font-size="28" font-weight="700" fill="#fff">Visuel de l'annonceur (fictif)</text>
+  <text x="210" y="102" font-family="Segoe UI, Arial" font-size="18" fill="#CFE0FF">Format grand écran 1200 × 150 · affiché en entier, sans recadrage</text>
+  <rect x="930" y="50" width="160" height="50" rx="25" fill="#fff"/>
+  <text x="1010" y="81" font-family="Segoe UI, Arial" font-size="17" font-weight="700" fill="#0F2A66" text-anchor="middle">En savoir plus</text>
+</svg>
