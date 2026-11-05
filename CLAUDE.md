@@ -55,6 +55,9 @@ Doc OpenAPI générée par API Platform : `GET /api` (ne couvre pas les contrôl
 - `src/Security/Voter/OwnershipVoter.php` — attribut `OWNER` : la ressource appartient-elle
   au user ? Utilisé en `securityPostDenormalize` sur les `#[ApiResource]` et via
   `$this->isGranted('OWNER', $x)` dans les contrôleurs custom.
+- **Recherche publique des codes INAMI** (sans JWT) : `src/Controller/PublicInamiController.php`
+  (`/api/public/inami/*`, lecture seule, limitée en débit), emplacement publicitaire `inami_search`
+  (jamais de campagne `professionals_only`). Voir `docs/RECHERCHE-INAMI.md`.
 - `src/State/` — state processors API Platform branchés par opération (`processor:`) :
   `UserProcessor` (hash du mot de passe, email d'activation), `CurrentUserAssignProcessor`
   (propriétaire des `Years`), `SurgeonProcessor` (maître de stage unique),

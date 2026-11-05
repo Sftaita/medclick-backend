@@ -1,7 +1,12 @@
 # Recherche publique des codes INAMI — spécifications fonctionnelles
 
-Statut : design validé le 04/11/2026, **en attente de validation visuelle finale**. Aucune
-implémentation n'est commencée. Compléments visuels : `README.md` et la prévisualisation.
+Statut : design validé le 04/11/2026 ; **implémenté** sur les branches `feature/recherche-inami`
+(backend et front), en attente de recette. Détails techniques : `docs/RECHERCHE-INAMI.md`.
+Compléments visuels : `README.md` et la prévisualisation.
+
+Écarts d'implémentation par rapport à ce document : recherche, tri et pagination faits par le
+serveur (R3, R7) ; import des bannières étroites par `?format=banner` (480 × 120 px au minimum) ;
+mesure publicitaire de la page sans aucun stockage navigateur (identifiant en mémoire).
 
 ## 1. Objet
 
