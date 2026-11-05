@@ -68,6 +68,10 @@ security:
     - { path: ^/api/partner/\d+$, roles: PUBLIC_ACCESS, methods: [GET] }
     - { path: ^/api/partner/events$, roles: PUBLIC_ACCESS, methods: [POST] }
     - { path: '^/api/partner/logo/[a-f0-9]{64}\.(png|svg)$', roles: PUBLIC_ACCESS, methods: [GET] }
+    # Recherche publique des codes INAMI (lecture seule de la nomenclature, statistiques agrégées ;
+    # limitées en débit). L'ancienne liste /api/nomenclature/{speciality} reste protégée.
+    - { path: ^/api/public/inami/(specialities|codes)$, roles: PUBLIC_ACCESS, methods: [GET] }
+    - { path: ^/api/public/inami/events$, roles: PUBLIC_ACCESS, methods: [POST] }
 
     - { path: ^/api/admin, roles: ROLE_ADMIN }
     - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }

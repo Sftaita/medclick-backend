@@ -82,6 +82,59 @@ class NomenclatureRepository extends ServiceEntityRepository
         }, $rows);
     }
 
+    /**
+     * Recherche publique des codes INAMI : spécialités qui proposent au moins un code
+     * aujourd'hui (mêmes règles que fetchBySpeciality, codes partagés compris), avec leur nombre
+     * de codes, triées par identifiant.
+     *
+     * @return list<array{id: string, count: int}>
+     */
+    public function fetchPublicSpecialities(?\DateTimeInterface $today = null): array
+    {
+        $day = self::day($today ?? new \DateTimeImmutable('today'));
+        $own = $this->getEntityManager()->createQuery(
+            'SELECT u.speciality AS id, COUNT(u.id) AS n FROM App\Entity\Nomenclature u
+             WHERE u.active = true AND (u.inamiRepealVerifiedAt IS NULL OR u.inamiRepealedAt > :today)
+             GROUP BY u.speciality'
+        )->setParameter('today', $day, Types::DATE_IMMUTABLE)->getResult();
+        $shared = $this->getEntityManager()->createQuery(
+            'SELECT s.speciality AS id, COUNT(u.id) AS n FROM App\Entity\NomenclatureSharedSpeciality s JOIN s.nomenclature u
+             WHERE u.active = true AND (u.inamiRepealVerifiedAt IS NULL OR u.inamiRepealedAt > :today) AND s.speciality <> u.speciality
+             GROUP BY s.speciality'
+        )->setParameter('today', $day, Types::DATE_IMMUTABLE)->getResult();
+
+        $counts = [];
+        foreach ([...$own, ...$shared] as $row) {
+            $counts[$row['id']] = ($counts[$row['id']] ?? 0) + (int) $row['n'];
+        }
+        ksort($counts);
+
+        return array_map(static fn (string $id, int $count) => ['id' => $id, 'count' => $count], array_map('strval', array_keys($counts)), array_values($counts));
+    }
+
+    /**
+     * Recherche publique des codes INAMI : codes proposés aujourd'hui pour une spécialité (ses
+     * codes et ceux partagés avec elle), ou pour toutes ($speciality = null, une ligne par code).
+     * Champs publics seulement : aucun identifiant, aucun lien vers des interventions.
+     *
+     * @return list<array{name: string, codeAmbulant: ?string, codeHospitalisation: ?string, n: ?string, speciality: string}>
+     */
+    public function fetchPublicCodes(?string $speciality, ?\DateTimeInterface $today = null): array
+    {
+        $query = $this->createQueryBuilder('u')
+            ->select('u.name, u.codeAmbulant, u.codeHospitalisation, u.n, u.speciality')
+            ->andWhere('u.active = :active')
+            ->andWhere('u.inamiRepealVerifiedAt IS NULL OR u.inamiRepealedAt > :today')
+            ->setParameter('active', true)
+            ->setParameter('today', self::day($today ?? new \DateTimeImmutable('today')), Types::DATE_IMMUTABLE)
+            ->orderBy('u.id');
+        if ($speciality !== null) {
+            $query->andWhere(self::OFFERED_TO_SPECIALITY)->setParameter('val', $speciality);
+        }
+
+        return $query->getQuery()->getArrayResult();
+    }
+
     private static function day(\DateTimeInterface $date): \DateTimeImmutable
     {
         return \DateTimeImmutable::createFromInterface($date)->setTime(0, 0);
