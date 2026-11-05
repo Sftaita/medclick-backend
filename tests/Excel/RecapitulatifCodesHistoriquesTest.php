@@ -10,8 +10,8 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 /**
- * ADR-213 : une ligne du récapitulatif = un code réellement enregistré. Les sections et leurs totaux ne
- * changent pas : seule la répartition en lignes change.
+ * ADR-213 : une ligne du récapitulatif = un code réellement enregistré, sans perte ni double compte.
+ * Rubriques de chirurgie générale : voir RecapitulatifRubriquesGeneralesTest (ADR-215).
  */
 final class RecapitulatifCodesHistoriquesTest extends ExcelTestCase
 {
@@ -50,7 +50,7 @@ final class RecapitulatifCodesHistoriquesTest extends ExcelTestCase
         self::assertSame([2, 1], array_column($lines, 'total'));
     }
 
-    public function testAnActKeepsItsSectionSoThatNoInterventionIsLostOrMoved(): void
+    public function testNoInterventionIsLostOrCountedTwice(): void
     {
         [$user, $yearId, $year] = $this->year();
         $act = $this->act('dig', null, null, 'Acte digestif');
@@ -66,10 +66,9 @@ final class RecapitulatifCodesHistoriquesTest extends ExcelTestCase
 
         $sheet = $this->summary($user, $yearId);
         $lines = $this->lines($sheet);
-        self::assertSame([1, 1, 1], array_column($lines, 'total'), 'Trois lignes distinctes, une seule section');
+        self::assertSame([1, 1, 1], array_column($lines, 'total'), 'Trois lignes distinctes');
         self::assertSame(3, array_sum(array_column($lines, 'total')));
         self::assertNotContains('Acte absent', array_column($lines, 'name'));
-        self::assertSame(1, $this->sectionsWithLines($sheet));
     }
 
     /** ADR-214 : un acte 14 n) enregistré en neurochirurgie est présenté dans la rubrique Rachis, avec ses propres codes. */
@@ -144,17 +143,17 @@ final class RecapitulatifCodesHistoriquesTest extends ExcelTestCase
         self::assertGreaterThan($this->rowOf($sheet, 'TOTAL GENERAL', 2), $this->lines($sheet)[0]['row']);
     }
 
-    /** Seule la spécialité distingue les lignes d'un acte, hors rachis : même mention. */
+    /** Seule la spécialité distingue les lignes d'une rubrique, hors rachis : même mention. */
     public function testSpecialityMentionOnlyWhenItDistinguishesTwoLines(): void
     {
         [$user, $yearId, $year] = $this->year();
         $act = $this->act('dig', null, null, 'Hernie');
         $this->surgery($year, $act, 'dig', self::A, 'Hernie', '1');
-        $this->surgery($year, $act, 'general', self::A, 'Hernie', '2');
-        $this->surgery($year, $act, 'general', self::B, 'Hernie', '2');
+        $this->surgery($year, $act, 'favorites', self::A, 'Hernie', '2');
+        $this->surgery($year, $act, 'favorites', self::B, 'Hernie', '2');
         $this->em->flush();
 
-        self::assertSame(['Hernie (Chirurgie digestive)', 'Hernie (Chirurgie générale)', 'Hernie'], array_column($this->lines($this->summary($user, $yearId)), 'name'));
+        self::assertSame(['Hernie (Chirurgie digestive)', 'Hernie (Favoris)', 'Hernie'], array_column($this->lines($this->summary($user, $yearId)), 'name'));
     }
 
     public function testExportingChangesNothingInTheInterventions(): void
@@ -257,10 +256,4 @@ final class RecapitulatifCodesHistoriquesTest extends ExcelTestCase
         self::fail("Absent : $text");
     }
 
-    private function sectionsWithLines(Worksheet $sheet): int
-    {
-        $rows = array_column($this->lines($sheet), 'row');
-
-        return $rows === [] ? 0 : (int) (max($rows) - min($rows) === count($rows) - 1);
-    }
 }

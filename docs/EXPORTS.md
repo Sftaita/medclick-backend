@@ -214,8 +214,9 @@ exports » du front (`/admin/exports`). Aucun accès aux fichiers.
   des totaux ; `manifest.json` : empreinte SHA-256, date d'édition, origine) et
   `var/excel-reference/` (volumes de 100 à 10 000 interventions, non versionnés). Une référence ne
   se régénère pas : une différence est une régression, ou un changement de format décidé
-  explicitement (nouvelles références, nouvelle validation). Seul changement à ce jour : ADR-213,
-  `cas-limites` et `audit-sans-nomenclature` (lignes du récapitulatif, totaux et autres feuilles identiques).
+  explicitement (nouvelles références, nouvelle validation). Changements à ce jour : ADR-213,
+  `cas-limites` et `audit-sans-nomenclature` (lignes du récapitulatif, totaux et autres feuilles identiques) ; ADR-215,
+  les 30 références (rubriques, sous-totaux et TOTAL GENERAL de chirurgie générale, autres feuilles identiques).
 - Comparateur `tests/Excel/XlsxComparator.php` : (1) parties du paquet identiques à l'octet ou après
   canonisation XML (seules les dates de `docProps/core.xml` tolérées), (2) sémantique : feuilles,
   chaque cellule (valeur, type, formule, style résolu), fusions, dimensions, mise en page et
