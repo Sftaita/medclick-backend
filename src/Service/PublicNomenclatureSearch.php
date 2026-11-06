@@ -16,6 +16,8 @@ use function Symfony\Component\String\u;
  * - texte : insensible à la casse et aux accents ; plusieurs mots = tous présents dans le nom ;
  * - chiffres seuls (au moins 2, espaces, points et tirets ignorés) : code ambulatoire ou
  *   hospitalisation contenant ces chiffres ;
+ * - aucun résultat exact pour un texte : nouvel essai sur la racine des mots longs (« ménisque » →
+ *   « ménis » : méniscectomie, méniscale), signalé par approximate: true et les termes utilisés ;
  * - tri « relevance » : noms qui commencent par la recherche d'abord, puis ordre alphabétique ;
  *   « name » : alphabétique ; « nk » : lettre (K, N) puis valeur numérique.
  * Une spécialité compte au plus quelques milliers de codes : le filtrage en mémoire reste rapide.
@@ -28,6 +30,9 @@ final class PublicNomenclatureSearch
     public const ALL = 'all';
     public const SORTS = ['relevance', 'name', 'nk'];
     public const ORDERS = ['asc', 'desc'];
+    /** Racine d'un mot pour le second essai : mots de 6 lettres et plus, au moins 5 lettres gardées. */
+    public const STEM_MIN_WORD = 6;
+    public const STEM_MIN_LENGTH = 5;
 
     public function __construct(private readonly NomenclatureRepository $nomenclature)
     {
@@ -40,13 +45,21 @@ final class PublicNomenclatureSearch
     }
 
     /**
-     * @return array{items: list<array<string, ?string>>, total: int, page: int, pageSize: int, pages: int}
+     * @return array{items: list<array<string, ?string>>, total: int, page: int, pageSize: int, pages: int, approximate: bool, terms: list<string>}
      */
     public function search(string $speciality, string $query, string $sort, string $order, int $page): array
     {
         $rows = $this->nomenclature->fetchPublicCodes($speciality === self::ALL ? null : $speciality);
-        $rows = self::filter($rows, $query);
-        $rows = self::sort($rows, $sort, $order === 'desc' ? -1 : 1, $query);
+        $terms = self::terms($query);
+        $matched = self::filter($rows, $query, $terms);
+        $approximate = false;
+        if ($matched === [] && self::codeQuery($query) === null && trim($query) !== '') {
+            $stems = array_map(self::stem(...), $terms);
+            if ($stems !== $terms) {
+                [$matched, $terms, $approximate] = [self::filter($rows, $query, $stems), $stems, true];
+            }
+        }
+        $rows = self::sort($matched, $sort, $order === 'desc' ? -1 : 1, $approximate ? implode(' ', $terms) : $query);
 
         $total = count($rows);
         $pages = max(1, (int) ceil($total / self::PAGE_SIZE));
@@ -64,7 +77,24 @@ final class PublicNomenclatureSearch
             'page' => $page,
             'pageSize' => self::PAGE_SIZE,
             'pages' => $pages,
+            // Second essai sur les racines des mots : termes réellement cherchés (surlignage du front).
+            'approximate' => $approximate,
+            'terms' => $terms,
         ];
+    }
+
+    /** Mots normalisés d'une recherche texte ([] pour une recherche par code ou vide). */
+    private static function terms(string $query): array
+    {
+        return self::codeQuery($query) === null ? preg_split('/\s+/', self::normalize(trim($query)), -1, PREG_SPLIT_NO_EMPTY) : [];
+    }
+
+    /** Racine d'un mot long : on retire jusqu'à 3 lettres finales, sans descendre sous STEM_MIN_LENGTH. */
+    public static function stem(string $word): string
+    {
+        $length = strlen($word);
+
+        return $length >= self::STEM_MIN_WORD ? substr($word, 0, max(self::STEM_MIN_LENGTH, $length - 3)) : $word;
     }
 
     /** Minuscules sans accents, apostrophes remplacées par une espace. */
@@ -86,7 +116,10 @@ final class PublicNomenclatureSearch
      * @param list<array<string, ?string>> $rows
      * @return list<array<string, ?string>>
      */
-    private static function filter(array $rows, string $query): array
+    /**
+     * @param list<string> $words mots normalisés à trouver dans le nom (recherche texte)
+     */
+    private static function filter(array $rows, string $query, array $words): array
     {
         $query = trim($query);
         if ($query === '') {
@@ -97,7 +130,6 @@ final class PublicNomenclatureSearch
             return array_values(array_filter($rows, static fn (array $row) => str_contains(preg_replace('/\D/', '', (string) $row['codeAmbulant']), $digits)
                 || str_contains(preg_replace('/\D/', '', (string) $row['codeHospitalisation']), $digits)));
         }
-        $words = preg_split('/\s+/', self::normalize($query), -1, PREG_SPLIT_NO_EMPTY);
 
         return array_values(array_filter($rows, static function (array $row) use ($words): bool {
             $name = self::normalize($row['name']);
