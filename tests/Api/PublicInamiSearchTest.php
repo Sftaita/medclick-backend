@@ -98,6 +98,30 @@ final class PublicInamiSearchTest extends ApiTestBase
         $this->assertSame(0, $this->get('/api/public/inami/codes?speciality=ortho&q=inconnu')['total']);
     }
 
+    public function testWordRootIsTriedWhenNothingMatchesExactly(): void
+    {
+        $this->code('Méniscectomie interne ou externe du genou', '300270', '300281', 'K180');
+        $this->code("Suture d'une déchirure méniscale", '300292', '300303', 'K120');
+        $this->code('Prothèse totale du genou', null, '290275', 'N588');
+        $this->em->flush();
+
+        // « ménisque » n'existe pas tel quel : racine « menis », résultats signalés comme approchants.
+        $approx = $this->get('/api/public/inami/codes?speciality=ortho&q=m%C3%A9nisque');
+        $this->assertTrue($approx['approximate']);
+        $this->assertSame(['menis'], $approx['terms']);
+        $this->assertSame(["Méniscectomie interne ou externe du genou", "Suture d'une déchirure méniscale"], array_column($approx['items'], 'name'));
+
+        // Résultat exact : jamais de second essai.
+        $exact = $this->get('/api/public/inami/codes?speciality=ortho&q=genou%20proth');
+        $this->assertFalse($exact['approximate']);
+        $this->assertSame(['genou', 'proth'], $exact['terms']);
+        $this->assertSame(['Prothèse totale du genou'], array_column($exact['items'], 'name'));
+
+        // Mots courts et codes : pas de racine, aucun résultat inventé.
+        $this->assertSame(0, $this->get('/api/public/inami/codes?speciality=ortho&q=hanch')['total']);
+        $this->assertFalse($this->get('/api/public/inami/codes?speciality=ortho&q=999999')['approximate']);
+    }
+
     public function testSearchByAmbulatoryOrHospitalisationCode(): void
     {
         $this->fixtures();
