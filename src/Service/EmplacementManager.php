@@ -136,9 +136,10 @@ final class EmplacementManager
                 'desktop' => ['ratio' => '16:9', 'width' => 1920, 'height' => 1080, 'label' => 'Ordinateur et tablette en paysage'],
                 'mobile' => ['ratio' => '9:16', 'width' => 1080, 'height' => 1920, 'label' => 'Téléphone et tablette en portrait'],
             ],
-            // Affichées entières (contain) ; import avec ?format=banner (480 × 120 px au minimum).
+            // Affichées entières (contain) ; import avec ?format=banner (480 × 120 px au minimum : les
+            // anciennes bannières 1200 × 150 restent acceptées, affichées à leurs proportions).
             Emplacements::INAMI_SEARCH => [
-                'desktop' => ['ratio' => '8:1', 'width' => 1200, 'height' => 150, 'label' => 'Ordinateur et tablette'],
+                'desktop' => ['ratio' => '4:1', 'width' => 1200, 'height' => 300, 'label' => 'Ordinateur et tablette'],
                 'mobile' => ['ratio' => '16:5', 'width' => 640, 'height' => 200, 'label' => 'Téléphone'],
             ],
             default => null,
@@ -1217,10 +1218,10 @@ final class EmplacementManager
                 ? "La recherche INAMI est une page publique (la déclaration « professionnel de la santé » n'est pas une vérification) : une publicité réservée aux professionnels ne peut pas y être diffusée."
                 : "La page d'identification est publique : une publicité réservée aux professionnels ne peut pas y être diffusée.");
         }
-        // Formats propres (8:1, 16:5) : une publicité de la recherche INAMI n'est diffusée nulle part ailleurs.
+        // Formats propres (4:1, 16:5) : une publicité de la recherche INAMI n'est diffusée nulle part ailleurs.
         $others = array_diff($current?->getPlacements() ?? [], Emplacements::campaignPlacements($key));
         if ($current !== null && ($key === Emplacements::INAMI_SEARCH ? $others !== [] : in_array(Marketing::PLACEMENT_INAMI_SEARCH, $others, true))) {
-            throw new \InvalidArgumentException('Recherche INAMI : formats propres (1200 × 150 et 640 × 200 px). Créez une publicité distincte pour les autres emplacements.');
+            throw new \InvalidArgumentException('Recherche INAMI : formats propres (1200 × 300 et 640 × 200 px). Créez une publicité distincte pour les autres emplacements.');
         }
         $duration = $data['duration'] ?? Marketing::DEFAULT_DURATION;
         if ($key === Emplacements::AFTER_LOGIN && filter_var($duration, FILTER_VALIDATE_INT, ['options' => ['min_range' => self::MIN_DURATION, 'max_range' => Marketing::MAX_DURATION]]) === false) {
