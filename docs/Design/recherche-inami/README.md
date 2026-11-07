@@ -55,7 +55,7 @@ statique. Si MySQL est arrêté, la page affiche son état d'erreur. Le visuel p
 | URL permanente | `/codes-inami`, publique, accessible directement (la fenêtre s'affiche si besoin). |
 | Accès | Gratuit, sans compte. |
 | Colonnes | Nom · Code ambulatoire · Code hospitalisation · N ou K. |
-| Bannière | Nouvel emplacement **« Recherche INAMI »** : 1200 × 150 px (ordinateur), 640 × 200 px (smartphone), affichée en entier, sans recadrage. Mention **« Publicité »**. |
+| Bannière | Nouvel emplacement **« Recherche INAMI »** : 1200 × 300 px (ordinateur), 640 × 200 px (smartphone), affichée en entier, sans recadrage. Mention **« Publicité »**. |
 | Gestion | Onglet « Recherche INAMI » dans Administration › Publicités, indépendant de « Accueil » et « Connexion ». Ses images, dates, statut et statistiques lui sont propres. |
 | Campagnes réservées aux professionnels | **Jamais diffusées** sur `/codes-inami` : la page est publique et la déclaration n'est pas une authentification. Seules les campagnes à diffusion publique. Toute évolution (médicaments) exige une vérification réglementaire préalable. |
 | Spécialité | Cookie `mc_inami_specialite`, 12 mois, identifiant de spécialité seulement. |
@@ -110,14 +110,14 @@ Proposition de texte :
 
 Voir l'écran « 3. Administration » de la prévisualisation.
 
-- Troisième onglet « Recherche INAMI » à côté de « Accueil » et « Connexion », avec ses propres images. Formats recommandés : 1200 × 150 px et 640 × 200 px. Les visuels sont affichés entiers.
+- Troisième onglet « Recherche INAMI » à côté de « Accueil » et « Connexion », avec ses propres images. Formats recommandés : 1200 × 300 px et 640 × 200 px. Les visuels sont affichés entiers.
 - Aperçu « Recherche INAMI ordinateur / mobile ».
 - Une publicité par affichage. Si plusieurs sont en ligne, elles alternent à chaque visite. Pas de carrousel animé sur une page de travail.
 - Impressions et clics mesurés comme pour les autres emplacements.
 
 Constat technique (pour plus tard) : `Marketing.placements` est une colonne JSON. Un placement
 `inami_search` s'ajoute **sans migration**, et les champs `bannerDesktop` / `bannerMobile` d'une
-publicité de cet onglet portent ses visuels 8:1 et 16:5. Une publicité ne doit donc pas partager
+publicité de cet onglet portent ses visuels 4:1 et 16:5. Une publicité ne doit donc pas partager
 l'emplacement INAMI avec un emplacement 16:9 / 2:1 (règle de validation à prévoir).
 
 **Dépendance** avec la branche `feature/refonte-publicites-partenaires` : voir

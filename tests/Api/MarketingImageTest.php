@@ -60,11 +60,12 @@ class MarketingImageTest extends ApiTestBase
 
     public function testNarrowBannerIsAcceptedOnlyWithTheBannerFormat(): void
     {
-        // Recherche INAMI : 1200 × 150 et 640 × 200 ; les autres visuels gardent 480 px par côté.
+        // Recherche INAMI : 1200 × 300 (anciennes bannières : 1200 × 150) et 640 × 200 ; les autres
+        // visuels gardent 480 px par côté.
         $this->upload(self::image('png', 1200, 150), 'inami.png');
         $this->assertResponseStatusCodeSame(400);
 
-        foreach ([[1200, 150], [640, 200]] as [$width, $height]) {
+        foreach ([[1200, 300], [1200, 150], [640, 200]] as [$width, $height]) {
             $upload = $this->admin->request('POST', '/api/admin/marketing-images?format=banner', [
                 'headers' => ['Content-Type' => 'multipart/form-data'],
                 'extra' => ['files' => ['file' => self::uploadedFile(self::image('png', $width, $height), 'inami.png')]],
