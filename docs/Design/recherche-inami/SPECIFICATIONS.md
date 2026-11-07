@@ -45,13 +45,13 @@ les médecins diplômés sans carnet de stage), alimenté par la nomenclature de
 | P1 | **Seules les campagnes autorisées pour une diffusion publique** apparaissent sur `/codes-inami`. Une campagne « réservée aux professionnels » (`professionals_only`) n'y est **jamais** diffusée : la page est publique et la déclaration de la fenêtre n'est pas une authentification (A4). |
 | P2 | Ce filtre est appliqué **côté serveur** : une campagne réservée n'est jamais envoyée à cette page. Dans l'administration, cocher « Recherche INAMI » sur une campagne réservée est refusé avec un message explicite, comme aujourd'hui pour « Connexion ». |
 | P3 | Toute évolution permettant d'y diffuser de la publicité pour des médicaments, ou de la publicité réservée aux professionnels, exige une **vérification réglementaire préalable** (notamment l'AR du 7 avril 1995 relatif à l'information et à la publicité concernant les médicaments à usage humain) et un mécanisme d'accès adapté. Elle n'est pas prévue. |
-| P4 | Emplacement dédié **« Recherche INAMI »** (placement technique proposé : `inami_search`) : bannière en haut de page, 1200 × 150 px sur ordinateur et 640 × 200 px sur smartphone, affichée entière sans recadrage, place réservée dès le chargement. |
+| P4 | Emplacement dédié **« Recherche INAMI »** (placement technique proposé : `inami_search`) : bannière en haut de page, 1200 × 300 px sur ordinateur et 640 × 200 px sur smartphone, affichée entière sans recadrage, place réservée dès le chargement. |
 | P5 | Mention « Publicité » toujours visible. Lien vers l'annonceur dans un nouvel onglet (`rel="sponsored noopener noreferrer"`). |
 | P6 | Une publicité par affichage. Si plusieurs sont en ligne, elles alternent à chaque visite. Pas de carrousel animé. Pas de plein écran, pas d'insertion entre les résultats. |
 | P7 | Sans campagne : encart MedClick discret (ou rien). Une erreur du service publicitaire n'empêche jamais la recherche. |
 | P8 | Impressions et clics mesurés comme pour les autres emplacements. |
 | P9 | Gestion indépendante : onglet « Recherche INAMI » dans Administration › Publicités, avec ses propres images, dates, statut, priorité et statistiques. Les emplacements « Accueil » et « Connexion » ne sont ni modifiés ni perturbés. |
-| P10 | Une publicité de cet emplacement ne partage pas d'autre emplacement : ses visuels (8:1, 16:5) ne conviennent pas aux formats 16:9 / 2:1. |
+| P10 | Une publicité de cet emplacement ne partage pas d'autre emplacement : ses visuels (4:1, 16:5) ne conviennent pas aux formats 16:9 / 2:1. |
 
 ## 5. Cookies et données personnelles
 

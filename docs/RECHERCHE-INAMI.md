@@ -26,7 +26,7 @@ Ajouté au système de campagnes existant (aucun module dupliqué) :
 - `Marketing::PLACEMENT_INAMI_SEARCH`, dans `PLACEMENTS` et `CARD_PLACEMENTS` (servi par `GET /api/marketing/slots`, clé `inami_search`, mesuré par `POST /api/marketing/events`, statistiques « Recherche INAMI »).
 - `Marketing::PUBLIC_ONLY_PLACEMENTS` : `SponsorDelivery` ne sert **jamais** une campagne `professionals_only` sur cet emplacement, **même à un utilisateur connecté**, et n'y compte aucun événement pour une telle campagne. Garantie côté serveur, indépendante de l'administration.
 - `Marketing::STANDALONE_PLACEMENTS` + `MarketingController` : refus d'une campagne `professionals_only` sur cet emplacement, et de toute combinaison avec un autre emplacement (formats différents).
-- Visuels : `bannerDesktop` (1200 × 150) et `bannerMobile` (640 × 200) de la campagne. Import : `POST /api/admin/marketing-images?format=banner` (480 × 120 px au minimum ; les autres visuels gardent 480 px par côté).
+- Visuels : `bannerDesktop` (1200 × 300, 4:1) et `bannerMobile` (640 × 200) de la campagne. Les anciennes bannières 1200 × 150 (8:1) restent acceptées : la page les affiche entières, dans une bande à leurs proportions. Import : `POST /api/admin/marketing-images?format=banner` (480 × 120 px au minimum ; les autres visuels gardent 480 px par côté).
 - Administration (front) : onglet « Recherche INAMI » de Communication › Publicités, indépendant de « Accueil » et « Connexion ».
 - Mesure sur la page : identifiant de visiteur gardé **en mémoire** le temps de la page (aucun stockage navigateur) ; le dédoublonnage du serveur ne vaut donc que pendant la visite.
 
@@ -70,7 +70,7 @@ Branche non fusionnée au 04/11/2026, en retard de 33 commits sur `master`. Poin
 2. **Intégration de « Recherche INAMI »** une fois la refonte fusionnée (ou rebasée sur cette branche) :
    - `src/Advertising/Emplacements.php` : ajouter une entrée `inami_search` (écran `pages_publiques`, `kind: ads`, `capacity: 3`, `supports: { desktop: inami_search, mobile: inami_search }`, `sameCampaignForSupports: true`, `public: true`) et son libellé dans `STAT_LABELS`. Sans cette entrée, `SponsorDelivery::selectFor()` de la refonte renvoie une liste vide pour `inami_search` : **rien ne casse**, la page affiche l'encart MedClick.
    - Conserver dans `SponsorDelivery` la règle `PUBLIC_ONLY_PLACEMENTS` (audience publique pour `inami_search`, y compris dans `isServable`).
-   - Reporter dans l'administration de la refonte (par emplacement) les formats 1200 × 150 / 640 × 200, l'import `?format=banner` et le refus `professionals_only`.
+   - Reporter dans l'administration de la refonte (par emplacement) les formats 1200 × 300 / 640 × 200, l'import `?format=banner` et le refus `professionals_only`.
    - Aucun emplacement existant n'est supprimé, renommé ni modifié.
 3. Ordre recommandé : fusionner la refonte (après correction du point 1), puis rebaser `feature/recherche-inami` et appliquer le point 2 ; ou l'inverse, la refonte reprenant alors le point 2 dans son rebase.
 

@@ -19,7 +19,7 @@ class MarketingImageProcessor
     public const MAX_UPLOAD_BYTES = 5242880;
     public const MIN_SIDE = 480;
     /**
-     * Bannière étroite (emplacement « Recherche INAMI » : 1200 × 150 et 640 × 200) : 480 px au
+     * Bannière (emplacement « Recherche INAMI » : 1200 × 300 et 640 × 200, anciennes 1200 × 150 acceptées) : 480 px au
      * moins en largeur, BANNER_MIN_HEIGHT en hauteur. Les autres visuels gardent MIN_SIDE.
      */
     public const FORMAT_BANNER = 'banner';
