@@ -30,6 +30,8 @@ final class Emplacements
     public const MOBILE_MENU = Assignment::MOBILE_MENU;
     public const PUBLIC_HOME = Assignment::PUBLIC_HOME;
     public const PARTNERS_PAGE = Assignment::PARTNERS_PAGE;
+    /** Recherche publique des codes INAMI (docs/RECHERCHE-INAMI.md). */
+    public const INAMI_SEARCH = Marketing::PLACEMENT_INAMI_SEARCH;
 
     public const SCREENS = [
         'connexion' => 'Connexion',
@@ -116,6 +118,16 @@ final class Emplacements
             'description' => "Présentation des entreprises sélectionnées, avec logos et liens. Accessible depuis la barre latérale, le menu mobile et l'accueil public.",
             'kind' => 'partner',
             'shared' => true,
+            'public' => true,
+        ],
+        self::INAMI_SEARCH => [
+            'screen' => 'pages_publiques',
+            'label' => 'Recherche INAMI — Bannière',
+            'description' => "Bannière en haut de la recherche publique des codes INAMI (/codes-inami), sur ordinateur (1200 × 150) et sur mobile (640 × 200), affichée entière. Page publique : la déclaration « professionnel de la santé » n'est pas une vérification, aucune publicité réservée aux professionnels n'y est diffusée.",
+            'kind' => 'ads',
+            'capacity' => 3,
+            'supports' => ['desktop' => Marketing::PLACEMENT_INAMI_SEARCH, 'mobile' => Marketing::PLACEMENT_INAMI_SEARCH],
+            'sameCampaignForSupports' => true,
             'public' => true,
         ],
     ];
@@ -205,5 +217,6 @@ final class Emplacements
         Assignment::MOBILE_MENU => 'Navigation mobile — Menu',
         Assignment::PUBLIC_HOME => 'Accueil public — Sponsor',
         Assignment::PARTNERS_PAGE => 'Page « Nos partenaires »',
+        Marketing::PLACEMENT_INAMI_SEARCH => 'Recherche INAMI — Bannière',
     ];
 }

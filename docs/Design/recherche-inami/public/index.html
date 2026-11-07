@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aperçu codes INAMI</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root { --ink: #0B1F4D; --muted: #3E4E73; --line: #DCE3EE; --primary: #2F5BEA; --soft: #E6EDFF; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color: var(--ink); background: #E9EDF4; }
+  .bar { position: sticky; top: 0; z-index: 5; background: #fff; border-bottom: 1px solid var(--line); padding: 10px 16px; display: flex; flex-wrap: wrap; gap: 10px 22px; align-items: center; }
+  .bar h1 { font-size: 15px; margin: 0 8px 0 0; font-weight: 800; }
+  .grp { display: flex; align-items: center; gap: 6px; }
+  .grp > span { font-size: 12px; font-weight: 700; color: var(--muted); margin-right: 2px; }
+  .seg { display: inline-flex; background: #F2F5FA; border-radius: 10px; padding: 3px; }
+  .seg button { border: 0; background: transparent; font: inherit; font-size: 13px; font-weight: 700; color: var(--muted); padding: 6px 11px; border-radius: 8px; cursor: pointer; }
+  .seg button[aria-pressed="true"] { background: #fff; color: var(--primary); box-shadow: 0 1px 4px rgba(11,31,77,.12); }
+  .reset { border: 1px solid var(--line); background: #fff; font: inherit; font-size: 13px; font-weight: 700; color: var(--ink); padding: 7px 12px; border-radius: 10px; cursor: pointer; }
+  .note { flex-basis: 100%; font-size: 12px; color: var(--muted); margin: 0; }
+  .stage { display: flex; gap: 28px; justify-content: center; align-items: flex-start; padding: 24px 16px 40px; flex-wrap: wrap; }
+  .dev { display: flex; flex-direction: column; gap: 8px; align-items: center; }
+  .dev small { font-size: 12px; font-weight: 700; color: var(--muted); }
+  .desk { border-radius: 12px; overflow: hidden; box-shadow: 0 18px 40px rgba(11,31,77,.18); background: #fff; }
+  .url { font-size: 12px; font-weight: 600; color: var(--muted); background: #fff; border: 1px solid var(--line); border-radius: 999px; padding: 4px 12px; }
+  .url b { color: var(--ink); }
+  .desk iframe { border: 0; transform-origin: 0 0; display: block; }
+  .phone { width: 414px; padding: 12px; border-radius: 46px; background: #0E1626; box-shadow: 0 18px 40px rgba(11,31,77,.25); }
+  .phone iframe { width: 390px; height: 844px; border: 0; border-radius: 34px; display: block; background: #fff; }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<div class="bar">
+  <h1>MedClick · aperçu « Trouver un code INAMI »</h1>
+  <div class="grp"><span>Écran</span><div class="seg" data-k="route">
+    <button data-v="/login">1. Connexion</button><button data-v="/codes-inami">2. Recherche</button><button data-v="/admin/publicites">3. Administration</button></div></div>
+  <div class="grp"><span>Appareil</span><div class="seg" data-k="dev">
+    <button data-v="both">Les deux</button><button data-v="desk">Ordinateur</button><button data-v="phone">Smartphone</button></div></div>
+  <div class="grp"><span>Bannière</span><div class="seg" data-k="ad">
+    <button data-v="campagne">Campagne</button><button data-v="encart">Encart MedClick</button><button data-v="aucune">Aucune</button></div></div>
+  <div class="grp"><span>Données</span><div class="seg" data-k="api">
+    <button data-v="normal">Normal</button><button data-v="lent">Lent</button><button data-v="erreur">Erreur</button></div></div>
+  <button class="reset" id="reset" title="Efface les deux cookies : spécialité et confirmation « professionnel »">Réinitialiser (1re visite)</button>
+  <p class="note">Nomenclature actuelle lue en direct dans la base MySQL locale (aucune copie). Visuel publicitaire fictif. Les deux vues partagent les cookies : comme un même visiteur.</p>
+</div>
+<div class="stage">
+  <div class="dev" id="d-desk"><small id="desk-label">Ordinateur · 1440 × 900</small><span class="url">medclick.be<b class="u"></b></span><div class="desk" id="desk-box"><iframe id="f-desk" title="Aperçu ordinateur"></iframe></div></div>
+  <div class="dev" id="d-phone"><small>Smartphone · 390 × 844</small><span class="url">medclick.be<b class="u"></b></span><div class="phone"><iframe id="f-phone" title="Aperçu smartphone"></iframe></div></div>
+</div>
+<script>
+  const S = { route: '/login', dev: 'both', ad: 'campagne', api: 'normal' };
+  try { Object.assign(S, JSON.parse(localStorage.getItem('ia-preview') || '{}')); } catch {}
+  const fd = document.getElementById('f-desk'), fp = document.getElementById('f-phone');
+  const W = 1440, H = 900;
+
+  function src() { return `app.html?ad=${S.ad}&api=${S.api}#${S.route}`; }
+  function load() { fd.src = src(); fp.src = src(); }
+  function layout() {
+    document.getElementById('d-desk').hidden = S.dev === 'phone';
+    document.getElementById('d-phone').hidden = S.dev === 'desk';
+    const avail = window.innerWidth - 32 - (S.dev === 'both' ? 414 + 28 : 0);
+    const k = Math.min(1, avail / W);
+    fd.style.width = W + 'px'; fd.style.height = H + 'px'; fd.style.transform = `scale(${k})`;
+    const box = document.getElementById('desk-box');
+    box.style.width = W * k + 'px'; box.style.height = H * k + 'px';
+    document.getElementById('desk-label').textContent = `Ordinateur · 1440 × 900 (affiché à ${Math.round(k * 100)} %)`;
+  }
+  function paint() {
+    document.querySelectorAll('.seg').forEach((g) => g.querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(S[g.dataset.k] === b.dataset.v))));
+    document.querySelectorAll('.u').forEach((u) => { u.textContent = S.route; });
+    try { localStorage.setItem('ia-preview', JSON.stringify(S)); } catch {}
+  }
+  document.querySelectorAll('.seg').forEach((g) => g.addEventListener('click', (e) => {
+    const b = e.target.closest('button'); if (!b) return;
+    S[g.dataset.k] = b.dataset.v; paint();
+    if (g.dataset.k === 'dev') return layout();
+    if (g.dataset.k === 'route') { fd.contentWindow.location.hash = S.route; fp.contentWindow.location.hash = S.route; return; }
+    load();
+  }));
+  // Suivre la navigation faite dans l'aperçu (bouton, « Non », logo…)
+  [fd, fp].forEach((f) => f.addEventListener('load', () => f.contentWindow.addEventListener('hashchange', () => {
+    const h = f.contentWindow.location.hash.slice(1) || '/login';
+    if (h !== S.route) { S.route = h; paint(); }
+  })));
+  document.getElementById('reset').addEventListener('click', () => {
+    document.cookie = 'mc_inami_specialite=; Max-Age=0; Path=/; SameSite=Lax';
+    document.cookie = 'mc_inami_pro=; Max-Age=0; Path=/; SameSite=Lax';
+    S.route = '/login'; paint(); load();
+  });
+  window.addEventListener('resize', layout);
+  paint(); layout(); load();
+</script>
+</body>
+</html>

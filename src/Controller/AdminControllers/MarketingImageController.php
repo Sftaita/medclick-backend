@@ -25,10 +25,17 @@ class MarketingImageController extends AbstractController
     {
     }
 
-    /** Multipart, champ « file » : PNG, JPEG ou WebP de 5 Mo au plus. */
+    /**
+     * Multipart, champ « file » : PNG, JPEG ou WebP de 5 Mo au plus. ?format=banner : bannière
+     * étroite de la recherche INAMI (480 × 120 px au minimum au lieu de 480 px par côté).
+     */
     #[Route('', name: 'admin_marketing_image_upload', methods: ['POST'])]
     public function upload(Request $request): JsonResponse
     {
+        $format = $request->query->get('format');
+        if ($format !== null && $format !== MarketingImageProcessor::FORMAT_BANNER) {
+            return $this->error('Format inconnu.');
+        }
         $file = $request->files->get('file');
         // Refusé par PHP avant l'application (upload_max_filesize : 6 Mo, voir backend.Dockerfile).
         if ($file instanceof UploadedFile && in_array($file->getError(), [UPLOAD_ERR_INI_SIZE, UPLOAD_ERR_FORM_SIZE], true)) {
@@ -41,7 +48,7 @@ class MarketingImageController extends AbstractController
             return $this->error('Le visuel dépasse 5 Mo.');
         }
         try {
-            $image = $this->store->store((string) file_get_contents($file->getPathname()));
+            $image = $this->store->store((string) file_get_contents($file->getPathname()), $format);
         } catch (\InvalidArgumentException $e) {
             return $this->error($e->getMessage());
         }

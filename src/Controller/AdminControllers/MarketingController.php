@@ -263,6 +263,14 @@ class MarketingController extends AbstractController
         if (!empty($data['professionals_only']) && in_array(Marketing::PLACEMENT_LOGIN, $placements, true)) {
             return $fail("Publicité réservée aux professionnels : la page de connexion est publique. Choisissez l'Accueil ou le plein écran (affiché après la connexion).");
         }
+        // Recherche INAMI : page publique, la déclaration « professionnel » n'est pas une authentification.
+        if (!empty($data['professionals_only']) && array_intersect(Marketing::PUBLIC_ONLY_PLACEMENTS, $placements) !== []) {
+            return $fail("Publicité réservée aux professionnels : la recherche INAMI est une page publique (la déclaration « professionnel de la santé » n'est pas une vérification). Seules les publicités à diffusion publique peuvent y paraître.");
+        }
+        // Formats propres (1200 × 300 / 640 × 200) : une publicité de la recherche INAMI n'est diffusée nulle part ailleurs.
+        if (array_intersect(Marketing::STANDALONE_PLACEMENTS, $placements) !== [] && count($placements) > 1) {
+            return $fail('Recherche INAMI : formats propres (1200 × 300 et 640 × 200 px). Créez une publicité distincte pour les autres emplacements.');
+        }
         if (!empty($data['show_cta']) && empty($data['redirect_url'])) {
             return $fail("Indiquez le site de l'annonceur pour afficher le bouton « Découvrir le partenaire ».");
         }

@@ -11,7 +11,8 @@ use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
 
 /**
  * Limite, par adresse IP, les routes publiques exposées aux abus (création de comptes en masse,
- * envoi d'emails de réinitialisation). Répond 429 lorsque la limite est atteinte.
+ * envoi d'emails de réinitialisation, aspiration de la recherche INAMI). Répond 429 lorsque la
+ * limite est atteinte.
  *
  * La connexion (/api/login_check) est protégée par "login_throttling" dans security.yaml.
  */
@@ -29,6 +30,8 @@ class PublicEndpointRateLimiter implements EventSubscriberInterface
         #[Target('marketing_click.limiter')] RateLimiterFactoryInterface $marketingClickLimiter,
         #[Target('marketing_event.limiter')] RateLimiterFactoryInterface $marketingEventLimiter,
         #[Target('partner_event.limiter')] RateLimiterFactoryInterface $partnerEventLimiter,
+        #[Target('inami_search.limiter')] RateLimiterFactoryInterface $inamiSearchLimiter,
+        #[Target('inami_event.limiter')] RateLimiterFactoryInterface $inamiEventLimiter,
     )
     {
         $this->limiters = [
@@ -39,6 +42,9 @@ class PublicEndpointRateLimiter implements EventSubscriberInterface
             'increment_campaign_click' => $marketingClickLimiter,
             'marketing_event' => $marketingEventLimiter,
             'partner_event' => $partnerEventLimiter,
+            'public_inami_specialities' => $inamiSearchLimiter,
+            'public_inami_codes' => $inamiSearchLimiter,
+            'public_inami_event' => $inamiEventLimiter,
         ];
     }
 
