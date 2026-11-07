@@ -123,7 +123,7 @@ final class Emplacements
         self::INAMI_SEARCH => [
             'screen' => 'pages_publiques',
             'label' => 'Recherche INAMI — Bannière',
-            'description' => "Bannière en haut de la recherche publique des codes INAMI (/codes-inami), sur ordinateur (1200 × 150) et sur mobile (640 × 200), affichée entière. Page publique : la déclaration « professionnel de la santé » n'est pas une vérification, aucune publicité réservée aux professionnels n'y est diffusée.",
+            'description' => "Bannière en haut de la recherche publique des codes INAMI (/codes-inami), sur ordinateur (1200 × 300) et sur mobile (640 × 200), affichée entière. Page publique : la déclaration « professionnel de la santé » n'est pas une vérification, aucune publicité réservée aux professionnels n'y est diffusée.",
             'kind' => 'ads',
             'capacity' => 3,
             'supports' => ['desktop' => Marketing::PLACEMENT_INAMI_SEARCH, 'mobile' => Marketing::PLACEMENT_INAMI_SEARCH],

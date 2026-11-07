@@ -48,7 +48,7 @@ dans un worktree dédié (branches d'origine inchangées) :
 - **`SponsorDelivery.php`** : résolution ci-dessous (sélection de la refonte + audience publique pour
   `inami_search`).
 - **Nouveau système** : emplacement `inami_search` dans `Emplacements` (écran « Pages publiques »,
-  publicités, capacité 3, ordinateur et mobile, public), formats recommandés 1200 × 150 / 640 × 200
+  publicités, capacité 3, ordinateur et mobile, public), formats recommandés 1200 × 300 / 640 × 200
   dans `EmplacementManager::recommended()`, refus d'une publicité réservée aux professionnels avec
   un message propre, refus de la reprise d'une publicité INAMI sur un autre emplacement (et
   inversement). Absence de ligne `ad_placement_setting` : emplacement activé par défaut (aucune

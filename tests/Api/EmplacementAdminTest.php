@@ -53,7 +53,7 @@ final class EmplacementAdminTest extends ApiTestBase
     public function testInamiSearchIsAPublicEmplacementNeverServingProfessionalAds(): void
     {
         $firm = $this->firm('OrthoLab');
-        $this->assertSame(['ratio' => '8:1', 'width' => 1200, 'height' => 150, 'label' => 'Ordinateur et tablette'], $this->detail('inami_search')['recommended']['desktop'] ?? null);
+        $this->assertSame(['ratio' => '4:1', 'width' => 1200, 'height' => 300, 'label' => 'Ordinateur et tablette'], $this->detail('inami_search')['recommended']['desktop'] ?? null);
 
         // Refus en administration : page publique (la déclaration n'est pas une vérification).
         $this->admin->request('POST', '/api/admin/emplacements/inami_search/contents', ['json' => $this->ad($firm, ['professionalsOnly' => true])]);
