@@ -55,6 +55,9 @@ Doc OpenAPI générée par API Platform : `GET /api` (ne couvre pas les contrôl
 - `src/Security/Voter/OwnershipVoter.php` — attribut `OWNER` : la ressource appartient-elle
   au user ? Utilisé en `securityPostDenormalize` sur les `#[ApiResource]` et via
   `$this->isGranted('OWNER', $x)` dans les contrôleurs custom.
+- **Recherche publique des codes INAMI** (sans JWT) : `src/Controller/PublicInamiController.php`
+  (`/api/public/inami/*`, lecture seule, limitée en débit), emplacement publicitaire `inami_search`
+  (jamais de campagne `professionals_only`). Voir `docs/RECHERCHE-INAMI.md`.
 - `src/State/` — state processors API Platform branchés par opération (`processor:`) :
   `UserProcessor` (hash du mot de passe, email d'activation), `CurrentUserAssignProcessor`
   (propriétaire des `Years`), `SurgeonProcessor` (maître de stage unique),
@@ -80,6 +83,11 @@ Doc OpenAPI générée par API Platform : `GET /api` (ne couvre pas les contrôl
   `tests/Fixtures/excel-reference/`. Voir `docs/EXPORTS.md`.
 - Contrôle d'accès : `config/packages/security.yaml` (`access_control` par préfixe d'URL).
 
+- **Publicités & partenaires** : `docs/PUBLICITES-PARTENAIRES.md` — huit emplacements
+  (`src/Advertising/Emplacements.php`), brouillons et publication par emplacement
+  (`src/Service/EmplacementManager.php`, `/api/admin/emplacements`), entreprises
+  (`/api/admin/companies`), statistiques (`src/Service/AdStats.php`). Aucune modification
+  enregistrée ne doit changer l'affichage public avant la publication.
 - **Espaces sponsors** : `docs/SPONSORS.md` — campagnes par emplacement (`src/Service/SponsorDelivery.php`),
   impressions réellement vues et clics dédoublonnés (`marketing_view`), statistiques (`SponsorStats.php`).
   Ne jamais compter une impression côté serveur sur un simple appel d'API.

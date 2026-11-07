@@ -18,6 +18,12 @@ class MarketingImageProcessor
 {
     public const MAX_UPLOAD_BYTES = 5242880;
     public const MIN_SIDE = 480;
+    /**
+     * Bannière (emplacement « Recherche INAMI » : 1200 × 300 et 640 × 200, anciennes 1200 × 150 acceptées) : 480 px au
+     * moins en largeur, BANNER_MIN_HEIGHT en hauteur. Les autres visuels gardent MIN_SIDE.
+     */
+    public const FORMAT_BANNER = 'banner';
+    public const BANNER_MIN_HEIGHT = 120;
     public const MAX_SIDE = 8000;
     public const MAX_PIXELS = 25000000;
     public const OUTPUT_MAX_SIDE = 2560;
@@ -29,7 +35,7 @@ class MarketingImageProcessor
      *
      * @throws \InvalidArgumentException message lisible pour l'administrateur
      */
-    public function process(string $data): array
+    public function process(string $data, ?string $format = null): array
     {
         if ($data === '') {
             throw new \InvalidArgumentException('Le fichier est vide.');
@@ -65,7 +71,11 @@ class MarketingImageProcessor
             }
             $width = imagesx($image);
             $height = imagesy($image);
-            if ($width < self::MIN_SIDE || $height < self::MIN_SIDE) {
+            if ($format === self::FORMAT_BANNER) {
+                if ($width < self::MIN_SIDE || $height < self::BANNER_MIN_HEIGHT) {
+                    throw new \InvalidArgumentException(sprintf('Bannière trop petite (%d × %d px) : %d px de large et %d px de haut au minimum.', $width, $height, self::MIN_SIDE, self::BANNER_MIN_HEIGHT));
+                }
+            } elseif ($width < self::MIN_SIDE || $height < self::MIN_SIDE) {
                 throw new \InvalidArgumentException(sprintf('Image trop petite (%d × %d px) : %d px minimum par côté.', $width, $height, self::MIN_SIDE));
             }
             $image = $this->fit($image);

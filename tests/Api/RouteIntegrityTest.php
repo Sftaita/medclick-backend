@@ -24,10 +24,11 @@ class RouteIntegrityTest extends ApiTestBase
                 continue;
             }
             // Valeur d'exemple compatible avec la contrainte du paramètre (id, nom de fichier
-            // <sha256>.webp des visuels de campagne, ou UUID v4 des exports).
+            // <sha256>.webp des visuels de campagne, UUID v4 des exports, ou clé d'emplacement,
+            // type et action de contenu des publicités).
             $path = preg_replace_callback('/\{([^}]+)\}/', static function (array $m) use ($route) {
                 $requirement = $route->getRequirement($m[1]);
-                foreach (['42', str_repeat('a', 64) . '.webp', '5213ede1-65a1-4fd2-b737-f8140a44153e'] as $sample) {
+                foreach (['42', str_repeat('a', 64) . '.webp', '5213ede1-65a1-4fd2-b737-f8140a44153e', 'login', 'ad', 'deactivate'] as $sample) {
                     if ($requirement === null || preg_match('#^(?:' . $requirement . ')$#', $sample)) {
                         return $sample;
                     }

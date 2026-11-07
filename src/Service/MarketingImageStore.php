@@ -30,9 +30,10 @@ class MarketingImageStore
     }
 
     /** @throws \InvalidArgumentException message lisible */
-    public function store(string $upload): MarketingImage
+    /** @param ?string $format MarketingImageProcessor::FORMAT_BANNER pour une bannière étroite */
+    public function store(string $upload, ?string $format = null): MarketingImage
     {
-        $result = $this->processor->process($upload);
+        $result = $this->processor->process($upload, $format);
         $image = $this->images->findOneBy(['sha256' => hash('sha256', $result['data'])]);
         if ($image === null) {
             $image = new MarketingImage($result['data'], $result['width'], $result['height'], strlen($upload));
@@ -59,6 +60,13 @@ class MarketingImageStore
                 preg_match(MarketingImage::PATH_PATTERN, $path, $match);
                 $used[$match[1]] = true;
             }
+            // Visuels de modifications pas encore publiées : conservés jusqu'à la publication.
+            $pending = $marketing->getPendingChanges() ?? [];
+            array_walk_recursive($pending, static function ($value) use (&$used): void {
+                if (is_string($value) && preg_match(MarketingImage::PATH_PATTERN, $value, $match)) {
+                    $used[$match[1]] = true;
+                }
+            });
         }
         // Visuels des fiches partenaires (même stockage).
         foreach ($this->em->getRepository(Partner::class)->findAll() as $partner) {
