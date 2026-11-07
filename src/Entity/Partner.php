@@ -63,6 +63,16 @@ class Partner
     #[ORM\Column(type: Types::STRING, length: 500, nullable: true)]
     private ?string $coverImage = null;
 
+    /** Contact administratif (facultatif) : jamais exposé par les routes publiques. */
+    #[ORM\Column(type: Types::STRING, length: 120, nullable: true)]
+    private ?string $contactName = null;
+
+    #[ORM\Column(type: Types::STRING, length: 180, nullable: true)]
+    private ?string $contactEmail = null;
+
+    #[ORM\Column(type: Types::STRING, length: 40, nullable: true)]
+    private ?string $contactPhone = null;
+
     #[ORM\Column(type: Types::DATE_IMMUTABLE, nullable: true)]
     private ?\DateTimeImmutable $startsOn = null;
 
@@ -287,6 +297,42 @@ class Partner
     public function touch(): self
     {
         $this->updatedAt = new \DateTimeImmutable();
+
+        return $this;
+    }
+
+    public function getContactName(): ?string
+    {
+        return $this->contactName;
+    }
+
+    public function setContactName(?string $contactName): self
+    {
+        $this->contactName = $contactName;
+
+        return $this;
+    }
+
+    public function getContactEmail(): ?string
+    {
+        return $this->contactEmail;
+    }
+
+    public function setContactEmail(?string $contactEmail): self
+    {
+        $this->contactEmail = $contactEmail;
+
+        return $this;
+    }
+
+    public function getContactPhone(): ?string
+    {
+        return $this->contactPhone;
+    }
+
+    public function setContactPhone(?string $contactPhone): self
+    {
+        $this->contactPhone = $contactPhone;
 
         return $this;
     }

@@ -31,6 +31,12 @@ class Marketing
     public const MAX_PRIORITY = 10;
     public const DEFAULT_PRIORITY = 5;
 
+    // Statuts : brouillon (jamais publiée), active (publiée : programmée, en ligne ou terminée
+    // selon ses dates), inactive (désactivée).
+    public const STATUS_DRAFT = 'draft';
+    public const STATUS_ACTIVE = 'active';
+    public const STATUS_INACTIVE = 'inactive';
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
@@ -126,6 +132,21 @@ class Marketing
      */
     #[ORM\Column(type: 'boolean', options: ['default' => false])]
     private bool $professionalsOnly = false;
+
+    /**
+     * Entreprise qui diffuse la publicité (bibliothèque commune, table partner). sponsorName
+     * reste renseigné avec son nom (rapports, anciennes campagnes sans entreprise).
+     */
+    #[ORM\ManyToOne(targetEntity: Partner::class)]
+    #[ORM\JoinColumn(name: 'partner_id', nullable: true, onDelete: 'RESTRICT')]
+    private ?Partner $partner = null;
+
+    /**
+     * Modifications enregistrées dans l'administration mais pas encore publiées (mêmes clés que
+     * EmplacementManager::campaignFields) ; null : aucune. Jamais lues par la diffusion.
+     */
+    #[ORM\Column(type: 'json', nullable: true)]
+    private ?array $pendingChanges = null;
 
     public function __construct()
     {
@@ -472,6 +493,35 @@ class Marketing
         $this->professionalsOnly = $professionalsOnly;
 
         return $this;
+    }
+
+    public function getPartner(): ?Partner
+    {
+        return $this->partner;
+    }
+
+    public function setPartner(?Partner $partner): self
+    {
+        $this->partner = $partner;
+
+        return $this;
+    }
+
+    public function getPendingChanges(): ?array
+    {
+        return $this->pendingChanges;
+    }
+
+    public function setPendingChanges(?array $pendingChanges): self
+    {
+        $this->pendingChanges = $pendingChanges === [] ? null : $pendingChanges;
+
+        return $this;
+    }
+
+    public function isDraft(): bool
+    {
+        return $this->status === self::STATUS_DRAFT;
     }
 
     /** Diffusée ce jour-là (AAAA-MM-JJ) : statut actif, dates de début et de fin incluses. */

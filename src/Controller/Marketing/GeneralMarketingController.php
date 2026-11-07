@@ -28,8 +28,8 @@ class GeneralMarketingController extends AbstractController
     #[Route('/api/marketing/active', name: 'get_active_campaign', methods: ['GET'])]
     public function getActiveCampaign(SponsorDelivery $delivery): JsonResponse
     {
-        // Plein écran de la connexion : exclusivité et priorité respectées (SponsorDelivery), le
-        // tirage portant sur toutes les campagnes, réservées aux professionnels comprises.
+        // Plein écran après la connexion : une seule publicité en ligne (SponsorDelivery), réservées
+        // aux professionnels comprises ; emplacement désactivé : 404 (accès direct à l'application).
         // Public : le front le demande avant l'authentification pour l'afficher dès le clic sur
         // « Se connecter ». Visiteur non connecté et campagne tirée réservée aux professionnels :
         // rien de son contenu, seulement after_login (le front la redemande une fois connecté).
@@ -46,29 +46,7 @@ class GeneralMarketingController extends AbstractController
 
         // Plus aucun comptage ici : le front précharge la campagne sans l'afficher. Les impressions
         // réellement vues arrivent par POST /api/marketing/events (docs/SPONSORS.md).
-
-        // Déterminer la durée avec une valeur par défaut de 5
-        $duration = $randomCampaign->getDuration();
-
-        // Renvoyer les informations de la campagne en JSON
-        $campaignData = [
-            'id' => $randomCampaign->getId(),
-            'campaign_name' => $randomCampaign->getCampaignName(),
-            'status' => $randomCampaign->getStatus(),
-            'start_date' => $randomCampaign->getStartDate()->format('Y-m-d'),
-            'end_date' => $randomCampaign->getEndDate() ? $randomCampaign->getEndDate()->format('Y-m-d') : null,
-            'views' => $randomCampaign->getViews(), // Compteur historique (figé)
-            'clicks' => $randomCampaign->getClicks(),
-            'duration' => $duration, // Inclure la durée
-            'formats' => [
-                'smartphone' => $randomCampaign->getSmartphoneFormat(),
-                'tablet_portrait' => $randomCampaign->getTabletPortraitFormat(),
-                'tablet_landscape' => $randomCampaign->getTabletLandscapeFormat(),
-                'screen_14_inch' => $randomCampaign->getScreen14InchFormat(),
-                'large_screen' => $randomCampaign->getLargeScreenFormat(),
-            ],
-            'redirect_url' => $randomCampaign->getRedirectUrl(), // Inclure l'URL de redirection
-        ];
+        $campaignData = $delivery->toInterstitialArray($randomCampaign);
         if (!$authenticated) {
             // Compteurs de l'administration : jamais exposés à un visiteur.
             unset($campaignData['views'], $campaignData['clicks']);
