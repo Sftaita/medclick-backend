@@ -27,8 +27,10 @@ recherche INAMI (`feature/recherche-inami`) et le format 1200 × 300 de l'emplac
   ADR-215, comme aujourd'hui non déployé. La PR #17 (dont `1e58091` n'est pas repris tel quel)
   est alors à fermer comme remplacée.
 
-La PWA de la release = `d9ff983` (PR #14, validée sur staging) + `fix/inami-cookies-consentement`
-(cookie de spécialité sur choix explicite, `/cookies` 1.1). Elle ne contient aucun changement Excel.
+La PWA de la release = `465503d` : `d9ff983` (PR #14, validée sur staging) + `fix/inami-cookies-consentement`
+(cookie de spécialité sur choix explicite) + `fix/publicite-sans-identifiant-persistant` (plus
+d'identifiant publicitaire persistant, `mc-ad-visitor` effacé au démarrage, fréquence du plein écran
+minimale, `/cookies` 1.2). Elle ne contient aucun changement Excel.
 
 ## Migrations
 
@@ -83,14 +85,14 @@ et PWA sont remplacés ensemble par `deploy.sh`.
 
 | Contrôle | Attendu |
 |---|---|
-| `GET /api/public/inami/specialities` (sans jeton) | 200, 9 spécialités |
+| `GET /api/public/inami/specialities` (sans jeton) | 200, 9 spécialités ; somme des `count` = 1 475 (1 347 codes proposés, dont 128 partagés avec la neurochirurgie comptés deux fois) ; ortho 791 |
 | `GET /api/public/inami/codes?speciality=ortho&q=genou` | 200, résultats, `Cache-Control: max-age=60, public`, `ETag` |
 | Recherche par code (ex. `q=` un code hospitalier connu) | 200, le code dans les résultats |
 | `…/codes?speciality=ortho&limit=1` | 400 |
 | `/api/nomenclature/ortho`, `/api/surgeries`, `/api/admin/inami-stats` (sans jeton) | 401 |
 | `GET /api/marketing/slots` | 200 ; campagnes 2 à 4 sur le tableau de bord, comme avant |
 | `doctrine:migrations:status` | aucune migration en attente |
-| Navigateur, ordinateur et smartphone : `/login` → « Trouver un code INAMI » → « Oui » | recherche, propositions sur toute la largeur, copie, aucun cookie de spécialité sans « Mémoriser », `/cookies` 1.1 |
+| Navigateur, ordinateur et smartphone : `/login` → « Trouver un code INAMI » → « Oui » | recherche, propositions sur toute la largeur, copie, aucun cookie de spécialité sans « Mémoriser », `/cookies` 1.2 ; après `/login`, aucune clé `mc-ad-visitor` (effacée si présente) |
 | Connexion d'un compte existant, tableau de bord, export Excel d'une année | identiques à la 3.7.x (export **inchangé** : ADR-215 non livré) |
 | Administration › Publicités & partenaires | neuf emplacements, « Recherche INAMI » sous « Pages publiques » ; statistiques |
 | `inami_search_stat` après une visite | compteurs du jour |
