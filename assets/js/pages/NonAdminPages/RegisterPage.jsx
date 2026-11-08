@@ -159,7 +159,7 @@ const RegisterPage = ({ history}) => {
                                 Si vous nous communiquez votre adresse e-mail via le web, vous pouvez recevoir des e-mails de notre société afin de vous communiquer des informations sur nos produits, services ou événements à venir (dans un but de marketing direct), à la condition que vous y ayez expressément consenti ou que vous soyez déjà membre chez nous et que vous nous ayez communiqué votre adresse e-mail.
                                 Si vous ne souhaitez plus recevoir de tels e-mails, vous pouvez en faire la demande de plusieurs manières possibles :<br/>
                                 - soit cliqué sur le lien de désinscription qui se trouve en bas de chaque e-mail de promotion ou marketing.<br/>
-                                - soit envoyez-nous un e-mail à <span>medclick.info@gmail.be</span><br/>
+                                - soit envoyez-nous un e-mail à <span>contact@medclick.be</span><br/>
                                 </p>
 
                                 <p>
@@ -172,7 +172,7 @@ const RegisterPage = ({ history}) => {
                                 <h4>f) Droit d’information, de correction et droit à l’oubli.</h4><br/>
                                 Sur requête, nous procurons aux visiteurs de notre site un accès à toutes les informations les concernant.
                                 Par ailleurs, conformément au Règlement européen de protection des données (GDPR), tout visiteur ou membre peut obtenir gratuitement la rectification, la limitation, la suppression ou l’interdiction d’utilisation de toute donnée à caractère personnel le concernant.
-                                Si le visiteur ou membre souhaite introduire une telle demande, merci d’envoyer un e-mail à <span>medclick.info@gmail.be</span>.
+                                Si le visiteur ou membre souhaite introduire une telle demande, merci d’envoyer un e-mail à <span>contact@medclick.be</span>.
                                 MED-CLICK s’engage à traiter votre demande dans un délai d’un mois.
                                 Si vous estimez que notre site ne respecte pas notre police vie privée telle qu'elle est décrite, veuillez prendre contact avec :<br/>
                                 - MED-CLICK, dont les coordonnées sont reprises ci-dessus.

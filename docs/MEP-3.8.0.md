@@ -27,10 +27,12 @@ recherche INAMI (`feature/recherche-inami`) et le format 1200 × 300 de l'emplac
   ADR-215, comme aujourd'hui non déployé. La PR #17 (dont `1e58091` n'est pas repris tel quel)
   est alors à fermer comme remplacée.
 
-La PWA de la release = `465503d` : `d9ff983` (PR #14, validée sur staging) + `fix/inami-cookies-consentement`
+La PWA de la release = `5a4887f` : `d9ff983` (PR #14, validée sur staging) + `fix/inami-cookies-consentement`
 (cookie de spécialité sur choix explicite) + `fix/publicite-sans-identifiant-persistant` (plus
 d'identifiant publicitaire persistant, `mc-ad-visitor` effacé au démarrage, fréquence du plein écran
-minimale, `/cookies` 1.2). Elle ne contient aucun changement Excel.
+minimale, `/cookies` 1.2) + `fix/contact-officiel` (adresse `contact@medclick.be` partout). Elle ne
+contient aucun changement Excel. Le backend ajoute aux documents la même adresse dans l'e-mail
+d'activation (aucune migration supplémentaire).
 
 ## Migrations
 
@@ -48,8 +50,10 @@ les modifier dans la nouvelle administration demandera de choisir une entreprise
 
 ## 1. Prérequis
 
-- Points juridiques de `MEP-3.8.0-COOKIES.md` tranchés ; texte des conditions prêt (publication
-  depuis l'administration après la mise en production, sans nouvelle acceptation imposée).
+- Points juridiques de `MEP-3.8.0-COOKIES.md` tranchés ; `docs/conditions/conditions-3.8.0.html`
+  validé (publication au § 7, sans nouvelle acceptation imposée).
+- Boîte `contact@medclick.be` opérationnelle et copie interne configurée (`MEP-3.8.0-COOKIES.md`,
+  § 8 bis), contrôlées par un message de test.
 - Release `<B>`/`<F>` déployée et recettée sur staging.
 - `./deploy.sh --verify 6ad8004eab83974a3a557f1622e2982ee437ea43 21b0d9639e79bc8b1b18203a1f30c9b93d8a4d71` : OK.
 - Services sains, `error_log` sans erreur nouvelle (une erreur connue : `GET /` du backend par un robot, sans lien).
@@ -97,6 +101,7 @@ et PWA sont remplacés ensemble par `deploy.sh`.
 | Administration › Publicités & partenaires | neuf emplacements, « Recherche INAMI » sous « Pages publiques » ; statistiques |
 | `inami_search_stat` après une visite | compteurs du jour |
 | `error_log`, journaux | aucune erreur 5xx nouvelle |
+| Page d'accueil, fenêtre des conditions à l'inscription, `/cookies`, encart partenaire | contact `contact@medclick.be`, aucune adresse `gmail` |
 
 Aucune écriture de test en production sans décision explicite.
 
@@ -112,3 +117,18 @@ différent de la 3.7.x, campagne existante non diffusée : arrêt, aucune correc
 | Code seul (avant ou sans écriture dans la nouvelle administration) | `rm -rf src/pwa && cp -a src/pwa.21b0d96 src/pwa`, puis `./deploy.sh 6ad8004eab83974a3a557f1622e2982ee437ea43 21b0d9639e79bc8b1b18203a1f30c9b93d8a4d71` (l'ancien code ignore les nouvelles tables et colonnes) |
 | Schéma | `doctrine:migrations:migrate 'DoctrineMigrations\Version20261107090000' --no-interaction` (descend `…109…` puis `…108…`), après le retour du code |
 | Échec de migration ou écritures à annuler | `./restore.sh into /opt/stack/apps/medclick-prod <sauvegarde du § 2>`, décision explicite, perte des écritures postérieures |
+
+## 7. Publication des conditions d'utilisation (après le § 4, sur décision)
+
+Aucun écran d'administration : l'API sert la ligne de `terms_conditions` la plus récente
+(`published_at`). Texte : `docs/conditions/conditions-3.8.0.html`, tel que validé.
+
+1. Sauvegarde : `./backup.sh /opt/stack/apps/medclick-prod prod` (ou celle du § 2 si aucune
+   écriture depuis).
+2. Insertion d'une ligne (`content` = le fichier, `published_at` = date du jour) ; la ligne n° 1
+   (17/12/2024) est conservée.
+3. Contrôle : `GET /api/terms-conditions` → nouvelle date, aucune occurrence de `gmail`, quatre
+   liens `contact@medclick.be` ; affichage des conditions dans l'application.
+4. Retour arrière : suppression de la ligne insérée (la version du 17/12/2024 redevient servie).
+
+Aucune nouvelle acceptation n'est demandée aux utilisateurs (acceptation non versionnée).

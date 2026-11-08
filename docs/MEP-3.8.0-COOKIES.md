@@ -14,11 +14,12 @@ champ technique de l'art. 5(3) de la directive « vie privée et communications 
 
 ## 1. Version concernée
 
-Release 3.8.0, PWA `release/3.8.0` = `465503d` : `d9ff983` (recherche INAMI, refonte publicitaire)
+Release 3.8.0, PWA `release/3.8.0` = `5a4887f` : `d9ff983` (recherche INAMI, refonte publicitaire)
 + `fix/inami-cookies-consentement` (`8b1884d`) + `fix/publicite-sans-identifiant-persistant`
-(`25f20ae`, `166c246`). Page `/cookies` en version 1.2. Aucun changement du backend.
+(`25f20ae`, `166c246`) + `fix/contact-officiel` (`b730e0c`, adresse `contact@medclick.be`).
+Page `/cookies` en version 1.2. Backend : seule l'adresse de contact de l'e-mail d'activation change.
 
-## 2. Inventaire (relevé exhaustif du code de `465503d`, 08/11/2026)
+## 2. Inventaire (relevé exhaustif du code de `465503d`, inchangé dans `5a4887f`, 08/11/2026)
 
 Recherche de `document.cookie`, `localStorage`, `sessionStorage`, IndexedDB et du service worker
 dans `frontend/src`. Aucun service tiers (publicité, mesure, police, carte) n'est chargé.
@@ -84,7 +85,7 @@ de la publicité. Absence d'identifiant ≠ exemption : à qualifier (§ 9, poin
 consentement est requis : fréquence tenue par le serveur par compte (table + migration, hors 3.8.0)
 ou fréquence « à chaque connexion » pour toutes les campagnes (aucun stockage).
 
-## 5. Texte de la page `/cookies` (version 1.2, intégré à `465503d`)
+## 5. Texte de la page `/cookies` (version 1.2, intégré à `5a4887f`)
 
 > **Cookies de la recherche INAMI**
 >
@@ -128,6 +129,9 @@ ou fréquence « à chaque connexion » pour toutes les campagnes (aucun stockag
 > dernière publicité plein écran (`campaign`). Ils sont effacés automatiquement à la première
 > ouverture de cette version et ne sont plus créés.
 >
+> **Contact** — Pour toute question sur ces informations ou sur vos données personnelles, écrivez à
+> contact@medclick.be.
+>
 > Version 1.2 du 8 novembre 2026.
 
 Si le juriste demande un retrait du consentement pour la spécialité autre que la case (§ 9,
@@ -139,8 +143,10 @@ Les mentions « aucune donnée personnelle » et « fonctionnels » sont des qua
 
 Remplace le premier alinéa du « 3. Cookies et sécurité » publié le 17/12/2024 (« L'Application et
 son site web utilisent des cookies afin d'améliorer l'expérience de navigation… ») ; l'alinéa sur
-la sécurité est conservé. Publication depuis l'administration (nouvelle ligne de
-`terms_conditions`), après validation et après la mise en production de la 3.8.0.
+la sécurité est conservé. Aucun écran d'administration ne publie les conditions : l'API
+(`GET /api/terms-conditions`) sert la ligne de `terms_conditions` la plus récente. La version complète
+prête à publier est `docs/conditions/conditions-3.8.0.html` (§ 6 bis) ; publication par insertion
+d'une ligne, après validation et après la mise en production (`MEP-3.8.0.md`, § 7).
 
 > **3. Cookies, stockage dans le navigateur et sécurité**
 >
@@ -181,11 +187,23 @@ la sécurité est conservé. Publication depuis l'administration (nouvelle ligne
 > *g) Suppression.* La liste à jour, avec la durée et le rôle de chaque élément, est publiée sur la
 > page « Cookies » (https://www.medclick.be/cookies). L'Utilisateur peut à tout moment supprimer ces
 > informations depuis les réglages de son navigateur ; le service peut alors lui redemander sa
-> spécialité, sa qualité de professionnel de la santé ou une nouvelle connexion.
+> spécialité, sa qualité de professionnel de la santé ou une nouvelle connexion. Pour toute
+> question : contact@medclick.be.
 
-Mentions de l'adresse de contact (articles « droits de l'Utilisateur », « désinscription » et
-« contact ») : remplacer `medclick.info@gmail.be` par **[adresse de contact RGPD à confirmer]**
-(§ 8). Aucune adresse de remplacement n'est proposée ici.
+Le point f) de la version complète écrit « antérieures à la version 3.8.0 » (pas de date à compléter).
+
+## 6 bis. Version complète des conditions : `docs/conditions/conditions-3.8.0.html`
+
+Texte publié le 17/12/2024 (`terms_conditions` n° 1), repris à l'identique sauf :
+
+- § 2 c) (droits de l'Utilisateur), § 4 (désinscription) et § 12 (contact) : l'ancienne adresse
+  remplacée par `contact@medclick.be` (lien `mailto:` et texte) ;
+- § 3 : premier alinéa remplacé par le texte ci-dessus (a à g) ; alinéa sur la sécurité conservé ;
+- aucune autre modification (la clause du point 12 du § 9 n'est pas touchée).
+
+Contrôle : aucune occurrence de `gmail` ni de l'ancienne adresse ; quatre liens vers
+`contact@medclick.be`. Publiée sur **staging uniquement** (`terms_conditions` n° 2, 08/11/2026)
+pour relecture : servie par `GET /api/terms-conditions`.
 
 ## 7. Nouvelle acceptation des conditions ?
 
@@ -201,21 +219,47 @@ la prochaine connexion) paraît suffire. Une nouvelle acceptation exigerait un d
 (version acceptée par utilisateur, écran d'acceptation), hors 3.8.0. La correction de l'adresse de
 contact ne crée pas d'obligation nouvelle.
 
-## 8. Adresse de contact RGPD (vérification du 08/11/2026)
+## 8. Adresse de contact (décision du 08/11/2026)
 
-| Où | Adresse |
-|---|---|
-| Conditions publiées (`terms_conditions` n° 1, 17/12/2024), 3 mentions | `medclick.info@gmail.be` |
-| Fenêtre des conditions à l'inscription (`ConditionsDialog.jsx`), 2 mentions | `medclick.info@gmail.be` |
-| Page d'accueil (`landing.js`), page d'erreur, encart « devenir partenaire » | `medclick.info@gmail.com` |
-| Expéditeur des e-mails du service (backend) | `service@medclick.be` (envoi) |
+Adresse officielle : **`contact@medclick.be`** (confirmée par MedClick). Une copie interne des
+messages reçus est assurée par la messagerie (§ 8 bis) ; l'adresse de copie n'est publiée nulle
+part, ni dans le code, ni dans les textes, ni dans ce dépôt.
 
-DNS : `gmail.be` n'a **aucun enregistrement MX ni adresse** ; un message envoyé à
-`medclick.info@gmail.be` ne peut pas être délivré. Les demandes d'exercice des droits adressées
-depuis les conditions n'ont donc pas pu aboutir. `medclick.be` dispose d'une messagerie (MX
-Hostinger). L'adresse correcte (vraisemblablement celle utilisée ailleurs dans l'application,
-`medclick.info@gmail.com`, ou une adresse du domaine) **doit être confirmée par MedClick** avant
-publication ; `ConditionsDialog.jsx` sera aligné sur la même adresse.
+| Où | Avant | 3.8.0 |
+|---|---|---|
+| Conditions publiées (§ 2 c, § 4, § 12) | `medclick.info@gmail.be` : domaine sans messagerie (ni MX ni adresse), messages non délivrables | `contact@medclick.be` (nouvelle version à publier, § 6 bis) |
+| Fenêtre des conditions à l'inscription (`ConditionsDialog.jsx`), 2 mentions | `medclick.info@gmail.be` | `contact@medclick.be` |
+| Page d'accueil (pied de page, FAQ), page d'erreur, encart « devenir partenaire » | `medclick.info@gmail.com` | `contact@medclick.be` |
+| Page `/cookies` | — | `contact@medclick.be` (rubrique « Contact ») |
+| E-mail d'activation (backend) | « contacteé via l'adresse `service@medclick.be` » | « contactez-nous à l'adresse `contact@medclick.be` » |
+| Expéditeur technique des e-mails | `service@medclick.be` | inchangé (envoi seulement) |
+| Anciens fronts non déployés (`src/js` de la PWA, `assets/js` du backend) | `gmail.be` / `gmail.com` | alignés |
+
+Une seule source dans la PWA : `frontend/src/app/contact.js`. Le test `contact.test.js` échoue si
+l'ancienne adresse ou une adresse `@gmail.` réapparaît dans le code de l'application ; le build de
+`5a4887f` n'en contient aucune.
+
+Hors code : les e-mails déjà envoyés, et les fichiers de la version précédente que l'image du
+frontend conserve pour les onglets restés ouverts (remplacés à la mise à jour suivante).
+
+## 8 bis. Messagerie `contact@medclick.be` (configuration hors application)
+
+L'application n'envoie ni ne reçoit de message sur cette adresse : les demandes RGPD arrivent
+directement dans la boîte du domaine (MX Hostinger). La copie interne se règle dans la
+messagerie, pas dans le code :
+
+1. Hostinger (hPanel) › Emails › `medclick.be` : vérifier que la boîte `contact@medclick.be` existe
+   (sinon la créer).
+2. Emails › Redirections (*Forwarders*) : redirection de `contact@medclick.be` vers l'adresse de
+   copie interne, **en conservant le message dans la boîte** `contact@` (elle reste la référence
+   des demandes et de leur délai d'un mois).
+3. Réponses aux utilisateurs : envoyées depuis `contact@medclick.be` (webmail ou client configuré
+   sur cette boîte), **sans copie ni copie cachée automatique** vers l'adresse interne ; ne pas
+   répondre depuis la boîte de copie (elle apparaîtrait comme expéditeur).
+4. Contrôle : un message de test envoyé à `contact@medclick.be` arrive dans la boîte et dans la
+   copie ; une réponse envoyée depuis `contact@` ne porte que le destinataire.
+5. Délivrabilité : une redirection peut être classée en indésirable par le service de la copie ;
+   vérifier la réception (dossier « Spam » compris) lors du contrôle.
 
 ## 9. Points nécessitant un avis juridique
 
@@ -241,10 +285,10 @@ publication ; `ConditionsDialog.jsx` sera aligné sur la même adresse.
 8. **Textes des § 5 et § 6** et **nouvelle acceptation** (§ 7).
 9. **Formulations** « aucune donnée personnelle », « fonctionnels », « ne servent à aucun pistage »
    (page `/cookies`) : exactes au sens du RGPD ?
-10. **Adresse de contact RGPD** (§ 8) à fournir ; faut-il informer que l'adresse publiée était
-    inopérante ?
-11. **`ConditionsDialog.jsx`** (fenêtre d'inscription, « c) Cookies et sécurité ») : texte
-    historique distinct, non modifié dans la 3.8.0 ; à aligner sur la version validée.
+10. **Adresse de contact** : `contact@medclick.be` décidée (§ 8). Faut-il informer que l'adresse
+    publiée depuis le 17/12/2024 était inopérante (demandes éventuellement perdues) ?
+11. **`ConditionsDialog.jsx`** (fenêtre d'inscription) : adresse corrigée ; son texte « c) Cookies
+    et sécurité », historique et distinct des conditions, reste à aligner sur la version validée.
 12. Hors 3.8.0, relevé à l'occasion : les conditions publiées prévoient le partage de données
     (nom, e-mail, année, spécialité) avec des partenaires à des fins de « marketing ciblé » ; la
     3.8.0 n'en réalise aucun, mais la clause mérite une relecture.
@@ -255,4 +299,4 @@ publication ; `ConditionsDialog.jsx` sera aligné sur la même adresse.
 |---|---|---|
 | 1.0 | 06/11/2026 | deux cookies de la recherche INAMI (staging uniquement) |
 | 1.1 | 07/11/2026 | spécialité mémorisée sur choix explicite ; suppression ; éléments enregistrés ailleurs par MedClick |
-| 1.2 | 08/11/2026 | plus d'identifiant publicitaire persistant ; fréquence du plein écran minimale ; colonnes de l'administration, cache de l'application et anciens identifiants décrits (release `465503d`) |
+| 1.2 | 08/11/2026 | plus d'identifiant publicitaire persistant ; fréquence du plein écran minimale ; colonnes de l'administration, cache de l'application et anciens identifiants décrits ; rubrique « Contact » (release `5a4887f`) |
