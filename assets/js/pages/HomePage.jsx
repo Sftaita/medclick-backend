@@ -135,7 +135,7 @@ const HomePage = (props) => {
                 <div className="footer">
                     <h2>MED-CLICK</h2>
                     <div className="footerLinks" >
-                        <a href="mailto:medclick.info@gmail.com">Nous contacter</a>
+                        <a href="mailto:contact@medclick.be">Nous contacter</a>
                         <Link to={"/conditions"} className="btn btn-link">Conditions générales</Link>
                     </div>
 

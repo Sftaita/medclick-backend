@@ -31,6 +31,8 @@ class PublicUrlsTest extends ApiTestBase
         [$token, $html] = $this->register();
 
         $this->assertStringContainsString('href="https://api-medclick.easymed.fun/activation/' . $token . '"', $html);
+        // Contact officiel (contact@medclick.be) ; service@medclick.be reste l'expéditeur technique.
+        $this->assertStringContainsString('contact@medclick.be', $html);
         static::createClient()->request('GET', '/activation/' . $token);
         $this->assertResponseRedirects('https://www.medclick.be/#/login');
     }

@@ -58,6 +58,36 @@ class MarketingImageTest extends ApiTestBase
         $this->assertSame([1200, 800], array_slice(getimagesizefromstring($body), 0, 2));
     }
 
+    public function testNarrowBannerIsAcceptedOnlyWithTheBannerFormat(): void
+    {
+        // Recherche INAMI : 1200 × 300 (anciennes bannières : 1200 × 150) et 640 × 200 ; les autres
+        // visuels gardent 480 px par côté.
+        $this->upload(self::image('png', 1200, 150), 'inami.png');
+        $this->assertResponseStatusCodeSame(400);
+
+        foreach ([[1200, 300], [1200, 150], [640, 200]] as [$width, $height]) {
+            $upload = $this->admin->request('POST', '/api/admin/marketing-images?format=banner', [
+                'headers' => ['Content-Type' => 'multipart/form-data'],
+                'extra' => ['files' => ['file' => self::uploadedFile(self::image('png', $width, $height), 'inami.png')]],
+            ])->toArray(false);
+            $this->assertResponseStatusCodeSame(201);
+            $this->assertSame([$width, $height], [$upload['width'], $upload['height']], 'Bannière conservée entière, sans recadrage.');
+        }
+
+        $tooSmall = $this->admin->request('POST', '/api/admin/marketing-images?format=banner', [
+            'headers' => ['Content-Type' => 'multipart/form-data'],
+            'extra' => ['files' => ['file' => self::uploadedFile(self::image('png', 600, 100), 'petite.png')]],
+        ]);
+        $this->assertSame(400, $tooSmall->getStatusCode());
+        $this->assertStringContainsString('480 px de large et 120 px de haut', $tooSmall->toArray(false)['message']);
+
+        $unknown = $this->admin->request('POST', '/api/admin/marketing-images?format=poster', [
+            'headers' => ['Content-Type' => 'multipart/form-data'],
+            'extra' => ['files' => ['file' => self::uploadedFile(self::image('png', 1200, 800), 'a.png')]],
+        ]);
+        $this->assertSame(400, $unknown->getStatusCode());
+    }
+
     public function testSameImageIsStoredOnce(): void
     {
         $image = self::image('png', 800, 600);

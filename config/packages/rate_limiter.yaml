@@ -29,6 +29,18 @@ framework:
             policy: sliding_window
             limit: 30
             interval: '1 hour'
+        # Recherche publique des codes INAMI : une requête par pause de frappe et par page de
+        # résultats ; 240 par minute laissent une utilisation intensive sans permettre l'aspiration
+        # rapide de la nomenclature.
+        inami_search:
+            policy: sliding_window
+            limit: 240
+            interval: '1 minute'
+        # Statistiques de la recherche INAMI : une visite et quelques spécialités par page.
+        inami_event:
+            policy: sliding_window
+            limit: 30
+            interval: '1 minute'
         password_reset:
             policy: sliding_window
             limit: 5
