@@ -36,6 +36,12 @@ jobs:
           php bin/console lint:container --env=test
           php bin/console doctrine:schema:validate --skip-sync --env=test
 
+      # Gabarits (dont les e-mails de campagne, templates/email/campagnes) et configuration.
+      - name: Vérifier les gabarits Twig et la configuration YAML
+        run: |
+          php bin/console lint:twig templates --env=test
+          php bin/console lint:yaml config --parse-tags --env=test
+
       - name: Tests
         run: composer test
 
