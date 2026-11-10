@@ -68,6 +68,10 @@ Doc OpenAPI générée par API Platform : `GET /api` (ne couvre pas les contrôl
   enregistrées après l'envoi de la réponse), `POST /api/client-errors` (fronts),
   `/api/admin/errors` (consultation). Ne jamais y stocker de corps de requête, mot de passe ou IP.
   Les fronts envoient leurs erreurs via `src/js/Services/errorReporter.js` (PWA et admin).
+- **Campagnes e-mail** : `src/EmailCampaign/` (catalogue, rendu, envoi, destinataires), gabarits
+  `templates/email/campagnes/`, `/api/admin/email-campaigns`, désinscription publique
+  `/email/desinscription/{jeton}`, commande `app:email-campaign:send` (envoi collectif verrouillé
+  par `EMAIL_CAMPAIGN_BULK_ENABLED`). Voir `docs/CAMPAGNES-EMAIL.md`.
 - `tests/Api/FrontCompatibilityTest.php` — contrat attendu par les fronts React (`hydra:member`,
   `PUT` partiel, `violations`, dates ISO 8601) : ne pas le casser.
 - `src/Security/UserChecker.php` — bloque le login si compte non activé (`token` non null) et

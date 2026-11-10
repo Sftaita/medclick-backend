@@ -1,3 +1,8 @@
 framework:
     mailer:
-        dsn: '%env(MAILER_DSN)%'
+        transports:
+            # Premier transport = transport par défaut : e-mails de service (activation, mot de
+            # passe, alertes), expéditeur service@medclick.be.
+            main: '%env(MAILER_DSN)%'
+            # Campagnes e-mail, sélectionné par l'en-tête X-Transport (App\EmailCampaign\CampaignSender).
+            campaigns: '%env(CAMPAIGN_MAILER_DSN)%'

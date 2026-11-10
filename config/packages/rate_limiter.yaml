@@ -41,6 +41,16 @@ framework:
             policy: sliding_window
             limit: 30
             interval: '1 minute'
+        # Page de désinscription des campagnes e-mail (lien et désinscription en un clic).
+        email_unsubscribe:
+            policy: sliding_window
+            limit: 30
+            interval: '1 minute'
+        # E-mails test d'une campagne, par administrateur (App\Controller\AdminControllers\EmailCampaignAdminController).
+        email_campaign_test:
+            policy: sliding_window
+            limit: 10
+            interval: '1 hour'
         password_reset:
             policy: sliding_window
             limit: 5

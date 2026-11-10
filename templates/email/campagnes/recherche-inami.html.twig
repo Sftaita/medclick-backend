@@ -1,0 +1,98 @@
+{#
+  Campagne « Recherche INAMI » : texte validé, repris tel quel (ne pas reformuler).
+  Variables : campaign (EmailCampaignDefinition), visual_src (cid: dans l'e-mail, data: dans l'aperçu),
+  unsubscribe_url. Mise en page compatible messageries : tableaux, styles en ligne, 600 px, bouton
+  VML pour Outlook (Windows), aucune image de suivi.
+#}
+<!DOCTYPE html>
+<html lang="fr" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="x-apple-disable-message-reformatting">
+<meta name="color-scheme" content="light">
+<meta name="supported-color-schemes" content="light">
+<title>{{ campaign.subject }}</title>
+<!--[if mso]>
+<noscript><xml><o:OfficeDocumentSettings><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xml></noscript>
+<style>table, td, h1, p, li, a { font-family: Arial, Helvetica, sans-serif !important; }</style>
+<![endif]-->
+<style>
+  body { margin: 0; padding: 0; width: 100% !important; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+  img { border: 0; outline: none; text-decoration: none; -ms-interpolation-mode: bicubic; }
+  a { color: #1d4ed8; }
+  @media only screen and (max-width: 620px) {
+    .mc-outer { padding: 0 !important; }
+    .mc-card { border-radius: 0 !important; }
+    .mc-pad { padding-left: 20px !important; padding-right: 20px !important; }
+    .mc-title { font-size: 24px !important; line-height: 31px !important; }
+    .mc-button a { display: block !important; }
+  }
+</style>
+</head>
+<body style="margin:0; padding:0; background-color:#eef3fb;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#eef3fb;">
+  <tr>
+    <td class="mc-outer" align="center" style="padding:24px 12px;">
+      <!--[if mso]><table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" align="center"><tr><td><![endif]-->
+      <table role="presentation" class="mc-card" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:600px; background-color:#ffffff; border-radius:12px;">
+        <tr>
+          <td class="mc-pad" style="padding:36px 40px 8px 40px; font-family:Arial, Helvetica, sans-serif; color:#1f2937;">
+            <h1 class="mc-title" style="margin:0 0 24px 0; font-family:Arial, Helvetica, sans-serif; font-size:28px; line-height:35px; font-weight:bold; color:#0f172a;">{{ campaign.title }}</h1>
+            <p style="margin:0 0 16px 0; font-size:16px; line-height:24px;">Bonjour,</p>
+            <p style="margin:0 0 16px 0; font-size:16px; line-height:24px;"><strong>MedClick évolue et vous propose un nouvel outil gratuit !</strong></p>
+            <p style="margin:0 0 16px 0; font-size:16px; line-height:24px;">Vous pouvez désormais retrouver rapidement vos <strong>codes INAMI</strong>, directement depuis MedClick, sans inscription ni connexion.</p>
+            <p style="margin:0 0 8px 0; font-size:16px; line-height:24px;"><strong>Une recherche simple et rapide :</strong></p>
+            <ul style="margin:0 0 24px 0; padding:0 0 0 22px; font-size:16px; line-height:24px;">
+              <li style="margin:0 0 6px 0;">Recherche par spécialité, intervention ou numéro de code.</li>
+              <li style="margin:0 0 6px 0;">Affichage instantané des résultats pendant la saisie.</li>
+              <li style="margin:0 0 6px 0;">Codes ambulatoires et hospitalisation, avec valeurs N/K.</li>
+              <li style="margin:0 0 6px 0;">Copie des codes en un clic.</li>
+              <li style="margin:0;">Accessible sur ordinateur et smartphone.</li>
+            </ul>
+          </td>
+        </tr>
+        <tr>
+          <td class="mc-pad" align="center" style="padding:0 20px;">
+            <a href="{{ campaign.destinationUrl }}" target="_blank" style="text-decoration:none;"><img src="{{ visual_src }}" width="560" height="{{ (560 * campaign.visualHeight / campaign.visualWidth)|round }}" alt="{{ campaign.visualAlt }}" style="display:block; width:100%; max-width:560px; height:auto; border:0; border-radius:8px; font-family:Arial, Helvetica, sans-serif; font-size:14px; color:#1f2937;"></a>
+          </td>
+        </tr>
+        <tr>
+          <td class="mc-pad mc-button" align="center" style="padding:28px 40px 8px 40px;">
+            <!--[if mso]>
+            <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="{{ campaign.destinationUrl }}" style="height:52px; v-text-anchor:middle; width:320px;" arcsize="50%" stroke="f" fillcolor="#1d4ed8">
+              <w:anchorlock/>
+              <center style="color:#ffffff; font-family:Arial, Helvetica, sans-serif; font-size:17px; font-weight:bold;">Rechercher un code INAMI</center>
+            </v:roundrect>
+            <![endif]-->
+            <!--[if !mso]><!-->
+            <a href="{{ campaign.destinationUrl }}" target="_blank" style="display:inline-block; background-color:#1d4ed8; color:#ffffff; font-family:Arial, Helvetica, sans-serif; font-size:17px; font-weight:bold; line-height:52px; padding:0 36px; border-radius:26px; text-decoration:none; text-align:center;">Rechercher un code INAMI</a>
+            <!--<![endif]-->
+          </td>
+        </tr>
+        <tr>
+          <td class="mc-pad" style="padding:28px 40px 36px 40px; font-family:Arial, Helvetica, sans-serif; color:#1f2937;">
+            <p style="margin:0 0 8px 0; font-size:16px; line-height:24px;"><strong>Et votre carnet de stage ?</strong></p>
+            <p style="margin:0 0 24px 0; font-size:16px; line-height:24px;">Que vous soyez encore en formation ou déjà diplômé, MedClick continue de vous accompagner dans votre pratique quotidienne.</p>
+            <p style="margin:0 0 16px 0; font-size:16px; line-height:24px;">À bientôt sur MedClick !</p>
+            <p style="margin:0 0 4px 0; font-size:16px; line-height:24px;"><strong>Sarah de l'équipe MedClick</strong></p>
+            <p style="margin:0; font-size:15px; line-height:23px;"><a href="https://www.medclick.be" target="_blank" style="color:#1d4ed8; text-decoration:none;">www.medclick.be</a></p>
+            <p style="margin:0; font-size:15px; line-height:23px;"><a href="mailto:contact@medclick.be" style="color:#1d4ed8; text-decoration:none;">contact@medclick.be</a></p>
+          </td>
+        </tr>
+      </table>
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;">
+        <tr>
+          <td class="mc-pad" style="padding:20px 40px 8px 40px; font-family:Arial, Helvetica, sans-serif; font-size:12px; line-height:18px; color:#64748b; text-align:center;">
+            Vous recevez cet e-mail parce que vous avez créé un compte sur MedClick, le carnet de stage numérique des médecins assistants.
+            Pour ne plus recevoir nos communications par e-mail, <a href="{{ unsubscribe_url }}" target="_blank" style="color:#475569; text-decoration:underline;">désinscrivez-vous</a>.
+          </td>
+        </tr>
+      </table>
+      <!--[if mso]></td></tr></table><![endif]-->
+    </td>
+  </tr>
+</table>
+</body>
+</html>

@@ -29,6 +29,15 @@ parameters:
   env(EXPORT_ALERT_DEDUP_MINUTES): '60'
   env(EXPORT_HISTORY_RETENTION_DAYS): '365'
   env(EXPORT_MEMORY_LIMIT): '512M'
+  # Campagnes e-mail (docs/CAMPAGNES-EMAIL.md) : expéditeur et transport SMTP dédié, authentifié
+  # avec la boîte de l'expéditeur. Transport nul par défaut : aucun envoi tant qu'il n'est pas défini.
+  env(CAMPAIGN_SENDER): 'contact@medclick.be'
+  env(CAMPAIGN_MAILER_DSN): 'null://null'
+  # Adresses autorisées pour l'e-mail test, en plus de celle de l'administrateur connecté (virgules).
+  env(EMAIL_CAMPAIGN_TEST_RECIPIENTS): ''
+  app.email_campaign_test_recipients: '%env(EMAIL_CAMPAIGN_TEST_RECIPIENTS)%'
+  # Verrou de l'envoi collectif (commande app:email-campaign:send) : 1 pour l'autoriser.
+  env(EMAIL_CAMPAIGN_BULK_ENABLED): '0'
 
 services:
   # default configuration for services in *this* file
@@ -51,6 +60,7 @@ services:
       - "../src/Export/Job/{ExportCancelled,JobProgress}.php"
       - "../src/Export/Job/Message/"
       - "../src/Export/Monitoring/Message/"
+      - "../src/EmailCampaign/{EmailCampaignDefinition,EmailCampaignException}.php"
 
   # controllers are imported separately to make sure services can be injected
   # as action arguments even if you don't extend any base controller class

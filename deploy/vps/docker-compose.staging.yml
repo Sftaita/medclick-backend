@@ -52,6 +52,9 @@ services:
       MAILER_DSN: smtp://mailpit:1025
       # Alertes techniques (erreurs 500, exports) : capturées par Mailpit, jamais envoyées.
       ERROR_ALERT_EMAIL: ${ERROR_ALERT_EMAIL:-}
+      # Campagnes e-mail : capturées par Mailpit (compte = expéditeur, exigé par CampaignSender).
+      CAMPAIGN_MAILER_DSN: smtp://contact%40medclick.be@mailpit:1025
+      CAMPAIGN_SENDER: contact@medclick.be
       PUBLIC_FRONTEND_URL: ${PUBLIC_URL}
       PUBLIC_API_URL: ${PUBLIC_URL}
       # Exports Excel asynchrones (docs/EXPORTS.md) : alertes vers Mailpit (capturées, jamais envoyées).
@@ -74,8 +77,8 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=proxy"
-      # /api (API) et /activation (lien des e-mails d'activation) vont au backend.
-      - "traefik.http.routers.medclick-staging-api.rule=Host(`${PUBLIC_HOST}`) && (PathPrefix(`/api`) || PathPrefix(`/activation`))"
+      # /api (API), /activation (lien des e-mails d'activation) et /email/desinscription (campagnes) vont au backend.
+      - "traefik.http.routers.medclick-staging-api.rule=Host(`${PUBLIC_HOST}`) && (PathPrefix(`/api`) || PathPrefix(`/activation`) || PathPrefix(`/email/desinscription`))"
       - "traefik.http.routers.medclick-staging-api.priority=100"
       - "traefik.http.routers.medclick-staging-api.entrypoints=websecure"
       - "traefik.http.routers.medclick-staging-api.tls.certresolver=letsencrypt"

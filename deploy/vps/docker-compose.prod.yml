@@ -55,6 +55,12 @@ services:
       JWT_PASSPHRASE: ${JWT_PASSPHRASE}
       MAILER_DSN: ${MAILER_DSN}
       ERROR_ALERT_EMAIL: ${ERROR_ALERT_EMAIL:-}
+      # Campagnes e-mail (docs/CAMPAGNES-EMAIL.md) : SMTP de la boîte contact@medclick.be. Absent =
+      # transport nul, aucun envoi. L'envoi collectif reste verrouillé tant que BULK_ENABLED vaut 0.
+      CAMPAIGN_MAILER_DSN: ${CAMPAIGN_MAILER_DSN:-null://null}
+      CAMPAIGN_SENDER: contact@medclick.be
+      EMAIL_CAMPAIGN_TEST_RECIPIENTS: ${EMAIL_CAMPAIGN_TEST_RECIPIENTS:-}
+      EMAIL_CAMPAIGN_BULK_ENABLED: ${EMAIL_CAMPAIGN_BULK_ENABLED:-0}
       # Traefik (réseau Docker « proxy », 172.18.0.0/16) est le seul pair direct du backend (aucun
       # port publié) et réécrit X-Forwarded-For/Proto/Port : seuls ces en-têtes font foi. Jamais
       # « forwarded » (RFC 7239), que Traefik transmet tel quel. Sous-réseau modifié = confiance perdue.
@@ -141,8 +147,8 @@ services:
     labels:
       - "traefik.enable=${WWW_LIVE:-false}"
       - "traefik.docker.network=proxy"
-      # /api et /activation de www.medclick.be → service du backend (même origine pour le front).
-      - "traefik.http.routers.medclick-prod-www-api.rule=Host(`www.medclick.be`) && (PathPrefix(`/api`) || PathPrefix(`/activation`))"
+      # /api, /activation et /email/desinscription de www.medclick.be → service du backend (même origine pour le front).
+      - "traefik.http.routers.medclick-prod-www-api.rule=Host(`www.medclick.be`) && (PathPrefix(`/api`) || PathPrefix(`/activation`) || PathPrefix(`/email/desinscription`))"
       - "traefik.http.routers.medclick-prod-www-api.priority=100"
       - "traefik.http.routers.medclick-prod-www-api.entrypoints=websecure"
       - "traefik.http.routers.medclick-prod-www-api.tls.certresolver=letsencrypt"

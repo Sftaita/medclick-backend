@@ -32,6 +32,7 @@ class PublicEndpointRateLimiter implements EventSubscriberInterface
         #[Target('partner_event.limiter')] RateLimiterFactoryInterface $partnerEventLimiter,
         #[Target('inami_search.limiter')] RateLimiterFactoryInterface $inamiSearchLimiter,
         #[Target('inami_event.limiter')] RateLimiterFactoryInterface $inamiEventLimiter,
+        #[Target('email_unsubscribe.limiter')] RateLimiterFactoryInterface $emailUnsubscribeLimiter,
     )
     {
         $this->limiters = [
@@ -45,6 +46,8 @@ class PublicEndpointRateLimiter implements EventSubscriberInterface
             'public_inami_specialities' => $inamiSearchLimiter,
             'public_inami_codes' => $inamiSearchLimiter,
             'public_inami_event' => $inamiEventLimiter,
+            'email_unsubscribe_form' => $emailUnsubscribeLimiter,
+            'email_unsubscribe_confirm' => $emailUnsubscribeLimiter,
         ];
     }
 
